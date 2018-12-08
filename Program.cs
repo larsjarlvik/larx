@@ -16,6 +16,7 @@ namespace Larx
 
         private Camera camera;
         private TerrainRenderer terrain;
+        private MousePicker mousePicker;
 
         public Program() : base(
             1280, 720,
@@ -38,6 +39,7 @@ namespace Larx
 
             terrain = new TerrainRenderer();
             camera = new Camera();
+            mousePicker = new MousePicker(camera);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -54,6 +56,12 @@ namespace Larx
                 FPS = 0;
                 lastFPSUpdate %= 1;
             }
+
+            camera.Update();
+            mousePicker.Update(Mouse.X, Mouse.Y, Width, Height);
+
+            if (Keyboard[Key.T]) terrain.ChangeElevation(0.1f, mousePicker);
+            if (Keyboard[Key.G]) terrain.ChangeElevation(-0.1f, mousePicker);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
