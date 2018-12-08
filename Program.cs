@@ -43,7 +43,7 @@ namespace Larx
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             if (Keyboard[Key.W]) camera.Move(CameraMoveDirection.Forward);
-            if (Keyboard[Key.S]) camera.Move(CameraMoveDirection.Forward);
+            if (Keyboard[Key.S]) camera.Move(CameraMoveDirection.Back);
             if (Keyboard[Key.A]) camera.Move(CameraMoveDirection.Right);
             if (Keyboard[Key.D]) camera.Move(CameraMoveDirection.Left);
 

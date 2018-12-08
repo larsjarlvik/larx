@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -6,6 +7,9 @@ namespace Larx.Terrain
 {
     public class TerrainRenderer
     {
+        private const int mapSize = 32;
+        private int indexCount = 0;
+
         public TerrainShader Shader { get; }
 
         public TerrainRenderer()
@@ -17,43 +21,55 @@ namespace Larx.Terrain
         public void Render(Camera camera)
         {
             camera.ApplyCamera(Shader);
-            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedShort, IntPtr.Zero);
+            GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);
         }
 
         private void build()
         {
             var triangleArray = GL.GenVertexArray();
             GL.BindVertexArray(triangleArray);
-            var vertices = new Vector3[] {
-                new Vector3(-0.5f, -0.5f, 0.0f), // Bottom left
-                new Vector3( 0.5f, -0.5f, 0.0f), // Bottom right
-                new Vector3( 0.5f,  0.5f, 0.0f), // Top right
-                new Vector3(-0.5f,  0.5f, 0.0f)  // Top left
-            };
+
+            var halfMapSize = (float)(mapSize / 2);
+            var rnd = new Random();
+
+            var vertices = new List<Vector3>();
+            var colors = new List<Vector3>();
+            var indices = new List<ushort>();
+            var i = 0;
+
+            for(var z = -halfMapSize; z <= halfMapSize; z++) {
+                for(var x = -halfMapSize; x <= halfMapSize; x++) {
+                    vertices.Add(new Vector3(x, (float)rnd.NextDouble(), z));
+                    colors.Add(new Vector3((float)rnd.NextDouble(), (float)rnd.NextDouble(), (float)rnd.NextDouble()));
+
+                    if (x < halfMapSize && z < halfMapSize) {
+                        indices.AddRange(new ushort[] {
+                            (ushort)(i), (ushort)(i + 1), (ushort)(i + mapSize + 1),
+                            (ushort)(i + 1), (ushort)(i + mapSize + 1), (ushort)(i + mapSize + 2)
+                        });
+                    }
+
+                    i ++;
+                }
+            }
+
+            indexCount = indices.Count;
 
             var vertexBuffer = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(0);
 
-            var colors = new Vector3[] {
-                new Vector3(1.0f, 0.0f, 0.0f),
-                new Vector3(0.0f, 1.0f, 0.0f),
-                new Vector3(0.0f, 0.0f, 1.0f),
-                new Vector3(1.0f, 1.0f, 0.0f)
-            };
-
             var colorBuffer = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, colors.Length * Vector3.SizeInBytes, colors, BufferUsageHint.StaticDraw);
+            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, colors.Count * Vector3.SizeInBytes, colors.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(1);
 
-            var indices = new ushort[] { 0, 1, 2, 0, 2, 3 };
             var indexBuffer = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(ushort), indices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(ushort), indices.ToArray(), BufferUsageHint.StaticDraw);
         }
     }
 }
