@@ -14,6 +14,7 @@ namespace Larx
         private int FPS;
         private double lastFPSUpdate;
         private Multisampling multisampling;
+        private PolygonMode polygonMode;
 
         public Program() : base(
             1280, 720,
@@ -23,6 +24,7 @@ namespace Larx
         {
             Keyboard.KeyRepeat = false;
             lastFPSUpdate = 0;
+            polygonMode = PolygonMode.Fill;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -66,10 +68,10 @@ namespace Larx
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            if (Keyboard[OpenTK.Input.Key.W]) cameraDistance -= 0.5f;
-            if (Keyboard[OpenTK.Input.Key.S]) cameraDistance += 0.5f;
-            if (Keyboard[OpenTK.Input.Key.A]) cameraRotation -= 0.5f;
-            if (Keyboard[OpenTK.Input.Key.D]) cameraRotation += 0.5f;
+            if (Keyboard[Key.W]) cameraDistance -= 0.5f;
+            if (Keyboard[Key.S]) cameraDistance += 0.5f;
+            if (Keyboard[Key.A]) cameraRotation -= 0.5f;
+            if (Keyboard[Key.D]) cameraRotation += 0.5f;
 
             var camX = (float)Math.Sin(cameraRotation) * cameraDistance;
             var camZ = (float)Math.Cos(cameraRotation) * cameraDistance;
@@ -109,9 +111,16 @@ namespace Larx
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
             if (e.IsRepeat) return;
-            if (Keyboard[OpenTK.Input.Key.Escape]) Exit();
-            if (Keyboard[OpenTK.Input.Key.F])
+
+            if (Keyboard[Key.Escape]) Exit();
+
+            if (Keyboard[Key.F])
                 WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
+
+            if (Keyboard[Key.P]) {
+                polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
+                GL.PolygonMode(MaterialFace.FrontAndBack, polygonMode);
+            }
         }
 
         public static void Main(string[] args)
