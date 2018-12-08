@@ -1,4 +1,5 @@
 ﻿using System;
+using Larx.Terrain;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -8,13 +9,13 @@ namespace Larx
 {
     class Program : GameWindow
     {
-        private DefaultShader shader;
-        private float cameraDistance = 20.0f;
-        private float cameraRotation = 0.0f;
         private int FPS;
         private double lastFPSUpdate;
         private Multisampling multisampling;
         private PolygonMode polygonMode;
+
+        private Camera camera;
+        private TerrainRenderer terrain;
 
         public Program() : base(
             1280, 720,
@@ -35,48 +36,16 @@ namespace Larx
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             GL.ClearColor(Color.FromArgb(255, 24, 24, 24));
 
-            shader = new DefaultShader();
-
-            var triangleArray = GL.GenVertexArray();
-            GL.BindVertexArray(triangleArray);
-            var positions = new Vector3[] {
-                new Vector3(-0.5f, -0.5f, 0.0f),
-                new Vector3(-0.5f,  0.5f, 0.0f),
-                new Vector3( 0.5f, -0.5f, 0.0f),
-                new Vector3( 0.5f,  0.5f, 0.0f)
-            };
-
-            var positionBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, positionBuffer);
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, positions.Length * Vector3.SizeInBytes, positions, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexAttribArray(0);
-
-            var colors = new Vector3[] {
-                new Vector3(1.0f, 0.0f, 0.0f),
-                new Vector3(0.0f, 1.0f, 0.0f),
-                new Vector3(0.0f, 0.0f, 1.0f),
-                new Vector3(1.0f, 0.0f, 0.0f)
-            };
-
-            var colorBuffer = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, colors.Length * Vector3.SizeInBytes, colors, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexAttribArray(1);
+            terrain = new TerrainRenderer();
+            camera = new Camera();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            if (Keyboard[Key.W]) cameraDistance -= 0.5f;
-            if (Keyboard[Key.S]) cameraDistance += 0.5f;
-            if (Keyboard[Key.A]) cameraRotation -= 0.5f;
-            if (Keyboard[Key.D]) cameraRotation += 0.5f;
-
-            var camX = (float)Math.Sin(cameraRotation) * cameraDistance;
-            var camZ = (float)Math.Cos(cameraRotation) * cameraDistance;
-
-            Matrix.SetViewMatrix(shader.ViewMatrix, new Vector3(camX, cameraDistance * 0.5f, camZ), new Vector3(0, 0, 0));
+            if (Keyboard[Key.W]) camera.Move(CameraMoveDirection.Forward);
+            if (Keyboard[Key.S]) camera.Move(CameraMoveDirection.Forward);
+            if (Keyboard[Key.A]) camera.Move(CameraMoveDirection.Right);
+            if (Keyboard[Key.D]) camera.Move(CameraMoveDirection.Left);
 
             lastFPSUpdate += e.Time;
             if (lastFPSUpdate > 1)
@@ -93,7 +62,7 @@ namespace Larx
             FPS++;
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 4);
+            terrain.Render(camera);
 
             multisampling.Draw();
             SwapBuffers();
@@ -101,8 +70,7 @@ namespace Larx
 
         protected override void OnResize(EventArgs e)
         {
-            var aspectRatio = (float)Width / (float)Height;
-            Matrix.SetProjectionMatrix(shader.ProjectionMatrix, (float)Math.PI / 4, aspectRatio);
+            camera.AspectRatio = (float)Width / (float)Height;
 
             GL.Viewport(0, 0, Width, Height);
             multisampling.RefreshBuffers(Width, Height);
