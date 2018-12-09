@@ -36,6 +36,8 @@ namespace Larx
             GL.Enable(EnableCap.DepthTest);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             GL.ClearColor(Color.FromArgb(255, 24, 24, 24));
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
 
             terrain = new TerrainRenderer();
             camera = new Camera();
@@ -103,7 +105,7 @@ namespace Larx
         {
             using (var program = new Program())
             {
-                program.VSync = VSyncMode.Off;
+                program.VSync = VSyncMode.On;
                 program.Run(60);
             }
         }

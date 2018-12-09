@@ -34,10 +34,10 @@ namespace Larx
                     cameraDistance += 0.5f;
                     break;
                 case CameraMoveDirection.Left:
-                    cameraRotation -= 0.5f;
+                    cameraRotation -= 0.1f;
                     break;
                 case CameraMoveDirection.Right:
-                    cameraRotation += 0.5f;
+                    cameraRotation += 0.1f;
                     break;
             }
         }
@@ -50,7 +50,7 @@ namespace Larx
                 (float)Math.Cos(cameraRotation) * cameraDistance
             );
 
-            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4f, AspectRatio, 1, 100);
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4f, AspectRatio, 1, 1000);
             ViewMatrix = Matrix4.LookAt(Position, new Vector3(0, 0, 0), new Vector3(0, 1, 0));
         }
 
