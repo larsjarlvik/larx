@@ -4,10 +4,10 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <RootNamespace>Larx</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="OpenTK.NETCore" Version="1.1.2749.6433"/>
-  </ItemGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-    <None Update="shaders\*.glsl" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="shaders\*.glsl" CopyToOutputDirectory="PreserveNewest"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="OpenTK.NetStandard" Version="1.0.4"/>
   </ItemGroup>
 </Project>

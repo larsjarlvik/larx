@@ -17,6 +17,7 @@ namespace Larx
         private Camera camera;
         private TerrainRenderer terrain;
         private MousePicker mousePicker;
+        private KeyboardState keyboard;
 
         public Program() : base(
             1280, 720,
@@ -24,7 +25,6 @@ namespace Larx
             DisplayDevice.Default, 3, 3,
             GraphicsContextFlags.ForwardCompatible | GraphicsContextFlags.Debug)
         {
-            Keyboard.KeyRepeat = false;
             lastFPSUpdate = 0;
             polygonMode = PolygonMode.Fill;
         }
@@ -46,10 +46,17 @@ namespace Larx
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            if (Keyboard[Key.W]) camera.Move(CameraMoveDirection.Forward);
-            if (Keyboard[Key.S]) camera.Move(CameraMoveDirection.Back);
-            if (Keyboard[Key.A]) camera.Move(CameraMoveDirection.Right);
-            if (Keyboard[Key.D]) camera.Move(CameraMoveDirection.Left);
+            if (keyboard[Key.W]) camera.Move(CameraMoveDirection.Forward);
+            if (keyboard[Key.S]) camera.Move(CameraMoveDirection.Back);
+            if (keyboard[Key.A]) camera.Move(CameraMoveDirection.Right);
+            if (keyboard[Key.D]) camera.Move(CameraMoveDirection.Left);
+            camera.Update();
+
+            var mouse = Mouse.GetState();
+            mousePicker.Update(mouse.X, mouse.Y, Width, Height);
+
+            if (keyboard[Key.T]) terrain.ChangeElevation(0.1f, mousePicker);
+            if (keyboard[Key.G]) terrain.ChangeElevation(-0.1f, mousePicker);
 
             lastFPSUpdate += e.Time;
             if (lastFPSUpdate > 1)
@@ -58,12 +65,6 @@ namespace Larx
                 FPS = 0;
                 lastFPSUpdate %= 1;
             }
-
-            camera.Update();
-            mousePicker.Update(Mouse.X, Mouse.Y, Width, Height);
-
-            if (Keyboard[Key.T]) terrain.ChangeElevation(0.1f, mousePicker);
-            if (Keyboard[Key.G]) terrain.ChangeElevation(-0.1f, mousePicker);
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -88,24 +89,35 @@ namespace Larx
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
-            if (e.IsRepeat) return;
+            if (!e.IsRepeat)
+            {
+                if (e.Keyboard[Key.Escape])
+                    Exit();
 
-            if (Keyboard[Key.Escape]) Exit();
+                if (e.Control && e.Keyboard[Key.F])
+                    WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
 
-            if (Keyboard[Key.F])
-                WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
-
-            if (Keyboard[Key.P]) {
-                polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
-                GL.PolygonMode(MaterialFace.FrontAndBack, polygonMode);
+                if (e.Control && e.Keyboard[Key.W])
+                {
+                    polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
+                    GL.PolygonMode(MaterialFace.FrontAndBack, polygonMode);
+                }
             }
+
+            if (!e.Control)
+                keyboard = e.Keyboard;
+        }
+
+        protected override void OnKeyUp(KeyboardKeyEventArgs e)
+        {
+            keyboard = e.Keyboard;
         }
 
         public static void Main(string[] args)
         {
             using (var program = new Program())
             {
-                program.VSync = VSyncMode.On;
+                program.VSync = VSyncMode.Off;
                 program.Run(60);
             }
         }
