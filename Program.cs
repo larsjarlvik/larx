@@ -52,8 +52,9 @@ namespace Larx
             if (keyboard[Key.D]) camera.Move(CameraMoveDirection.Left);
             camera.Update();
 
-            var mouse = Mouse.GetState();
-            mousePicker.Update(mouse.X, mouse.Y, Width, Height);
+            var mouse = Mouse.GetCursorState();
+            var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
+            mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
             if (keyboard[Key.T]) terrain.ChangeElevation(0.1f, mousePicker);
             if (keyboard[Key.G]) terrain.ChangeElevation(-0.1f, mousePicker);
