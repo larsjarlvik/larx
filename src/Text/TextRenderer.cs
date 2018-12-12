@@ -32,6 +32,9 @@ namespace Larx.Text
 
         public void Render(Vector2 position, float buffer, float gamma)
         {
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+
             GL.DepthMask(false);
             GL.UseProgram(Shader.Program);
             var pMatrix = Matrix4.CreateOrthographicOffCenter(0, 1280f, 720f, 0f, 0f, -1.0f);
@@ -126,12 +129,10 @@ namespace Larx.Text
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * numItems, vertexElements.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
-            GL.EnableVertexAttribArray(0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, textureBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * numItems, textureElements.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Double, false, Vector2.SizeInBytes, 0);
-            GL.EnableVertexAttribArray(1);
         }
     }
 }

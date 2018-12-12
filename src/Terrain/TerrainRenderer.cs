@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -16,7 +17,7 @@ namespace Larx.Terrain
         private List<Vector3> vertices = new List<Vector3>();
         private List<Vector3> colors = new List<Vector3>();
         private List<Vector3> normals = new List<Vector3>();
-        private List<ushort> indices = new List<ushort>();
+        private List<uint> indices = new List<uint>();
         private int triangleArray;
 
         public TerrainShader Shader { get; }
@@ -29,6 +30,10 @@ namespace Larx.Terrain
 
         public void Render(Camera camera)
         {
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
+
             GL.UseProgram(Shader.Program);
 
             GL.Uniform3(Shader.Ambient, 0.2f, 0.2f, 0.2f);
@@ -46,11 +51,8 @@ namespace Larx.Terrain
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            GL.BindVertexArray(triangleArray);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.UnsignedShort, false, 0, 0);
-
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
-            GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);
+            GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
 
         public void ChangeElevation(float offset, MousePicker picker) {
@@ -74,13 +76,13 @@ namespace Larx.Terrain
         {
             for (int i = 0; i < indexCount; i += 3)
             {
-                var v1 = vertices[indices[i]];
-                var v2 = vertices[indices[i + 1]];
-                var v3 = vertices[indices[i + 2]];
+                var v1 = vertices[(int)indices[i]];
+                var v2 = vertices[(int)indices[i + 1]];
+                var v3 = vertices[(int)indices[i + 2]];
 
-                normals[indices[i]] += Vector3.Cross(v2 - v1, v3 - v1);
-                normals[indices[i + 1]] += Vector3.Cross(v2 - v1, v3 - v1);
-                normals[indices[i + 2]] += Vector3.Cross(v2 - v1, v3 - v1);
+                normals[(int)indices[i]] += Vector3.Cross(v2 - v1, v3 - v1);
+                normals[(int)indices[i + 1]] += Vector3.Cross(v2 - v1, v3 - v1);
+                normals[(int)indices[i + 2]] += Vector3.Cross(v2 - v1, v3 - v1);
             }
 
             foreach(var normal in normals)
@@ -105,9 +107,9 @@ namespace Larx.Terrain
                     normals.Add(new Vector3(0f, 1f, 0f));
 
                     if (x < halfMapSize && z < halfMapSize) {
-                        indices.AddRange(new ushort[] {
-                            (ushort)(i), (ushort)(i + mapSize + 1), (ushort)(i + 1),
-                            (ushort)(i + 1), (ushort)(i + mapSize + 1), (ushort)(i + mapSize + 2)
+                        indices.AddRange(new uint[] {
+                            (uint)(i), (uint)(i + mapSize + 1), (uint)(i + 1),
+                            (uint)(i + 1), (uint)(i + mapSize + 1), (uint)(i + mapSize + 2)
                         });
                     }
 
@@ -122,10 +124,11 @@ namespace Larx.Terrain
             indexBuffer = GL.GenBuffer();
             normalBuffer = GL.GenBuffer();
 
+            calculateNormals();
             updateBuffers();
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(ushort), indices.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(uint), indices.ToArray(), BufferUsageHint.StaticDraw);
         }
 
         private int? getTileIndex(Vector3 position)
@@ -144,18 +147,14 @@ namespace Larx.Terrain
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexAttribArray(0);
-
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, colors.Count * Vector3.SizeInBytes, colors.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexAttribArray(1);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Count * Vector3.SizeInBytes, normals.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexAttribArray(2);
         }
     }
 }
