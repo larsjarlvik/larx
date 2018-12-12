@@ -11,7 +11,7 @@ out vec3 position;
 out vec3 color;
 out vec3 normal;
 
-void main(void)
+void main()
 {
     position = vPosition;
     color = vColor;

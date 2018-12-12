@@ -17,6 +17,7 @@ namespace Larx.Terrain
         private List<Vector3> colors = new List<Vector3>();
         private List<Vector3> normals = new List<Vector3>();
         private List<ushort> indices = new List<ushort>();
+        private int triangleArray;
 
         public TerrainShader Shader { get; }
 
@@ -28,12 +29,26 @@ namespace Larx.Terrain
 
         public void Render(Camera camera)
         {
+            GL.UseProgram(Shader.Program);
+
             GL.Uniform3(Shader.Ambient, 0.2f, 0.2f, 0.2f);
             GL.Uniform3(Shader.Diffuse, 0.6f, 0.6f, 0.6f);
             GL.Uniform3(Shader.Specular, 0.5f, 0.5f, 0.5f);
             GL.Uniform1(Shader.Shininess, 50f);
-
             camera.ApplyCamera(Shader);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            GL.BindVertexArray(triangleArray);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.UnsignedShort, false, 0, 0);
+
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);
         }
 
@@ -75,7 +90,7 @@ namespace Larx.Terrain
 
         private void build()
         {
-            var triangleArray = GL.GenVertexArray();
+            triangleArray = GL.GenVertexArray();
             GL.BindVertexArray(triangleArray);
 
             var halfMapSize = (float)(mapSize / 2);
@@ -129,6 +144,7 @@ namespace Larx.Terrain
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(0);
+
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, colors.Count * Vector3.SizeInBytes, colors.ToArray(), BufferUsageHint.StaticDraw);

@@ -1,9 +1,11 @@
 ﻿using System;
 using Larx.Terrain;
+using Larx.Text;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
+using GL4 = OpenTK.Graphics.OpenGL4;
 
 namespace Larx
 {
@@ -17,12 +19,14 @@ namespace Larx
         private Camera camera;
         private TerrainRenderer terrain;
         private MousePicker mousePicker;
+        private TextRenderer text;
+
         private KeyboardState keyboard;
 
         public Program() : base(
             1280, 720,
             new GraphicsMode(32, 24, 0, 0), "Larx", 0,
-            DisplayDevice.Default, 3, 3,
+            DisplayDevice.Default, 4, 0,
             GraphicsContextFlags.ForwardCompatible | GraphicsContextFlags.Debug)
         {
             lastFPSUpdate = 0;
@@ -32,9 +36,10 @@ namespace Larx
         protected override void OnLoad(EventArgs e)
         {
             multisampling = new Multisampling(Width, Height, 4);
+            GL.Enable(EnableCap.Blend);
+            GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
             GL.Enable(EnableCap.DepthTest);
-            GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             GL.ClearColor(Color.FromArgb(255, 24, 24, 24));
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
@@ -42,6 +47,8 @@ namespace Larx
             terrain = new TerrainRenderer();
             camera = new Camera();
             mousePicker = new MousePicker(camera);
+            text = new TextRenderer();
+            text.CreateText("Text Test", 26);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -74,6 +81,10 @@ namespace Larx
             FPS++;
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.Enable(EnableCap.Blend);
+            text.Render(26.0f, 0.2f, 0.0f, 0.0f);
+            GL.Disable(EnableCap.Blend);
+
             terrain.Render(camera);
 
             multisampling.Draw();
@@ -118,7 +129,7 @@ namespace Larx
         {
             using (var program = new Program())
             {
-                program.VSync = VSyncMode.Off;
+                program.VSync = VSyncMode.On;
                 program.Run(60);
             }
         }
