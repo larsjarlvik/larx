@@ -23,19 +23,22 @@ namespace Larx
 
         private KeyboardState keyboard;
 
+        private float scaleFactor;
+
         public Program() : base(
             1280, 720,
             new GraphicsMode(32, 24, 0, 0), "Larx", 0,
             DisplayDevice.Default, 4, 0,
             GraphicsContextFlags.ForwardCompatible | GraphicsContextFlags.Debug)
         {
+            scaleFactor = Width / 1280f;
             lastFPSUpdate = 0;
             polygonMode = PolygonMode.Fill;
         }
 
         protected override void OnLoad(EventArgs e)
         {
-            multisampling = new Multisampling(Width, Height, 8);
+            multisampling = new Multisampling(ClientSize.Width, ClientSize.Width, 8);
             GL.Enable(EnableCap.Blend);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
@@ -84,7 +87,7 @@ namespace Larx
             GL.PolygonMode(MaterialFace.FrontAndBack, polygonMode);
             GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.DepthTest);
-            
+
             terrain.Render(camera);
             multisampling.Draw();
 
@@ -100,6 +103,7 @@ namespace Larx
         protected override void OnResize(EventArgs e)
         {
             camera.AspectRatio = (float)Width / (float)Height;
+            text.Resize(new Vector2(Width / scaleFactor, Height / scaleFactor));
 
             GL.Viewport(0, 0, Width, Height);
             multisampling.RefreshBuffers(Width, Height);

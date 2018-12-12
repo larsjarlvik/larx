@@ -16,6 +16,7 @@ namespace Larx.Text
         private int textureBuffer;
         private int numItems;
         private float size;
+        private Vector2 windowSize;
 
         public TextShader Shader { get; }
 
@@ -37,7 +38,7 @@ namespace Larx.Text
 
             GL.DepthMask(false);
             GL.UseProgram(Shader.Program);
-            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, 1280f, 720f, 0f, 0f, -1.0f);
+            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, windowSize.X, windowSize.Y, 0f, 0f, -1.0f);
 
             GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
             GL.Uniform2(Shader.Position, position);
@@ -65,7 +66,12 @@ namespace Larx.Text
             GL.DepthMask(true);
         }
 
-        private PointF drawGlyph(char chr, PointF pen, float size, List<Vector2> vertexElements, List<Vector2> textureElements) {
+        public void Resize(Vector2 size)
+        {
+            windowSize = size;
+        }
+
+        private Vector2 drawGlyph(char chr, Vector2 pen, float size, List<Vector2> vertexElements, List<Vector2> textureElements) {
             this.size = size;
 
             var metric = fontData.Chars[chr];
@@ -117,7 +123,7 @@ namespace Larx.Text
             var vertexElements = new List<Vector2>();
             var textureElements = new List<Vector2>();
 
-            var pen = new PointF(0, 0);
+            var pen = new Vector2(0, 0);
 
             for (var i = 0; i < text.Length; i++) {
                 var chr = text[i];
