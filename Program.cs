@@ -35,7 +35,7 @@ namespace Larx
 
         protected override void OnLoad(EventArgs e)
         {
-            multisampling = new Multisampling(Width, Height, 4);
+            multisampling = new Multisampling(Width, Height, 8);
             GL.Enable(EnableCap.Blend);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
@@ -48,7 +48,7 @@ namespace Larx
             camera = new Camera();
             mousePicker = new MousePicker(camera);
             text = new TextRenderer();
-            text.CreateText("Text Test", 26);
+            text.CreateText("Larx Text Rendering v0.1", 12.0f);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -81,13 +81,19 @@ namespace Larx
             FPS++;
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.Enable(EnableCap.Blend);
-            text.Render(26.0f, 0.2f, 0.0f, 0.0f);
+            GL.PolygonMode(MaterialFace.FrontAndBack, polygonMode);
             GL.Disable(EnableCap.Blend);
-
+            GL.Enable(EnableCap.DepthTest);
+            
             terrain.Render(camera);
-
             multisampling.Draw();
+
+            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            GL.Disable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.Blend);
+
+            text.Render(new Vector2(10, 20), 0.65f, 1.6f);
+
             SwapBuffers();
         }
 
@@ -110,10 +116,7 @@ namespace Larx
                     WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
 
                 if (e.Control && e.Keyboard[Key.W])
-                {
                     polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
-                    GL.PolygonMode(MaterialFace.FrontAndBack, polygonMode);
-                }
             }
 
             if (!e.Control)
@@ -129,7 +132,7 @@ namespace Larx
         {
             using (var program = new Program())
             {
-                program.VSync = VSyncMode.On;
+                program.VSync = VSyncMode.Off;
                 program.Run(60);
             }
         }

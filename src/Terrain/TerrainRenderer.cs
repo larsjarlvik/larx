@@ -49,6 +49,7 @@ namespace Larx.Terrain
             GL.BindVertexArray(triangleArray);
             GL.VertexAttribPointer(3, 3, VertexAttribPointerType.UnsignedShort, false, 0, 0);
 
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);
         }
 

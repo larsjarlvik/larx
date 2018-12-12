@@ -12,6 +12,7 @@ namespace Larx.Text
         public int Color { get; private set; }
         public int Buffer { get; private set; }
         public int Gamma { get; private set; }
+        public int Position { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -22,6 +23,7 @@ namespace Larx.Text
             Color = GL.GetUniformLocation(Program, "uColor");
             Buffer = GL.GetUniformLocation(Program, "uBuffer");
             Gamma = GL.GetUniformLocation(Program, "uGamma");
+            Position = GL.GetUniformLocation(Program, "uPosition");
         }
     }
 }

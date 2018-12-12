@@ -13,9 +13,9 @@ namespace Larx.Text
         private Texture texture;
         private FontData fontData;
         private int vertexBuffer;
-        private int numItems;
         private int textureBuffer;
-        private int numTextureItems;
+        private int numItems;
+        private float size;
 
         public TextShader Shader { get; }
 
@@ -30,19 +30,20 @@ namespace Larx.Text
             textureBuffer = GL.GenBuffer();
         }
 
-        public void Render(float scale, float buffer, float angle, float translateX)
+        public void Render(Vector2 position, float buffer, float gamma)
         {
             GL.DepthMask(false);
             GL.UseProgram(Shader.Program);
             var pMatrix = Matrix4.CreateOrthographicOffCenter(0, 1280f, 720f, 0f, 0f, -1.0f);
 
             GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
+            GL.Uniform2(Shader.Position, position);
 
             GL.BindTexture(TextureTarget.Texture2D, texture.TextureId);
             GL.Uniform1(Shader.Texture, 0);
             GL.Uniform2(Shader.TextSize, new Vector2(texture.Size.X, texture.Size.Y));
 
-            GL.Uniform4(Shader.Color, new Color4(1f, 1f, 1f, 1f));
+            GL.Uniform4(Shader.Color, new Color4(0.2f, 0.2f, 0.2f, 1f));
             GL.Uniform1(Shader.Buffer, buffer);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
@@ -53,15 +54,17 @@ namespace Larx.Text
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, numItems);
 
-            GL.Uniform4(Shader.Color, new Color4(0f, 0f, 0f, 1f));
+            GL.Uniform4(Shader.Color, new Color4(1f, 1f, 1f, 1f));
             GL.Uniform1(Shader.Buffer, 192f / 256f);
-            GL.Uniform1(Shader.Gamma, 1.4142f / scale);
+            GL.Uniform1(Shader.Gamma, gamma * 1.4142f / size);
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, numItems);
             GL.DepthMask(true);
         }
 
-        private PointF drawGlyph(char chr, PointF pen, int size, List<Vector2> vertexElements, List<Vector2> textureElements) {
+        private PointF drawGlyph(char chr, PointF pen, float size, List<Vector2> vertexElements, List<Vector2> textureElements) {
+            this.size = size;
+
             var metric = fontData.Chars[chr];
             var scale = size / fontData.Size;
 
@@ -104,14 +107,14 @@ namespace Larx.Text
             return pen;
         }
 
-        public void CreateText(string text, int size) {
+        public void CreateText(string text, float size) {
             var vertexArray = GL.GenVertexArray();
-            GL.BindVertexArray(0);
+            GL.BindVertexArray(vertexArray);
 
             var vertexElements = new List<Vector2>();
             var textureElements = new List<Vector2>();
 
-            var pen = new PointF(40.0f, 40.0f);
+            var pen = new PointF(0, 0);
 
             for (var i = 0; i < text.Length; i++) {
                 var chr = text[i];
@@ -120,7 +123,6 @@ namespace Larx.Text
 
             numItems = vertexElements.Count;
 
-            GL.BindVertexArray(vertexArray);
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * numItems, vertexElements.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
