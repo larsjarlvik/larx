@@ -8,7 +8,7 @@ namespace Larx.Terrain
 {
     public class TerrainRenderer : TerrainPicker
     {
-        private const int mapSize = 32;
+        private const int mapSize = 128;
         private int indexCount = 0;
         private int vertexBuffer;
         private int colorBuffer;
@@ -74,10 +74,10 @@ namespace Larx.Terrain
                 colors[(int)indices[(int)i]] = elev > 0f
                     ? new Vector3(1f, 1f - (elev / 2f), 1f - (elev / 2f))
                     : new Vector3(1f + (elev / 2f), 1f + (elev / 2f), 1f);
-
-                updateNormals(position, radius);
-                updateBuffers();
             }
+
+            updateNormals(position, radius);
+            updateBuffers();
         }
 
         private void updateNormals(Vector3 center, float radius)
