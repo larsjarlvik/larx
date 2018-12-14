@@ -66,10 +66,10 @@ namespace Larx.Terrain
                 if (i >= indices.Count) continue;
 
                 var vertex = vertices[(int)indices[(int)i]];
-                var distance = Math.Abs(Vector3.Distance(position, vertex));
-
                 var color = colors[(int)indices[(int)i]];
-                var elev = vertex.Y + (offset / distance / radius * 0.5f);
+
+                Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
+                var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt(Vector3.Distance(position, vertex) / radius))) * offset;
 
                 vertices[(int)indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
                 colors[(int)indices[(int)i]] = elev > 0f
