@@ -16,7 +16,7 @@ namespace Larx.Text
         private int textureBuffer;
         private int numItems;
         private float size;
-        private Vector2 windowSize;
+        private SizeF windowSize;
 
         public TextShader Shader { get; }
 
@@ -38,7 +38,7 @@ namespace Larx.Text
 
             GL.DepthMask(false);
             GL.UseProgram(Shader.Program);
-            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, windowSize.X, windowSize.Y, 0f, 0f, -1.0f);
+            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, windowSize.Width, windowSize.Height, 0f, 0f, -1.0f);
 
             GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
             GL.Uniform2(Shader.Position, position);
@@ -66,7 +66,7 @@ namespace Larx.Text
             GL.DepthMask(true);
         }
 
-        public void Resize(Vector2 size)
+        public void Resize(SizeF size)
         {
             windowSize = size;
         }

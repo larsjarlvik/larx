@@ -55,10 +55,9 @@ namespace Larx.Terrain
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
 
-        public void ChangeElevation(float offset, MousePicker picker)
+        public void ChangeElevation(float offset, float radius, MousePicker picker)
         {
             var position = GetPosition(picker);
-            var radius = 3;
             var toUpdate = getTilesInArea(position, radius);
 
             foreach (var i in toUpdate)
@@ -76,7 +75,7 @@ namespace Larx.Terrain
                     ? new Vector3(1f, 1f - (elev / 2f), 1f - (elev / 2f))
                     : new Vector3(1f + (elev / 2f), 1f + (elev / 2f), 1f);
 
-                updateNormals(position, radius + 1);
+                updateNormals(position, radius);
                 updateBuffers();
             }
         }

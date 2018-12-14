@@ -1,6 +1,7 @@
 ﻿using System;
 using Larx.Terrain;
 using Larx.Text;
+using Larx.UserInterFace;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -19,11 +20,12 @@ namespace Larx
         private Camera camera;
         private TerrainRenderer terrain;
         private MousePicker mousePicker;
-        private TextRenderer text;
+        private UiBuilder ui;
 
         private KeyboardState keyboard;
 
         private float scaleFactor;
+        private float radius;
 
         public Program() : base(
             1280, 720,
@@ -34,6 +36,7 @@ namespace Larx
             scaleFactor = Width / 1280f;
             lastFPSUpdate = 0;
             polygonMode = PolygonMode.Fill;
+            radius = 3f;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -50,8 +53,10 @@ namespace Larx
             terrain = new TerrainRenderer();
             camera = new Camera();
             mousePicker = new MousePicker(camera);
-            text = new TextRenderer();
-            text.CreateText("Larx Text Rendering v0.1", 12.0f);
+            ui = new UiBuilder();
+            ui.AddText("title", "Larx Terrain Editor v0.1");
+            ui.AddText("fps", "FPS: Calculating");
+            ui.AddText("size", $"Tool Size: {radius}");
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -66,12 +71,13 @@ namespace Larx
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
             mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
-            if (keyboard[Key.T]) terrain.ChangeElevation(0.1f, mousePicker);
-            if (keyboard[Key.G]) terrain.ChangeElevation(-0.1f, mousePicker);
+            if (keyboard[Key.T]) terrain.ChangeElevation(0.1f, radius, mousePicker);
+            if (keyboard[Key.G]) terrain.ChangeElevation(-0.1f, radius, mousePicker);
 
             lastFPSUpdate += e.Time;
             if (lastFPSUpdate > 1)
             {
+                ui.UpdateText("fps", $"FPS: {FPS}");
                 Title = $"Larx (Vsync: {VSync}) - FPS: {FPS}";
                 FPS = 0;
                 lastFPSUpdate %= 1;
@@ -95,7 +101,7 @@ namespace Larx
             GL.Disable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Blend);
 
-            text.Render(new Vector2(10, 20), 0.65f, 1.6f);
+            ui.Render();
 
             SwapBuffers();
         }
@@ -103,7 +109,7 @@ namespace Larx
         protected override void OnResize(EventArgs e)
         {
             camera.AspectRatio = (float)Width / (float)Height;
-            text.Resize(new Vector2(Width / scaleFactor, Height / scaleFactor));
+            ui.Resize(new SizeF(Width / scaleFactor, Height / scaleFactor));
 
             GL.Viewport(0, 0, Width, Height);
             multisampling.RefreshBuffers(Width, Height);
@@ -121,6 +127,14 @@ namespace Larx
 
                 if (e.Control && e.Keyboard[Key.W])
                     polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
+                    
+                if (e.Control && e.Keyboard[Key.Plus])
+                    radius ++;
+                    
+                if (e.Control && e.Keyboard[Key.Minus])
+                    radius --;
+                    
+                ui.UpdateText("size", $"Tool Size: {radius}");
             }
 
             if (!e.Control)
