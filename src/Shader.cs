@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -17,11 +18,11 @@ namespace Larx
             var vertexShader = GL.CreateShader(ShaderType.VertexShader);
             var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
 
-            GL.ShaderSource(vertexShader, System.IO.File.ReadAllText($"shaders\\{name}.vs.glsl"));
+            GL.ShaderSource(vertexShader, System.IO.File.ReadAllText(Path.Combine("shaders", $"{name}.vs.glsl")));
             GL.CompileShader(vertexShader);
             checkCompileStatus($"Vertex Shader: {name}", vertexShader);
 
-            GL.ShaderSource(fragmentShader, System.IO.File.ReadAllText($"shaders\\{name}.fs.glsl"));
+            GL.ShaderSource(fragmentShader, System.IO.File.ReadAllText(Path.Combine("shaders", $"{name}.fs.glsl")));
             GL.CompileShader(fragmentShader);
             checkCompileStatus($"Fragment Shader: {name}", fragmentShader);
 

@@ -24,8 +24,8 @@ namespace Larx.Text
         {
             Shader = new TextShader();
             texture = new Texture();
-            texture.LoadTexture("resources\\OpenSans-Regular.bmp");
-            fontData = JsonConvert.DeserializeObject<FontData>(File.ReadAllText("resources\\OpenSans-Regular.json"));
+            texture.LoadTexture(Path.Combine("resources", "OpenSans-Regular.bmp"));
+            fontData = JsonConvert.DeserializeObject<FontData>(File.ReadAllText(Path.Combine("resources", "OpenSans-Regular.json")));
 
             vertexBuffer = GL.GenBuffer();
             textureBuffer = GL.GenBuffer();
