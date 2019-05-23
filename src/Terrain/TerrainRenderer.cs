@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -11,20 +12,25 @@ namespace Larx.Terrain
         private const int mapSize = 128;
         private int indexCount = 0;
         private int vertexBuffer;
-        private int colorBuffer;
+        private int coordBuffer;
         private int indexBuffer;
         private int normalBuffer;
         private List<Vector3> vertices = new List<Vector3>();
-        private List<Vector3> colors = new List<Vector3>();
+        private List<Vector2> coords = new List<Vector2>();
         private List<Vector3> normals = new List<Vector3>();
         private List<int> indices = new List<int>();
         private int triangleArray;
 
-        public TerrainShader Shader { get; }
+        private readonly TerrainShader shader;
+        private readonly Texture texture;
 
         public TerrainRenderer()
         {
-            Shader = new TerrainShader();
+            shader = new TerrainShader();
+            
+            texture = new Texture();
+            texture.LoadTexture(Path.Combine("resources", "textures", "grass.bmp"), true);
+
             build();
         }
 
@@ -34,22 +40,25 @@ namespace Larx.Terrain
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
 
-            GL.UseProgram(Shader.Program);
+            GL.UseProgram(shader.Program);
+            
+            GL.BindTexture(TextureTarget.Texture2D, texture.TextureId);
+            GL.Uniform1(shader.Texture, 0);
+            GL.Uniform3(shader.Ambient, 0.2f, 0.2f, 0.2f);
+            GL.Uniform3(shader.Diffuse, 0.5f, 0.5f, 0.5f);
+            GL.Uniform3(shader.Specular, 1.0f, 1.0f, 1.0f);
+            GL.Uniform1(shader.Shininess, 50f);
 
-            GL.Uniform3(Shader.Ambient, 0.5f, 0.5f, 0.5f);
-            GL.Uniform3(Shader.Diffuse, 0.9f, 0.9f, 0.9f);
-            GL.Uniform3(Shader.Specular, 1.0f, 1.0f, 1.0f);
-            GL.Uniform1(Shader.Shininess, 50f);
-            camera.ApplyCamera(Shader);
+            camera.ApplyCamera(shader);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
@@ -65,7 +74,6 @@ namespace Larx.Terrain
                 if (i >= indices.Count) continue;
 
                 var vertex = vertices[indices[(int)i]];
-                var color = colors[indices[(int)i]];
 
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
@@ -73,7 +81,6 @@ namespace Larx.Terrain
                 var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / radius > hardness ? amount : 0.0f) / radius))) * offset;
 
                 vertices[indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
-                colors[indices[(int)i]] = new Vector3(0.27f, 0.34f, 0.05f);
             }
 
             updateNormals(position, radius);
@@ -144,7 +151,7 @@ namespace Larx.Terrain
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
                     vertices.Add(new Vector3(x, 0f, z));
-                    colors.Add(new Vector3(0.27f, 0.34f, 0.05f));
+                    coords.Add(new Vector2((x + halfMapSize), (z + halfMapSize))); 
                     normals.Add(new Vector3(0f, 1f, 0f));
 
                     if (x < halfMapSize && z < halfMapSize)
@@ -162,7 +169,7 @@ namespace Larx.Terrain
             indexCount = indices.Count;
 
             vertexBuffer = GL.GenBuffer();
-            colorBuffer = GL.GenBuffer();
+            coordBuffer = GL.GenBuffer();
             indexBuffer = GL.GenBuffer();
             normalBuffer = GL.GenBuffer();
 
@@ -190,9 +197,9 @@ namespace Larx.Terrain
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, colorBuffer);
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, colors.Count * Vector3.SizeInBytes, colors.ToArray(), BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
+            GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, coords.Count * Vector2.SizeInBytes, coords.ToArray(), BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Count * Vector3.SizeInBytes, normals.ToArray(), BufferUsageHint.StaticDraw);

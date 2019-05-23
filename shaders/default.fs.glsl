@@ -1,7 +1,8 @@
 #version 330
+uniform sampler2D uTexture;
 
 in vec3 position;
-in vec3 color;
+in vec2 texCoord;
 in vec3 normal;
 
 out vec3 outputColor;
@@ -29,6 +30,7 @@ void main() {
     float slope = 1.0 - n.y;
     float slopeBlend;
 
+    vec3 color = texture(uTexture, texCoord).xyz;
     vec3 finalColor;
     vec3 sand = vec3(0.39, 0.32, 0.23);
     vec3 rock = vec3(0.17, 0.17, 0.15);

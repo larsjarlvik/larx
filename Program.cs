@@ -44,6 +44,9 @@ namespace Larx
         protected override void OnLoad(EventArgs e)
         {
             multisampling = new Multisampling(ClientSize.Width, ClientSize.Width, 8);
+
+            GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
+            GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.Blend);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
@@ -52,10 +55,11 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
+            ui = new UiBuilder();
             terrain = new TerrainRenderer();
             camera = new Camera();
             mousePicker = new MousePicker(camera);
-            ui = new UiBuilder();
+
             ui.AddText("title", "Larx Terrain Editor v0.1");
             ui.AddText("fps", "FPS: Calculating");
             ui.AddText("size", $"Tool Size: {radius}");
