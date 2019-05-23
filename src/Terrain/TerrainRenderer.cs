@@ -29,7 +29,11 @@ namespace Larx.Terrain
             shader = new TerrainShader();
             
             texture = new Texture();
-            texture.LoadTexture(Path.Combine("resources", "textures", "grass.bmp"), true);
+            texture.LoadTexture(new [] { 
+                Path.Combine("resources", "textures", "grass.bmp"),
+                Path.Combine("resources", "textures", "sand.bmp"),
+                Path.Combine("resources", "textures", "rocks.bmp")
+            }, true);
 
             build();
         }
@@ -41,12 +45,12 @@ namespace Larx.Terrain
             GL.EnableVertexAttribArray(2);
 
             GL.UseProgram(shader.Program);
-            
-            GL.BindTexture(TextureTarget.Texture2D, texture.TextureId);
+
+            GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
             GL.Uniform1(shader.Texture, 0);
             GL.Uniform3(shader.Ambient, 0.2f, 0.2f, 0.2f);
             GL.Uniform3(shader.Diffuse, 0.5f, 0.5f, 0.5f);
-            GL.Uniform3(shader.Specular, 1.0f, 1.0f, 1.0f);
+            GL.Uniform3(shader.Specular, 0.7f, 0.7f, 0.7f);
             GL.Uniform1(shader.Shininess, 50f);
 
             camera.ApplyCamera(shader);
@@ -147,11 +151,11 @@ namespace Larx.Terrain
             var i = 0;
 
             for (var z = -halfMapSize; z <= halfMapSize; z++)
-            {
+            {   
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
                     vertices.Add(new Vector3(x, 0f, z));
-                    coords.Add(new Vector2((x + halfMapSize), (z + halfMapSize))); 
+                    coords.Add(new Vector2((x + halfMapSize / 6), (z + halfMapSize / 6))); 
                     normals.Add(new Vector3(0f, 1f, 0f));
 
                     if (x < halfMapSize && z < halfMapSize)

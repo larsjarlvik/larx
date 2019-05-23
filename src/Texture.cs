@@ -31,7 +31,7 @@ namespace Larx
             }
         }
 
-        public unsafe void LoadTexture(string path, bool mipMap = false)
+        private byte[] readTextureData(string path)
         {
             var imageStream = readFile(path);
 
@@ -49,6 +49,13 @@ namespace Larx
             InvertRows(buffer, Size.Y, Size.X * pixelSize);
             if (pixelFormat == PixelFormat.Bgra)
                 reorganizeBuffer(buffer);
+
+            return buffer;
+        }
+
+        public unsafe void LoadTexture(string path, bool mipMap = false)
+        {
+            var buffer = readTextureData(path);
 
             fixed (byte* p = buffer)
             {
@@ -70,6 +77,33 @@ namespace Larx
 
                 GL.BindTexture(TextureTarget.Texture2D, 0);
             }
+        }
+
+        public unsafe void LoadTexture(string[] path, bool mipMap = false)
+        {
+            var buffers = path.Select(p => readTextureData(p)).ToList();
+
+            TextureId = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2DArray, TextureId);
+
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 5, SizedInternalFormat.Rgba32f, Size.X, Size.Y, buffers.Count());
+
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, new[] { (int)TextureMinFilter.Linear });
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, new[] { mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear });
+
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+            for (var i = 0; i < buffers.Count(); i ++) 
+            {
+                fixed (byte* p = buffers[i])
+                {
+                    var ptr = (IntPtr)p;
+                    GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, i, Size.X, Size.Y, 1, pixelFormat, PixelType.UnsignedByte, ptr);
+                }
+            }
+
+            if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
         }
 
         private FileStream readFile(string path)
