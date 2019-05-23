@@ -17,7 +17,7 @@ namespace Larx.Terrain
         private List<Vector3> vertices = new List<Vector3>();
         private List<Vector3> colors = new List<Vector3>();
         private List<Vector3> normals = new List<Vector3>();
-        private List<uint> indices = new List<uint>();
+        private List<int> indices = new List<int>();
         private int triangleArray;
 
         public TerrainShader Shader { get; }
@@ -36,9 +36,9 @@ namespace Larx.Terrain
 
             GL.UseProgram(Shader.Program);
 
-            GL.Uniform3(Shader.Ambient, 0.2f, 0.2f, 0.2f);
-            GL.Uniform3(Shader.Diffuse, 0.6f, 0.6f, 0.6f);
-            GL.Uniform3(Shader.Specular, 0.5f, 0.5f, 0.5f);
+            GL.Uniform3(Shader.Ambient, 0.5f, 0.5f, 0.5f);
+            GL.Uniform3(Shader.Diffuse, 0.9f, 0.9f, 0.9f);
+            GL.Uniform3(Shader.Specular, 1.0f, 1.0f, 1.0f);
             GL.Uniform1(Shader.Shininess, 50f);
             camera.ApplyCamera(Shader);
 
@@ -55,7 +55,7 @@ namespace Larx.Terrain
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
 
-        public void ChangeElevation(float offset, float radius, MousePicker picker)
+        public void ChangeElevation(float offset, float radius, float hardness, MousePicker picker)
         {
             var position = GetPosition(picker);
             var toUpdate = getTilesInArea(position, radius);
@@ -64,16 +64,16 @@ namespace Larx.Terrain
             {
                 if (i >= indices.Count) continue;
 
-                var vertex = vertices[(int)indices[(int)i]];
-                var color = colors[(int)indices[(int)i]];
+                var vertex = vertices[indices[(int)i]];
+                var color = colors[indices[(int)i]];
 
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
-                var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt(Vector3.Distance(position, vertex) / radius))) * offset;
 
-                vertices[(int)indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
-                colors[(int)indices[(int)i]] = elev > 0f
-                    ? new Vector3(1f, 1f - (elev / 2f), 1f - (elev / 2f))
-                    : new Vector3(1f + (elev / 2f), 1f + (elev / 2f), 1f);
+                var amount = Vector3.Distance(position, vertex);
+                var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / radius > hardness ? amount : 0.0f) / radius))) * offset;
+
+                vertices[indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
+                colors[indices[(int)i]] = new Vector3(0.27f, 0.34f, 0.05f);
             }
 
             updateNormals(position, radius);
@@ -117,17 +117,17 @@ namespace Larx.Terrain
 
         private void updateNormal(int i)
         {
-            var v1 = vertices[(int)indices[i]];
-            var v2 = vertices[(int)indices[i + 1]];
-            var v3 = vertices[(int)indices[i + 2]];
+            var v1 = vertices[indices[i]];
+            var v2 = vertices[indices[i + 1]];
+            var v3 = vertices[indices[i + 2]];
 
-            normals[(int)indices[i]] += Vector3.Cross(v2 - v1, v3 - v1);
-            normals[(int)indices[i + 1]] += Vector3.Cross(v2 - v1, v3 - v1);
-            normals[(int)indices[i + 2]] += Vector3.Cross(v2 - v1, v3 - v1);
+            normals[indices[i]] += Vector3.Cross(v2 - v1, v3 - v1);
+            normals[indices[i + 1]] += Vector3.Cross(v2 - v1, v3 - v1);
+            normals[indices[i + 2]] += Vector3.Cross(v2 - v1, v3 - v1);
 
-            normals[(int)indices[i]].Normalize();
-            normals[(int)indices[i + 1]].Normalize();
-            normals[(int)indices[i + 2]].Normalize();
+            normals[indices[i]].Normalize();
+            normals[indices[i + 1]].Normalize();
+            normals[indices[i + 2]].Normalize();
         }
 
         private void build()
@@ -144,14 +144,14 @@ namespace Larx.Terrain
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
                     vertices.Add(new Vector3(x, 0f, z));
-                    colors.Add(new Vector3(1f, 1f, 1f));
+                    colors.Add(new Vector3(0.27f, 0.34f, 0.05f));
                     normals.Add(new Vector3(0f, 1f, 0f));
 
                     if (x < halfMapSize && z < halfMapSize)
                     {
-                        indices.AddRange(new uint[] {
-                            (uint)(i), (uint)(i + mapSize + 1), (uint)(i + 1),
-                            (uint)(i + 1), (uint)(i + mapSize + 1), (uint)(i + mapSize + 2)
+                        indices.AddRange(new int[] {
+                            (i), (i + mapSize + 1), (i + 1),
+                            (i + 1), (i + mapSize + 1), (i + mapSize + 2)
                         });
                     }
 
@@ -170,7 +170,7 @@ namespace Larx.Terrain
             updateBuffers();
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(uint), indices.ToArray(), BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.StaticDraw);
         }
 
         private int? getTileIndex(Vector3 position)

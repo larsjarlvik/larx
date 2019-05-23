@@ -26,6 +26,7 @@ namespace Larx
 
         private float scaleFactor;
         private float radius;
+        private float hardness;
 
         public Program() : base(
             1280, 720,
@@ -37,6 +38,7 @@ namespace Larx
             lastFPSUpdate = 0;
             polygonMode = PolygonMode.Fill;
             radius = 3f;
+            hardness = 0.5f;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -57,6 +59,7 @@ namespace Larx
             ui.AddText("title", "Larx Terrain Editor v0.1");
             ui.AddText("fps", "FPS: Calculating");
             ui.AddText("size", $"Tool Size: {radius}");
+            ui.AddText("hardness", $"Hardness: {hardness}");
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -71,8 +74,8 @@ namespace Larx
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
             mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
-            if (keyboard[Key.T]) terrain.ChangeElevation(0.1f, radius, mousePicker);
-            if (keyboard[Key.G]) terrain.ChangeElevation(-0.1f, radius, mousePicker);
+            if (keyboard[Key.T]) terrain.ChangeElevation(0.1f, radius, hardness, mousePicker);
+            if (keyboard[Key.G]) terrain.ChangeElevation(-0.1f, radius, hardness, mousePicker);
 
             lastFPSUpdate += e.Time;
             if (lastFPSUpdate > 1)
@@ -128,13 +131,28 @@ namespace Larx
                 if (e.Control && e.Keyboard[Key.W])
                     polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
                     
-                if (e.Control && e.Keyboard[Key.Plus])
+                if (e.Control && e.Keyboard[Key.Plus]) {
                     radius ++;
-                    
-                if (e.Control && e.Keyboard[Key.Minus])
+                    if (radius > 12.0f) radius = 12.0f;
+                }
+
+                if (e.Control && e.Keyboard[Key.Minus]) {
                     radius --;
-                    
+                    if (radius < 0.0f) radius = 0.0f;
+                }
+
+                if (e.Shift && e.Keyboard[Key.Plus]) {
+                    hardness += 0.1f;
+                    if (hardness > 1.0f) hardness = 1.0f;
+                }
+
+                if (e.Shift && e.Keyboard[Key.Minus]) {
+                    hardness -= 0.1f;
+                    if (hardness < 0.0f) hardness = 0.0f;
+                }
+
                 ui.UpdateText("size", $"Tool Size: {radius}");
+                ui.UpdateText("hardness", $"Hardness: {Math.Round(hardness, 1)}");
             }
 
             if (!e.Control)
