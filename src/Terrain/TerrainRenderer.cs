@@ -114,9 +114,10 @@ namespace Larx.Terrain
         private List<int> getTilesInArea(Vector3 center, float radius)
         {
             var included = new List<int>();
+            var r = radius + 3;
 
-            for (var z = center.Z - radius; z <= center.Z + radius; z++)
-                for (var x = center.X - radius; x <= center.X + radius; x++)
+            for (var z = center.Z - r; z <= center.Z + r; z++)
+                for (var x = center.X - r; x <= center.X + r; x++)
                 {
                     var index = getTileIndex(new Vector3(x, 0, z));
                     if (index == null) continue;
