@@ -4,7 +4,7 @@ namespace Larx.Terrain
 {
     public class TerrainShader : Shader
     {
-        public TerrainShader() : base("default") { }
+        public TerrainShader() : base("terrain") { }
 
         public int Ambient { get; private set; }
         public int Diffuse { get; private set; }

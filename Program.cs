@@ -1,5 +1,6 @@
 ﻿using System;
 using Larx.Terrain;
+using Larx.Object;
 using Larx.Text;
 using Larx.UserInterFace;
 using OpenTK;
@@ -18,6 +19,7 @@ namespace Larx
         private PolygonMode polygonMode;
 
         private Camera camera;
+        private ObjectRenderer debug;
         private TerrainRenderer terrain;
         private MousePicker mousePicker;
         private UiBuilder ui;
@@ -57,6 +59,7 @@ namespace Larx
 
             ui = new UiBuilder();
             terrain = new TerrainRenderer();
+            debug = new ObjectRenderer();
             camera = new Camera();
             mousePicker = new MousePicker(camera);
 
@@ -102,6 +105,7 @@ namespace Larx
             GL.Enable(EnableCap.DepthTest);
 
             terrain.Render(camera);
+            debug.Render(camera, new Vector3(35.0f, 35.0f, 35.0f));
             multisampling.Draw();
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);

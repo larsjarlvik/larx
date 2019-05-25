@@ -19,7 +19,6 @@ namespace Larx.Terrain
         private List<Vector2> coords = new List<Vector2>();
         private List<Vector3> normals = new List<Vector3>();
         private List<int> indices = new List<int>();
-        private int triangleArray;
 
         private readonly TerrainShader shader;
         private readonly Texture texture;
@@ -36,36 +35,6 @@ namespace Larx.Terrain
             }, true);
 
             build();
-        }
-
-        public void Render(Camera camera)
-        {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.EnableVertexAttribArray(2);
-
-            GL.UseProgram(shader.Program);
-
-            GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
-            GL.Uniform1(shader.Texture, 0);
-            GL.Uniform3(shader.Ambient, 0.2f, 0.2f, 0.2f);
-            GL.Uniform3(shader.Diffuse, 0.5f, 0.5f, 0.5f);
-            GL.Uniform3(shader.Specular, 0.7f, 0.7f, 0.7f);
-            GL.Uniform1(shader.Shininess, 50f);
-
-            camera.ApplyCamera(shader);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
-            GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
 
         public void ChangeElevation(float offset, float radius, float hardness, MousePicker picker)
@@ -144,9 +113,6 @@ namespace Larx.Terrain
 
         private void build()
         {
-            triangleArray = GL.GenVertexArray();
-            GL.BindVertexArray(triangleArray);
-
             var halfMapSize = (float)(mapSize / 2);
             var rnd = new Random();
             var i = 0;
@@ -209,6 +175,36 @@ namespace Larx.Terrain
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Count * Vector3.SizeInBytes, normals.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+        }
+
+        public void Render(Camera camera)
+        {
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
+
+            GL.UseProgram(shader.Program);
+
+            GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
+            GL.Uniform1(shader.Texture, 0);
+            GL.Uniform3(shader.Ambient, 0.2f, 0.2f, 0.2f);
+            GL.Uniform3(shader.Diffuse, 0.5f, 0.5f, 0.5f);
+            GL.Uniform3(shader.Specular, 0.7f, 0.7f, 0.7f);
+            GL.Uniform1(shader.Shininess, 50f);
+
+            camera.ApplyCamera(shader);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
+            GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
     }
 }
