@@ -11,6 +11,7 @@ namespace Larx.Terrain
         public int Specular { get; private set; }
         public int Shininess { get; private set; }
         public int Texture { get; private set; }
+        public int GridLines { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -21,6 +22,7 @@ namespace Larx.Terrain
             Specular = GL.GetUniformLocation(Program, "uSpecular");
             Shininess = GL.GetUniformLocation(Program, "uShininess");
             Texture = GL.GetUniformLocation(Program, "uTexture");
+            GridLines = GL.GetUniformLocation(Program, "uGridLines");
         }
     }
 }

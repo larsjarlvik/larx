@@ -81,8 +81,8 @@ namespace Larx
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
             mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
-            if (keyboard[Key.T]) terrain.ChangeElevation(0.1f, radius, hardness, mousePicker);
-            if (keyboard[Key.G]) terrain.ChangeElevation(-0.1f, radius, hardness, mousePicker);
+            if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, radius, hardness, mousePicker);
+            if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, radius, hardness, mousePicker);
 
             lastFPSUpdate += e.Time;
             if (lastFPSUpdate > 1)
@@ -138,7 +138,10 @@ namespace Larx
 
                 if (e.Control && e.Keyboard[Key.W])
                     polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
-                    
+
+                if (e.Control && e.Keyboard[Key.G])
+                    terrain.ShowGridLines = !terrain.ShowGridLines;
+
                 if (e.Control && e.Keyboard[Key.Plus]) {
                     radius ++;
                     if (radius > 12.0f) radius = 12.0f;

@@ -23,6 +23,8 @@ namespace Larx.Terrain
         private readonly TerrainShader shader;
         private readonly Texture texture;
 
+        public bool ShowGridLines { get; set; }
+
         public TerrainRenderer()
         {
             shader = new TerrainShader();
@@ -191,6 +193,7 @@ namespace Larx.Terrain
             GL.Uniform3(shader.Diffuse, 0.5f, 0.5f, 0.5f);
             GL.Uniform3(shader.Specular, 0.7f, 0.7f, 0.7f);
             GL.Uniform1(shader.Shininess, 50f);
+            GL.Uniform1(shader.GridLines, ShowGridLines ? 1 : 0);
 
             camera.ApplyCamera(shader);
 

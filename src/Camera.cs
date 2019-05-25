@@ -40,8 +40,6 @@ namespace Larx
                     cameraRotation += 0.1f;
                     break;
             }
-
-            Console.WriteLine(cameraRotation);
         }
 
         public void Update()
