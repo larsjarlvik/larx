@@ -104,13 +104,9 @@ namespace Larx.Terrain
             var v2 = vertices[indices[i + 1]];
             var v3 = vertices[indices[i + 2]];
 
-            normals[indices[i]] += Vector3.Cross(v2 - v1, v3 - v1);
-            normals[indices[i + 1]] += Vector3.Cross(v2 - v1, v3 - v1);
-            normals[indices[i + 2]] += Vector3.Cross(v2 - v1, v3 - v1);
-
-            normals[indices[i]].Normalize();
-            normals[indices[i + 1]].Normalize();
-            normals[indices[i + 2]].Normalize();
+            normals[indices[i]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized() * 100;
+            normals[indices[i + 1]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized() * 100;
+            normals[indices[i + 2]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized() * 100;
         }
 
         private void build()
@@ -179,7 +175,7 @@ namespace Larx.Terrain
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
         }
 
-        public void Render(Camera camera)
+        public void Render(Camera camera, Light light)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -189,13 +185,14 @@ namespace Larx.Terrain
 
             GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
             GL.Uniform1(shader.Texture, 0);
-            GL.Uniform3(shader.Ambient, 0.2f, 0.2f, 0.2f);
-            GL.Uniform3(shader.Diffuse, 0.5f, 0.5f, 0.5f);
+            GL.Uniform3(shader.Ambient, 0.3f, 0.3f, 0.3f);
+            GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
             GL.Uniform3(shader.Specular, 0.7f, 0.7f, 0.7f);
             GL.Uniform1(shader.Shininess, 50f);
             GL.Uniform1(shader.GridLines, ShowGridLines ? 1 : 0);
 
             camera.ApplyCamera(shader);
+            light.ApplyLight(shader);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);

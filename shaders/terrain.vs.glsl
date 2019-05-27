@@ -6,13 +6,14 @@ layout(location = 2) in vec3 vNormal;
 
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
+uniform vec3 uLightPosition;
 
 out vec3 position;
 out vec2 texCoord;
 out vec3 normal;
 out vec3 lightVector;
-
-const vec3 lightPosition = vec3(350, 350, 350);
+out vec3 normalVector;
+out vec3 eyeVector;
 
 void main()
 {
@@ -20,8 +21,11 @@ void main()
     texCoord = vTexCoord;
     normal = vNormal;
 
-    vec3 position = vec3(uViewMatrix * vec4(vPosition, 1.0));
-    lightVector = lightPosition - position;
-    
-    gl_Position = uProjectionMatrix * vec4(position, 1.0);
+    vec3 worldPosition = vec3(uViewMatrix * vec4(vPosition, 1.0));
+
+    lightVector = normalize(uViewMatrix * vec4(uLightPosition - worldPosition, 1.0)).xyz;
+    normalVector = normalize((uViewMatrix * vec4(normal, 1.0)).xyz);
+    eyeVector = -normalize(worldPosition);
+
+    gl_Position = uProjectionMatrix * vec4(worldPosition, 1.0);
 }

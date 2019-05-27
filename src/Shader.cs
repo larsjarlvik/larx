@@ -12,6 +12,10 @@ namespace Larx
         public int Program { get; }
         public int ProjectionMatrix { get; private set; }
         public int ViewMatrix { get; private set; }
+        public int LightPosition { get; private set; }
+        public int LightAmbient { get; private set; }
+        public int LightDiffuse { get; private set; }
+        public int LightSpecular { get; private set; }
 
         public Shader(string name)
         {
@@ -42,6 +46,10 @@ namespace Larx
         {
             ProjectionMatrix = GL.GetUniformLocation(Program, "uProjectionMatrix");
             ViewMatrix = GL.GetUniformLocation(Program, "uViewMatrix");
+            LightPosition = GL.GetUniformLocation(Program, "uLightPosition");
+            LightAmbient = GL.GetUniformLocation(Program, "uLightAmbient");
+            LightDiffuse = GL.GetUniformLocation(Program, "uLightDiffuse");
+            LightSpecular = GL.GetUniformLocation(Program, "uLightSpecular");
         }
 
         private void checkCompileStatus(string shaderName, int shader)

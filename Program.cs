@@ -19,6 +19,7 @@ namespace Larx
         private PolygonMode polygonMode;
 
         private Camera camera;
+        private Light light;
         private ObjectRenderer debug;
         private TerrainRenderer terrain;
         private MousePicker mousePicker;
@@ -61,6 +62,7 @@ namespace Larx
             terrain = new TerrainRenderer();
             debug = new ObjectRenderer();
             camera = new Camera();
+            light = new Light();
             mousePicker = new MousePicker(camera);
 
             ui.AddText("title", "Larx Terrain Editor v0.1");
@@ -104,7 +106,7 @@ namespace Larx
             GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.DepthTest);
 
-            terrain.Render(camera);
+            terrain.Render(camera, light);
             debug.Render(camera, new Vector3(35.0f, 35.0f, 35.0f));
             multisampling.Draw();
 
