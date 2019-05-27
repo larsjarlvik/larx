@@ -28,9 +28,9 @@ namespace Larx.Terrain
         public TerrainRenderer()
         {
             shader = new TerrainShader();
-            
+
             texture = new Texture();
-            texture.LoadTexture(new [] { 
+            texture.LoadTexture(new [] {
                 Path.Combine("resources", "textures", "grass.bmp"),
                 Path.Combine("resources", "textures", "sand.bmp"),
                 Path.Combine("resources", "textures", "rocks.bmp")
@@ -56,28 +56,12 @@ namespace Larx.Terrain
                 var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / radius > hardness ? amount : 0.0f) / radius))) * offset;
 
                 vertices[indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
+
+                var v1 = vertices[indices[i]];
+                var v2 = vertices[indices[i + 1]];
+                var v3 = vertices[indices[i + 2]];
+                normals[indices[i]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized();
             }
-
-            updateNormals(position, radius);
-            updateBuffers();
-        }
-
-        private void updateNormals(Vector3 center, float radius)
-        {
-            var toUpdate = getTilesInArea(center, radius);
-
-            for (var i = 0; i < toUpdate.Count; i++)
-            {
-                var ci = toUpdate[i];
-                if (ci < 0 || ci >= indices.Count) continue;
-                updateNormal(ci);
-            }
-        }
-
-        private void calculateNormals()
-        {
-            for (var i = 0; i < indices.Count; i += 3)
-                updateNormal(i);
 
             updateBuffers();
         }
@@ -85,7 +69,7 @@ namespace Larx.Terrain
         private List<int> getTilesInArea(Vector3 center, float radius)
         {
             var included = new List<int>();
-            var r = radius + 3;
+            var r = radius + 2;
 
             for (var z = center.Z - r; z <= center.Z + r; z++)
                 for (var x = center.X - r; x <= center.X + r; x++)
@@ -98,17 +82,6 @@ namespace Larx.Terrain
             return included;
         }
 
-        private void updateNormal(int i)
-        {
-            var v1 = vertices[indices[i]];
-            var v2 = vertices[indices[i + 1]];
-            var v3 = vertices[indices[i + 2]];
-
-            normals[indices[i]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized() * 100;
-            normals[indices[i + 1]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized() * 100;
-            normals[indices[i + 2]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized() * 100;
-        }
-
         private void build()
         {
             var halfMapSize = (float)(mapSize / 2);
@@ -116,12 +89,12 @@ namespace Larx.Terrain
             var i = 0;
 
             for (var z = -halfMapSize; z <= halfMapSize; z++)
-            {   
+            {
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
                     vertices.Add(new Vector3(x, 0f, z));
-                    coords.Add(new Vector2((x + halfMapSize / 6), (z + halfMapSize / 6))); 
-                    normals.Add(new Vector3(0f, 1f, 0f));
+                    coords.Add(new Vector2((x + halfMapSize / 6), (z + halfMapSize / 6)));
+                    normals.Add(new Vector3(0f, 1f, 0f).Normalized());
 
                     if (x < halfMapSize && z < halfMapSize)
                     {
@@ -142,7 +115,6 @@ namespace Larx.Terrain
             indexBuffer = GL.GenBuffer();
             normalBuffer = GL.GenBuffer();
 
-            calculateNormals();
             updateBuffers();
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
@@ -151,10 +123,10 @@ namespace Larx.Terrain
 
         private int? getTileIndex(Vector3 position)
         {
-            var x = (int)Math.Round(position.X + (mapSize / 2));
+            var x = (int)Math.Floor(position.X + (mapSize / 2));
             if (x < 0 || x > mapSize) return null;
 
-            var z = (int)Math.Round(position.Z + (mapSize / 2));
+            var z = (int)Math.Floor(position.Z + (mapSize / 2));
             if (z < 0 || z > mapSize) return null;
 
             return ((z * mapSize) + x) * 6;
@@ -185,7 +157,7 @@ namespace Larx.Terrain
 
             GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
             GL.Uniform1(shader.Texture, 0);
-            GL.Uniform3(shader.Ambient, 0.3f, 0.3f, 0.3f);
+            GL.Uniform3(shader.Ambient, 0.8f, 0.8f, 0.8f);
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
             GL.Uniform3(shader.Specular, 0.7f, 0.7f, 0.7f);
             GL.Uniform1(shader.Shininess, 50f);

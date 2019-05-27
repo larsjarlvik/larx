@@ -21,11 +21,12 @@ void main()
     texCoord = vTexCoord;
     normal = vNormal;
 
-    vec3 worldPosition = vec3(uViewMatrix * vec4(vPosition, 1.0));
+    vec4 worldPosition = (uViewMatrix * vec4(vPosition, 1.0));
+    mat3 normalMatrix = transpose(inverse(mat3(uViewMatrix)));
 
-    lightVector = normalize(uViewMatrix * vec4(uLightPosition - worldPosition, 1.0)).xyz;
-    normalVector = normalize((uViewMatrix * vec4(normal, 1.0)).xyz);
-    eyeVector = -normalize(worldPosition);
+    lightVector = normalize(uViewMatrix * vec4(uLightPosition, 1.0) - worldPosition).xyz;
+    normalVector = normalize(normalMatrix * normal);
+    eyeVector = -normalize(worldPosition).xyz;
 
-    gl_Position = uProjectionMatrix * vec4(worldPosition, 1.0);
+    gl_Position = uProjectionMatrix * worldPosition;
 }

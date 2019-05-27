@@ -1,9 +1,9 @@
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx 
+namespace Larx
 {
-    public class Light 
+    public class Light
     {
         public Vector3 Ambient { get; private set; }
         public Vector3 Diffuse { get; private set; }

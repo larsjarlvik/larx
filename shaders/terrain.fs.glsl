@@ -53,6 +53,7 @@ vec3 blendSlope(float slope, float start, float stop, vec3 texture1, vec3 textur
 }
 
 vec3 calculateLight() {
+    vec3 ambient = uAmbient * uLightAmbient;
     vec3 diffuse = max(dot(lightVector, normalVector), 0.0) * uDiffuse;
     vec3 halfwayVector = normalize(lightVector + eyeVector);
     vec3 specular = pow(max(dot(normalVector, halfwayVector), 0.0), uShininess) * uSpecular;
@@ -61,14 +62,14 @@ vec3 calculateLight() {
         specular = vec3(0.0, 0.0, 0.0);
     }
 
-    return uAmbient + diffuse + specular;
+    return ambient + diffuse + specular;
 }
 
 void main() {
     vec3 grass = getTriPlanarTexture(0.0);
     vec3 sand = getTriPlanarTexture(1.0);
     vec3 rock = getTriPlanarTexture(2.0);
-    
+
     vec3 lightColor = calculateLight();
     vec3 finalColor = grass;
 
