@@ -8,7 +8,7 @@ namespace Larx
         public Vector3 Ambient { get; private set; }
         public Vector3 Diffuse { get; private set; }
         public Vector3 Specular { get; private set; }
-        public Vector3 Position { get; private set; }
+        public Vector3 Position { get; set; }
 
         public Light()
         {

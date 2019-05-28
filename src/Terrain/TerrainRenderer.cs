@@ -31,9 +31,15 @@ namespace Larx.Terrain
 
             texture = new Texture();
             texture.LoadTexture(new [] {
-                Path.Combine("resources", "textures", "grass.bmp"),
-                Path.Combine("resources", "textures", "sand.bmp"),
-                Path.Combine("resources", "textures", "rocks.bmp")
+                Path.Combine("resources", "textures", "grass-albedo.bmp"),
+                Path.Combine("resources", "textures", "grass-normal.bmp"),
+                Path.Combine("resources", "textures", "grass-rough.bmp"),
+                Path.Combine("resources", "textures", "rocky-grass-albedo.bmp"),
+                Path.Combine("resources", "textures", "rocky-grass-normal.bmp"),
+                Path.Combine("resources", "textures", "rocky-grass-rough.bmp"),
+                Path.Combine("resources", "textures", "cliff-albedo.bmp"),
+                Path.Combine("resources", "textures", "cliff-normal.bmp"),
+                Path.Combine("resources", "textures", "cliff-rough.bmp")
             }, true);
 
             build();
@@ -93,7 +99,7 @@ namespace Larx.Terrain
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
                     vertices.Add(new Vector3(x, 0f, z));
-                    coords.Add(new Vector2((x + halfMapSize / 6), (z + halfMapSize / 6)));
+                    coords.Add(new Vector2((x + halfMapSize), (z + halfMapSize)));
                     normals.Add(new Vector3(0f, 1f, 0f).Normalized());
 
                     if (x < halfMapSize && z < halfMapSize)
@@ -159,7 +165,7 @@ namespace Larx.Terrain
             GL.Uniform1(shader.Texture, 0);
             GL.Uniform3(shader.Ambient, 0.8f, 0.8f, 0.8f);
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
-            GL.Uniform3(shader.Specular, 0.7f, 0.7f, 0.7f);
+            GL.Uniform3(shader.Specular, 0.4f, 0.4f, 0.4f);
             GL.Uniform1(shader.Shininess, 50f);
             GL.Uniform1(shader.GridLines, ShowGridLines ? 1 : 0);
 

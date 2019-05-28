@@ -91,8 +91,6 @@ namespace Larx
             var rx = DegToRad(Rotation.X);
             var ry = DegToRad(Rotation.Y);
 
-            Console.WriteLine($"{Look.X} {Look.Z}");
-
             Position = new Vector3(
                 Look.X - (MathF.Sin(rx) * MathF.Cos(ry) * cameraDistance),
                 cameraDistance * MathF.Sin(ry),

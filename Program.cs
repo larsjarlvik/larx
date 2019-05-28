@@ -89,6 +89,12 @@ namespace Larx
             if (keyboard[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
             if (keyboard[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
 
+
+            if (keyboard[Key.Up]) light.Position += new Vector3( 0.0f, 0.0f, 1.0f);
+            if (keyboard[Key.Down]) light.Position += new Vector3( 0.0f, 0.0f,-1.0f);
+            if (keyboard[Key.Left]) light.Position += new Vector3( 1.0f, 0.0f, 0.0f);
+            if (keyboard[Key.Right]) light.Position += new Vector3(-1.0f, 0.0f, 0.0f);
+
             camera.Update((float)e.Time);
             mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
@@ -122,7 +128,7 @@ namespace Larx
             GL.Enable(EnableCap.DepthTest);
 
             terrain.Render(camera, light);
-            debug.Render(camera, new Vector3(35.0f, 35.0f, 35.0f));
+            debug.Render(camera, light.Position / 10.0f);
             multisampling.Draw();
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);

@@ -94,7 +94,7 @@ namespace Larx
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 
-            for (var i = 0; i < buffers.Count(); i ++) 
+            for (var i = 0; i < buffers.Count(); i ++)
             {
                 fixed (byte* p = buffers[i])
                 {
