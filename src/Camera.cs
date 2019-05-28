@@ -4,18 +4,18 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Larx
 {
-    public enum CameraMoveDirection
-    {
-        Forward,
-        Left,
-        Back,
-        Right
-    }
-
     public class Camera
     {
-        private float cameraDistance = 20.0f;
-        private float cameraRotation = 0.0f;
+        public const float LookDeceleration = 8.0f;
+        public const float RotationDeceleration = 0.1f;
+        public const float DistanceDeceleration = 4.0f;
+
+        private float cameraDistance = 40.0f;
+        private float cameraDistanceSpeed = 0.0f;
+        public Vector3 Look;
+        public Vector2 Rotation;
+        public Vector3 LookSpeed;
+        public Vector2 RotationSpeed;
 
         public float AspectRatio { get; set; }
         public Matrix4 ProjectionMatrix;
@@ -23,35 +23,84 @@ namespace Larx
 
         public Vector3 Position;
 
-        public void Move(CameraMoveDirection direction)
-        {
-            switch (direction)
-            {
-                case CameraMoveDirection.Forward:
-                    cameraDistance -= 0.5f;
-                    break;
-                case CameraMoveDirection.Back:
-                    cameraDistance += 0.5f;
-                    break;
-                case CameraMoveDirection.Left:
-                    cameraRotation -= 0.1f;
-                    break;
-                case CameraMoveDirection.Right:
-                    cameraRotation += 0.1f;
-                    break;
-            }
+
+        private float DegToRad(float input) {
+            return (MathF.PI / 180) * input;
         }
 
-        public void Update()
+        public Camera()
         {
+            Look = new Vector3();
+            Rotation = new Vector2(0.0f, 30.0f);
+        }
+
+        public void Move(Vector3 delta)
+        {
+            LookSpeed += delta * 0.2f;
+
+            if (LookSpeed.X > 2.0f) LookSpeed.X = 2.0f;
+            if (LookSpeed.X < -2.0f) LookSpeed.X = -2.0f;
+            if (LookSpeed.Z > 2.0f) LookSpeed.Z = 2.0f;
+            if (LookSpeed.Z < -2.0f) LookSpeed.Z = -2.0f;
+        }
+
+        private void move(float frameTime)
+        {
+            var rx = DegToRad(Rotation.X);
+
+            Look.Z += LookSpeed.Z * MathF.Cos(rx);
+            Look.X += LookSpeed.Z * MathF.Sin(rx);
+
+            Look.Z += LookSpeed.X * MathF.Cos(rx + MathF.PI / 2);
+            Look.X += LookSpeed.X * MathF.Sin(rx + MathF.PI / 2);
+
+            LookSpeed /= (frameTime * LookDeceleration) + 1.0f;
+        }
+
+        public void Rotate(Vector2 delta)
+        {
+            Rotation += delta * 0.5f;
+        }
+
+        private void rotate(float frameTime)
+        {
+            Rotation += RotationSpeed;
+            RotationSpeed /= (frameTime * RotationDeceleration) + 1.0f;
+        }
+
+        public void Zoom(float delta)
+        {
+            cameraDistanceSpeed += delta;
+
+            if (cameraDistanceSpeed > 1.0f) cameraDistanceSpeed = 1.0f;
+            if (cameraDistanceSpeed < -1.0f) cameraDistanceSpeed = -1.0f;
+        }
+
+        private void zoom(float frameTime)
+        {
+            cameraDistance += cameraDistanceSpeed;
+            cameraDistanceSpeed /= (frameTime * DistanceDeceleration) + 1.0f;
+        }
+
+        public void Update(float frameTime)
+        {
+            move(frameTime);
+            rotate(frameTime);
+            zoom(frameTime);
+
+            var rx = DegToRad(Rotation.X);
+            var ry = DegToRad(Rotation.Y);
+
+            Console.WriteLine($"{Look.X} {Look.Z}");
+
             Position = new Vector3(
-                (float)Math.Sin(cameraRotation) * cameraDistance,
-                cameraDistance * 0.5f,
-                (float)Math.Cos(cameraRotation) * cameraDistance
+                Look.X - (MathF.Sin(rx) * MathF.Cos(ry) * cameraDistance),
+                cameraDistance * MathF.Sin(ry),
+                Look.Z - (MathF.Cos(rx) * MathF.Cos(ry) * cameraDistance)
             );
 
-            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4f, AspectRatio, 1, 1000);
-            ViewMatrix = Matrix4.LookAt(Position, new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, AspectRatio, 1, 1000);
+            ViewMatrix = Matrix4.LookAt(Position, Look, new Vector3(0, 1, 0));
         }
 
         public void ApplyCamera(Shader shader)

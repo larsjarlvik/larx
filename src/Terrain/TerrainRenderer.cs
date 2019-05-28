@@ -123,10 +123,10 @@ namespace Larx.Terrain
 
         private int? getTileIndex(Vector3 position)
         {
-            var x = (int)Math.Floor(position.X + (mapSize / 2));
+            var x = (int)MathF.Floor(position.X + (mapSize / 2));
             if (x < 0 || x > mapSize) return null;
 
-            var z = (int)Math.Floor(position.Z + (mapSize / 2));
+            var z = (int)MathF.Floor(position.Z + (mapSize / 2));
             if (z < 0 || z > mapSize) return null;
 
             return ((z * mapSize) + x) * 6;

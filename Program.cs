@@ -30,6 +30,8 @@ namespace Larx
         private float scaleFactor;
         private float radius;
         private float hardness;
+        private int lastScroll;
+        private Point lastMouse;
 
         public Program() : base(
             1280, 720,
@@ -37,6 +39,7 @@ namespace Larx
             DisplayDevice.Default, 4, 0,
             GraphicsContextFlags.ForwardCompatible | GraphicsContextFlags.Debug)
         {
+            lastMouse = new Point();
             scaleFactor = Width / 1280f;
             lastFPSUpdate = 0;
             polygonMode = PolygonMode.Fill;
@@ -69,18 +72,24 @@ namespace Larx
             ui.AddText("fps", "FPS: Calculating");
             ui.AddText("size", $"Tool Size: {radius}");
             ui.AddText("hardness", $"Hardness: {hardness}");
+            ui.AddText("position", $"Position: {mousePicker.MouseRay.X} {mousePicker.MouseRay.Z}");
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
-            if (keyboard[Key.W]) camera.Move(CameraMoveDirection.Forward);
-            if (keyboard[Key.S]) camera.Move(CameraMoveDirection.Back);
-            if (keyboard[Key.A]) camera.Move(CameraMoveDirection.Right);
-            if (keyboard[Key.D]) camera.Move(CameraMoveDirection.Left);
-            camera.Update();
-
             var mouse = Mouse.GetCursorState();
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
+
+            if (mouse.ScrollWheelValue > lastScroll) camera.Zoom(-1.0f);
+            if (mouse.ScrollWheelValue < lastScroll) camera.Zoom( 1.0f);
+            if (mouse.MiddleButton == ButtonState.Pressed) camera.Rotate(new Vector2((float)(mousePos.X - lastMouse.X), (float)(mousePos.Y - lastMouse.Y)));
+
+            if (keyboard[Key.W]) camera.Move(new Vector3( 0.0f, 0.0f, 1.0f));
+            if (keyboard[Key.S]) camera.Move(new Vector3( 0.0f, 0.0f,-1.0f));
+            if (keyboard[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
+            if (keyboard[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
+
+            camera.Update((float)e.Time);
             mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
             if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, radius, hardness, mousePicker);
@@ -94,6 +103,12 @@ namespace Larx
                 FPS = 0;
                 lastFPSUpdate %= 1;
             }
+
+            lastScroll = mouse.ScrollWheelValue;
+            lastMouse = new Point(mousePos.X, mousePos.Y);
+
+            var pos = terrain.GetPosition(mousePicker);
+            ui.UpdateText("position", $"Position: {pos.X} {pos.Z}");
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -165,7 +180,7 @@ namespace Larx
                 }
 
                 ui.UpdateText("size", $"Tool Size: {radius}");
-                ui.UpdateText("hardness", $"Hardness: {Math.Round(hardness, 1)}");
+                ui.UpdateText("hardness", $"Hardness: {MathF.Round(hardness, 1)}");
             }
 
             if (!e.Control)
