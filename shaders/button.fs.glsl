@@ -19,7 +19,12 @@ void main() {
 
     if (texCoord.x < maxX && texCoord.x > minX &&
         texCoord.y < maxY && texCoord.y > minY) {
-        float intensity = clamp((pow((texCoord.x - 0.5) * 2, shade_strength) + pow((texCoord.y - 0.5) * 2, shade_strength)), 0.0, 1.0) * 0.5;
+        float intensity = clamp(
+            pow(abs(texCoord.x - 0.5) * 2, shade_strength) +
+            pow(abs(texCoord.y - 0.5) * 2, shade_strength),
+            0.0, 1.0
+        ) * 0.6;
+
         outputColor = vec4(mix(texColor, gradient, intensity), 1.0);
     } else {
         outputColor = vec4(1.0);
