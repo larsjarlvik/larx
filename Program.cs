@@ -73,6 +73,10 @@ namespace Larx
             ui.AddText("size", $"Tool Size: {radius}");
             ui.AddText("hardness", $"Hardness: {hardness}");
             ui.AddText("position", $"Position: {mousePicker.MouseRay.X} {mousePicker.MouseRay.Z}");
+
+            ui.AddButton("test", "textures/grass-albedo.bmp");
+            ui.AddButton("test1", "textures/rocky-grass-albedo.bmp");
+            ui.AddButton("test2", "textures/cliff-albedo.bmp");
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
