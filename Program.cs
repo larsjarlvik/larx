@@ -84,8 +84,8 @@ namespace Larx
             var mouse = Mouse.GetCursorState();
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
 
-            if (mouse.ScrollWheelValue > lastScroll) camera.Zoom(-1.0f);
-            if (mouse.ScrollWheelValue < lastScroll) camera.Zoom( 1.0f);
+            if (mouse.ScrollWheelValue > lastScroll) camera.Zoom(-0.2f);
+            if (mouse.ScrollWheelValue < lastScroll) camera.Zoom( 0.2f);
             if (mouse.MiddleButton == ButtonState.Pressed) camera.Rotate(new Vector2((float)(mousePos.X - lastMouse.X), (float)(mousePos.Y - lastMouse.Y)));
 
             if (keyboard[Key.W]) camera.Move(new Vector3( 0.0f, 0.0f, 1.0f));

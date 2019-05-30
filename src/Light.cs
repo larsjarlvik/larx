@@ -15,7 +15,7 @@ namespace Larx
             Ambient = new Vector3(0.5f, 0.5f, 0.5f);
             Diffuse = new Vector3(1.0f, 1.0f, 1.0f);
             Specular = new Vector3(1.0f, 1.0f, 1.0f);
-            Position = new Vector3(350.0f, 350.0f, 350.0f);
+            Position = new Vector3(350.0f, 750.0f, 350.0f);
         }
 
         public void ApplyLight(Shader shader)

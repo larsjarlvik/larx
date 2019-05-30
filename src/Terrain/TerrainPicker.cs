@@ -3,7 +3,7 @@ using OpenTK;
 namespace Larx.Terrain
 {
     public partial class TerrainPicker {
-        private const float RayRange = 200;
+        private const float RayRange = 2000;
         private const int MaxRecursions = 50;
 
         public Vector3 GetPosition(MousePicker picker)

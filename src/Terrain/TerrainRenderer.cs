@@ -163,10 +163,10 @@ namespace Larx.Terrain
 
             GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
             GL.Uniform1(shader.Texture, 0);
-            GL.Uniform3(shader.Ambient, 0.8f, 0.8f, 0.8f);
+            GL.Uniform3(shader.Ambient, 0.3f, 0.3f, 0.3f);
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
             GL.Uniform3(shader.Specular, 0.4f, 0.4f, 0.4f);
-            GL.Uniform1(shader.Shininess, 50f);
+            GL.Uniform1(shader.Shininess, 2f);
             GL.Uniform1(shader.GridLines, ShowGridLines ? 1 : 0);
 
             camera.ApplyCamera(shader);

@@ -1,4 +1,6 @@
 #version 330
+precision highp float;
+
 uniform sampler2DArray uTexture;
 
 in vec3 position;
@@ -55,17 +57,21 @@ vec3 blendSlope(float slope, float start, float stop, vec3 texture1, vec3 textur
 vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
     vec3 n = normalize(normalVector * normalMap);
     vec3 ambient = uAmbient * uLightAmbient;
-    vec3 diffuse = max(dot(lightVector, n), 0.0) * uDiffuse;
+    vec3 diffuse = max(dot(lightVector, n), 0.0) * uDiffuse * uLightDiffuse;
     vec3 halfwayVector = normalize(lightVector + eyeVector);
-    vec3 specular = pow(max(dot(n, halfwayVector), 0.0), (1.0 - roughMap.r)) * uSpecular;
+    vec3 specular = pow(max(dot(n, halfwayVector), 0.0), (roughMap.r * 50.0)) * uSpecular * uLightSpecular;
 
     return ambient + diffuse + specular;
 }
 
+vec3 finalTexture(int index) {
+    return getTriPlanarTexture(index * 3) * calculateLight(getTriPlanarTexture(index * 3 + 1), getTriPlanarTexture(index * 3 + 2));
+}
+
 void main() {
-    vec3 grass = getTriPlanarTexture(0.0) * calculateLight(getTriPlanarTexture(1.0), getTriPlanarTexture(2.0));
-    vec3 sand = getTriPlanarTexture(3.0) * calculateLight(getTriPlanarTexture(4.0), getTriPlanarTexture(5.0));
-    vec3 rock = getTriPlanarTexture(6.0) * calculateLight(getTriPlanarTexture(7.0), getTriPlanarTexture(8.0));
+    vec3 grass = finalTexture(0);
+    vec3 sand = finalTexture(1);
+    vec3 rock = finalTexture(2);
 
     vec3 finalColor = grass;
 
