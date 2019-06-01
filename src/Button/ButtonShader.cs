@@ -11,6 +11,7 @@ namespace Larx.Button
         public int Position { get; private set; }
         public int Size { get; private set; }
         public int State { get; private set; }
+        public int Active { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -19,6 +20,7 @@ namespace Larx.Button
             Position = GL.GetUniformLocation(Program, "uPosition");
             Size = GL.GetUniformLocation(Program, "uSize");
             State = GL.GetUniformLocation(Program, "uState");
+            Active = GL.GetUniformLocation(Program, "uActive");
         }
     }
 }

@@ -1,6 +1,7 @@
 #version 330
 uniform sampler2D uTexture;
 uniform int uState;
+uniform int uActive;
 
 in vec2 texCoord;
 
@@ -29,14 +30,18 @@ void main() {
             0.0, 1.0
         ) * 0.6;
 
-        outputColor = vec4(mix(texColor, gradient, intensity), 0.8);
+        outputColor = vec4(mix(texColor, gradient, intensity), uState == 0 ? 0.85 : 1.0);
     } else {
-        if (uState == state_hover) {
-            outputColor = vec4(0.41, 0.56, 0.64, 1.0);
-        } else if (uState == state_pressed) {
-            outputColor = vec4(0.53, 0.75, 0.87, 1.0);
+
+        if (uActive == 1) {
+            outputColor = vec4(1.0, 0.54, 0.0, 1.0);
         } else {
             outputColor = vec4(1.0);
+        }
+
+
+        if (uState == state_pressed) {
+            outputColor.a = 0.5;
         }
     }
 }

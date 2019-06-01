@@ -34,14 +34,17 @@ namespace Larx.UserInterFace
             AddButton(Keys.ElevationTools, "ui/terrain.bmp");
             AddButton(Keys.TerrainPaint, "ui/paint.bmp");
 
-            elevationTools.Add(AddButton(Keys.Terrain.Increase, "ui/terrain-increase.bmp"));
-            elevationTools.Add(AddButton(Keys.Terrain.Decrease, "ui/terrain-decrease.bmp"));
+            elevationTools.Add(AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.bmp"));
+            elevationTools.Add(AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.bmp"));
+            elevationTools.Add(AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.bmp"));
+            elevationTools.Add(AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.bmp"));
 
             terrainPaint.Add(AddButton(Keys.Paint.Grass, "textures/grass-albedo.bmp"));
             terrainPaint.Add(AddButton(Keys.Paint.RoughGrass, "textures/rocky-grass-albedo.bmp"));
             terrainPaint.Add(AddButton(Keys.Paint.Cliff, "textures/cliff-albedo.bmp"));
 
             activeTopMenu = elevationTools;
+            buttons[Keys.ElevationTools].Active = true;
         }
 
         public bool Update(Point mousePos, ButtonState leftButton)
@@ -65,9 +68,13 @@ namespace Larx.UserInterFace
             switch(uiIntersect) {
                 case Keys.ElevationTools:
                     activeTopMenu = elevationTools;
+                    buttons[Keys.ElevationTools].Active = true;
+                    buttons[Keys.TerrainPaint].Active = false;
                     break;
                 case Keys.TerrainPaint:
                     activeTopMenu = terrainPaint;
+                    buttons[Keys.ElevationTools].Active = false;
+                    buttons[Keys.TerrainPaint].Active = true;
                     break;
             }
 

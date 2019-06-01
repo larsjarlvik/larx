@@ -12,12 +12,13 @@ namespace Larx.Button
         {
             Default = 0,
             Hover = 1,
-            Pressed = 2
+            Pressed = 2,
         }
 
         public ButtonShader Shader { get; }
         public Vector2 Position { get; set; }
         public Vector2 Size { get; set; }
+        public bool Active { get; set; }
 
         private int vertexBuffer;
         private int textureBuffer;
@@ -81,6 +82,7 @@ namespace Larx.Button
             GL.Uniform2(Shader.Position, Position);
             GL.Uniform2(Shader.Size, Size);
             GL.Uniform1(Shader.State, (int)state);
+            GL.Uniform1(Shader.Active, Active ? 1 : 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);

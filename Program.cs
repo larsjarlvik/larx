@@ -109,7 +109,9 @@ namespace Larx
             lastMouse = new Point(mousePos.X, mousePos.Y);
 
             var pos = terrain.GetPosition(mousePicker);
-            ui.UpdateText("position", $"Position: {pos.X} {pos.Z}");
+            ui.UpdateText("position", $"Position: {pos.X:0.##} {pos.Z:0.##}");
+            ui.UpdateText("size", $"Tool Size: {radius}");
+            ui.UpdateText("hardness", $"Hardness: {MathF.Round(hardness, 1)}");
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -150,16 +152,24 @@ namespace Larx
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
             var uiIntersect = ui.Click(mousePos, mouse.LeftButton);
 
-            if (uiIntersect == Keys.Terrain.Increase) {
+            if (uiIntersect == Keys.Terrain.SizeIncrease) {
                 radius ++;
                 if (radius > 12.0f) radius = 12.0f;
-                ui.UpdateText("size", $"Tool Size: {radius}");
             }
 
-            if (uiIntersect == Keys.Terrain.Decrease) {
+            if (uiIntersect == Keys.Terrain.SizeDecrease) {
                 radius --;
                 if (radius < 0.0f) radius = 0.0f;
-                ui.UpdateText("size", $"Tool Size: {radius}");
+            }
+
+            if (uiIntersect == Keys.Terrain.HardnessIncrease) {
+                hardness += 0.1f;
+                if (hardness > 1.0f) hardness = 1.0f;
+            }
+
+            if (uiIntersect == Keys.Terrain.HardnessDecrease) {
+                hardness -= 0.1f;
+                if (hardness < 0.0f) hardness = 0.0f;
             }
         }
 
@@ -178,20 +188,6 @@ namespace Larx
 
                 if (e.Control && e.Keyboard[Key.G])
                     terrain.ShowGridLines = !terrain.ShowGridLines;
-
-                if (e.Control && e.Keyboard[Key.Plus])
-
-                if (e.Shift && e.Keyboard[Key.Plus]) {
-                    hardness += 0.1f;
-                    if (hardness > 1.0f) hardness = 1.0f;
-                }
-
-                if (e.Shift && e.Keyboard[Key.Minus]) {
-                    hardness -= 0.1f;
-                    if (hardness < 0.0f) hardness = 0.0f;
-                }
-
-                ui.UpdateText("hardness", $"Hardness: {MathF.Round(hardness, 1)}");
             }
 
             if (!e.Control)

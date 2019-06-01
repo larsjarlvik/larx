@@ -23,13 +23,13 @@ namespace Larx.UserInterFace
         public void AddText(string key, string text)
         {
             var tr = new TextRenderer();
-            tr.CreateText(text, 12.0f);
+            tr.CreateText(text, 14.0f);
             texts.Add(key, tr);
         }
 
         public void UpdateText(string key, string text)
         {
-            texts[key].CreateText(text, 12.0f);
+            texts[key].CreateText(text, 14.0f);
         }
 
         public string AddButton(string key, string texturePath)
@@ -47,9 +47,7 @@ namespace Larx.UserInterFace
 
         public string MouseUiIntersect(List<string> keys, Point mousePos, ButtonState leftButton)
         {
-            return buttons
-                .Where(x => keys.Contains(x.Key))
-                .FirstOrDefault(x => x.Value.MouseIntersect(mousePos, leftButton)).Key;
+            return buttons.Where(x => keys.Contains(x.Key) && x.Value.MouseIntersect(mousePos, leftButton)).FirstOrDefault().Key;
         }
     }
 }

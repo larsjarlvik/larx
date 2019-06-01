@@ -7,8 +7,10 @@ namespace Larx.UserInterFace
 
         public static class Terrain
         {
-            public const string Increase = "terrain_increase";
-            public const string Decrease = "terrain_decrease";
+            public const string SizeIncrease = "terrain_size_increase";
+            public const string SizeDecrease = "terrain_size_decrease";
+            public const string HardnessIncrease = "terrain_hardness_increase";
+            public const string HardnessDecrease = "terrain_hardness_decrease";
         }
 
         public static class Paint
