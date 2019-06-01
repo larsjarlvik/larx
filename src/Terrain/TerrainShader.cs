@@ -12,6 +12,8 @@ namespace Larx.Terrain
         public int Shininess { get; private set; }
         public int Texture { get; private set; }
         public int GridLines { get; private set; }
+        public int TextureId { get; private set; }
+        public int TextureIntensity { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -23,6 +25,8 @@ namespace Larx.Terrain
             Shininess = GL.GetUniformLocation(Program, "uShininess");
             Texture = GL.GetUniformLocation(Program, "uTexture");
             GridLines = GL.GetUniformLocation(Program, "uGridLines");
+            TextureId = GL.GetUniformLocation(Program, "uTextureId");
+            TextureIntensity = GL.GetUniformLocation(Program, "uTextureIntensity");
         }
     }
 }

@@ -2,6 +2,8 @@
 precision highp float;
 
 uniform sampler2DArray uTexture;
+uniform sampler2D uTextureId;
+uniform sampler2D uTextureIntensity;
 
 in vec3 position;
 in vec2 texCoord;
@@ -47,13 +49,6 @@ float gridLine() {
     return (1.0 - min(line, 1.0)) / 3;
 }
 
-vec3 blendSlope(float slope, float start, float stop, vec3 texture1, vec3 texture2, vec3 textureDefault) {
-    if (slope < start || slope > stop) return textureDefault;
-
-    float slopeBlend = (slope - start) * (1.0 / (stop - start));
-    return mix(texture1, texture2, slopeBlend);
-}
-
 vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
     vec3 n = normalize(normalVector * normalMap);
     vec3 ambient = uAmbient * uLightAmbient;
@@ -64,21 +59,22 @@ vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
     return ambient + diffuse + specular;
 }
 
-vec3 finalTexture(int index) {
+vec3 finalTexture(float index) {
     return getTriPlanarTexture(index * 3) * calculateLight(getTriPlanarTexture(index * 3 + 1), getTriPlanarTexture(index * 3 + 2));
 }
 
 void main() {
-    vec3 grass = finalTexture(0);
-    vec3 sand = finalTexture(1);
-    vec3 rock = finalTexture(2);
+    vec3 textureIds = texture(uTextureId, position.xz).rgb * 255;
+    vec3 textureIntensities = texture(uTextureIntensity, position.xz).rgb;
 
-    vec3 finalColor = grass;
+    vec3 t1 = textureIntensities.r > 0.0 ? finalTexture(textureIds.r) : vec3(0.0);
+    vec3 t2 = textureIntensities.g > 0.0 ? finalTexture(textureIds.g) : vec3(0.0);
+    vec3 t3 = textureIntensities.b > 0.0 ? finalTexture(textureIds.b) : vec3(0.0);
 
-    float slope = 1.0 - normalize(normal).y;
-    finalColor = blendSlope(slope, 0.1, 0.2, grass, sand, finalColor);
-    finalColor = blendSlope(slope, 0.2, 0.3, sand, rock, finalColor);
-    finalColor = blendSlope(slope, 0.3, 1.0, rock, rock, finalColor);
+    vec3 color =
+        t1 * textureIntensities.r +
+        t2 * textureIntensities.g +
+        t3 * textureIntensities.b;
 
-    outputColor = mix(finalColor, vec3(0.3, 0.3, 0.3), gridLine());
+    outputColor = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
 }

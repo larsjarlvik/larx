@@ -20,6 +20,7 @@ namespace Larx.Terrain
         private List<Vector3> normals = new List<Vector3>();
         private List<int> indices = new List<int>();
 
+        private readonly SplatMap splatMap;
         private readonly TerrainShader shader;
         private readonly Texture texture;
 
@@ -28,6 +29,7 @@ namespace Larx.Terrain
         public TerrainRenderer()
         {
             shader = new TerrainShader();
+            splatMap = new SplatMap();
 
             texture = new Texture();
             texture.LoadTexture(new [] {
@@ -161,8 +163,19 @@ namespace Larx.Terrain
 
             GL.UseProgram(shader.Program);
 
+
+            GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
             GL.Uniform1(shader.Texture, 0);
+
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, splatMap.TextureId);
+            GL.Uniform1(shader.TextureId, 1);
+
+            GL.ActiveTexture(TextureUnit.Texture2);
+            GL.BindTexture(TextureTarget.Texture2D, splatMap.TextureIntensity);
+            GL.Uniform1(shader.TextureIntensity, 2);
+
             GL.Uniform3(shader.Ambient, 0.3f, 0.3f, 0.3f);
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
             GL.Uniform3(shader.Specular, 0.4f, 0.4f, 0.4f);
@@ -183,6 +196,8 @@ namespace Larx.Terrain
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
         }
     }
 }
