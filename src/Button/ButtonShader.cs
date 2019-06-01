@@ -10,6 +10,7 @@ namespace Larx.Button
         public int Texture { get; private set; }
         public int Position { get; private set; }
         public int Size { get; private set; }
+        public int State { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -17,6 +18,7 @@ namespace Larx.Button
             Texture = GL.GetUniformLocation(Program, "uTexture");
             Position = GL.GetUniformLocation(Program, "uPosition");
             Size = GL.GetUniformLocation(Program, "uSize");
+            State = GL.GetUniformLocation(Program, "uState");
         }
     }
 }

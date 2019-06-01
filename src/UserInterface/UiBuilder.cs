@@ -4,16 +4,17 @@ using Larx.Button;
 using Larx.Text;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using OpenTK.Input;
 
 namespace Larx.UserInterFace
 {
-    public class UiBuilder
+    public partial class Builder
     {
-        private Dictionary<string, TextRenderer> texts;
-        private Dictionary<string, ButtonRenderer> buttons;
-        private SizeF uiSize;
+        protected Dictionary<string, TextRenderer> texts;
+        protected Dictionary<string, ButtonRenderer> buttons;
+        protected SizeF uiSize;
 
-        public UiBuilder()
+        public Builder()
         {
             texts = new Dictionary<string, TextRenderer>();
             buttons = new Dictionary<string, ButtonRenderer>();
@@ -31,10 +32,12 @@ namespace Larx.UserInterFace
             texts[key].CreateText(text, 12.0f);
         }
 
-        public void AddButton(string key, string texturePath)
+        public string AddButton(string key, string texturePath)
         {
-            var br = new ButtonRenderer(texturePath);
+            var br = new ButtonRenderer(texturePath, new Vector2(60, 60));
             buttons.Add(key, br);
+
+            return key;
         }
 
         public void Resize(SizeF uiSize)
@@ -42,19 +45,11 @@ namespace Larx.UserInterFace
             this.uiSize = uiSize;
         }
 
-
-        public void Render()
+        public string MouseUiIntersect(List<string> keys, Point mousePos, ButtonState leftButton)
         {
-            GL.Enable(EnableCap.Blend);
-            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, uiSize.Width, uiSize.Height, 0f, 0f, -1.0f);
-
-            for(var i = 0; i < texts.Count; i ++)
-                texts.Values.ElementAt(i).Render(pMatrix, new Vector2(10, 20 + i * 20), 0.65f, 1.6f);
-
-            for(var i = 0; i < buttons.Count; i ++)
-                buttons.Values.ElementAt(i).Render(pMatrix, new Vector2(20 + i * 60, uiSize.Height - 70), new Vector2(50, 50));
-
-            GL.Disable(EnableCap.Blend);
+            return buttons
+                .Where(x => keys.Contains(x.Key))
+                .FirstOrDefault(x => x.Value.MouseIntersect(mousePos, leftButton)).Key;
         }
     }
 }

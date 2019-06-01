@@ -23,7 +23,7 @@ namespace Larx
         private ObjectRenderer debug;
         private TerrainRenderer terrain;
         private MousePicker mousePicker;
-        private UiBuilder ui;
+        private Ui ui;
 
         private KeyboardState keyboard;
 
@@ -61,28 +61,19 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
-            ui = new UiBuilder();
+            ui = new Ui();
             terrain = new TerrainRenderer();
             debug = new ObjectRenderer();
             camera = new Camera();
             light = new Light();
             mousePicker = new MousePicker(camera);
-
-            ui.AddText("title", "Larx Terrain Editor v0.1");
-            ui.AddText("fps", "FPS: Calculating");
-            ui.AddText("size", $"Tool Size: {radius}");
-            ui.AddText("hardness", $"Hardness: {hardness}");
-            ui.AddText("position", $"Position: {mousePicker.MouseRay.X} {mousePicker.MouseRay.Z}");
-
-            ui.AddButton("test", "textures/grass-albedo.bmp");
-            ui.AddButton("test1", "textures/rocky-grass-albedo.bmp");
-            ui.AddButton("test2", "textures/cliff-albedo.bmp");
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             var mouse = Mouse.GetCursorState();
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
+            var uiIntersect = ui.Update(mousePos, mouse.LeftButton);
 
             if (mouse.ScrollWheelValue > lastScroll) camera.Zoom(-0.2f);
             if (mouse.ScrollWheelValue < lastScroll) camera.Zoom( 0.2f);
@@ -93,7 +84,6 @@ namespace Larx
             if (keyboard[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
             if (keyboard[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
 
-
             if (keyboard[Key.Up]) light.Position += new Vector3( 0.0f, 0.0f, 1.0f);
             if (keyboard[Key.Down]) light.Position += new Vector3( 0.0f, 0.0f,-1.0f);
             if (keyboard[Key.Left]) light.Position += new Vector3( 1.0f, 0.0f, 0.0f);
@@ -102,13 +92,14 @@ namespace Larx
             camera.Update((float)e.Time);
             mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
-            if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, radius, hardness, mousePicker);
-            if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, radius, hardness, mousePicker);
+            if (!uiIntersect) {
+                if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, radius, hardness, mousePicker);
+                if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, radius, hardness, mousePicker);
+            }
 
             lastFPSUpdate += e.Time;
             if (lastFPSUpdate > 1)
             {
-                ui.UpdateText("fps", $"FPS: {FPS}");
                 Title = $"Larx (Vsync: {VSync}) - FPS: {FPS}";
                 FPS = 0;
                 lastFPSUpdate %= 1;
@@ -153,6 +144,25 @@ namespace Larx
             multisampling.RefreshBuffers(Width, Height);
         }
 
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            var mouse = Mouse.GetCursorState();
+            var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
+            var uiIntersect = ui.Click(mousePos, mouse.LeftButton);
+
+            if (uiIntersect == Keys.Terrain.Increase) {
+                radius ++;
+                if (radius > 12.0f) radius = 12.0f;
+                ui.UpdateText("size", $"Tool Size: {radius}");
+            }
+
+            if (uiIntersect == Keys.Terrain.Decrease) {
+                radius --;
+                if (radius < 0.0f) radius = 0.0f;
+                ui.UpdateText("size", $"Tool Size: {radius}");
+            }
+        }
+
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
             if (!e.IsRepeat)
@@ -169,15 +179,7 @@ namespace Larx
                 if (e.Control && e.Keyboard[Key.G])
                     terrain.ShowGridLines = !terrain.ShowGridLines;
 
-                if (e.Control && e.Keyboard[Key.Plus]) {
-                    radius ++;
-                    if (radius > 12.0f) radius = 12.0f;
-                }
-
-                if (e.Control && e.Keyboard[Key.Minus]) {
-                    radius --;
-                    if (radius < 0.0f) radius = 0.0f;
-                }
+                if (e.Control && e.Keyboard[Key.Plus])
 
                 if (e.Shift && e.Keyboard[Key.Plus]) {
                     hardness += 0.1f;
@@ -189,7 +191,6 @@ namespace Larx
                     if (hardness < 0.0f) hardness = 0.0f;
                 }
 
-                ui.UpdateText("size", $"Tool Size: {radius}");
                 ui.UpdateText("hardness", $"Hardness: {MathF.Round(hardness, 1)}");
             }
 
