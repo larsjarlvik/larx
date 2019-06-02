@@ -16,7 +16,6 @@ namespace Larx
         private int FPS;
         private double lastFPSUpdate;
         private Multisampling multisampling;
-        private PolygonMode polygonMode;
 
         private Camera camera;
         private Light light;
@@ -27,9 +26,6 @@ namespace Larx
 
         private KeyboardState keyboard;
 
-        private float scaleFactor;
-        private float radius;
-        private float hardness;
         private int lastScroll;
         private Point lastMouse;
 
@@ -40,11 +36,10 @@ namespace Larx
             GraphicsContextFlags.ForwardCompatible | GraphicsContextFlags.Debug)
         {
             lastMouse = new Point();
-            scaleFactor = Width / 1280f;
             lastFPSUpdate = 0;
-            polygonMode = PolygonMode.Fill;
-            radius = 3f;
-            hardness = 0.5f;
+            State.PolygonMode = PolygonMode.Fill;
+            State.ToolRadius = 3f;
+            State.ToolHardness = 0.5f;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -93,8 +88,16 @@ namespace Larx
             mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
 
             if (!uiIntersect) {
-                if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, radius, hardness, mousePicker);
-                if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, radius, hardness, mousePicker);
+                switch (State.ActiveTopMenu)
+                {
+                    case TopMenu.Terrain:
+                        if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, mousePicker);
+                        if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, mousePicker);
+                        break;
+                    case TopMenu.Paint:
+                        if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint(mousePicker);
+                        break;
+                }
             }
 
             lastFPSUpdate += e.Time;
@@ -110,8 +113,6 @@ namespace Larx
 
             var pos = terrain.GetPosition(mousePicker);
             ui.UpdateText("position", $"Position: {pos.X:0.##} {pos.Z:0.##}");
-            ui.UpdateText("size", $"Tool Size: {radius}");
-            ui.UpdateText("hardness", $"Hardness: {MathF.Round(hardness, 1)}");
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -120,7 +121,7 @@ namespace Larx
             FPS++;
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.PolygonMode(MaterialFace.FrontAndBack, polygonMode);
+            GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
             GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.DepthTest);
 
@@ -140,7 +141,7 @@ namespace Larx
         protected override void OnResize(EventArgs e)
         {
             camera.AspectRatio = (float)Width / (float)Height;
-            ui.Resize(new SizeF(Width / scaleFactor, Height / scaleFactor));
+            ui.Resize(new SizeF(Width, Height));
 
             GL.Viewport(0, 0, Width, Height);
             multisampling.RefreshBuffers(Width, Height);
@@ -150,27 +151,7 @@ namespace Larx
         {
             var mouse = Mouse.GetCursorState();
             var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
-            var uiIntersect = ui.Click(mousePos, mouse.LeftButton);
-
-            if (uiIntersect == Keys.Terrain.SizeIncrease) {
-                radius ++;
-                if (radius > 12.0f) radius = 12.0f;
-            }
-
-            if (uiIntersect == Keys.Terrain.SizeDecrease) {
-                radius --;
-                if (radius < 0.0f) radius = 0.0f;
-            }
-
-            if (uiIntersect == Keys.Terrain.HardnessIncrease) {
-                hardness += 0.1f;
-                if (hardness > 1.0f) hardness = 1.0f;
-            }
-
-            if (uiIntersect == Keys.Terrain.HardnessDecrease) {
-                hardness -= 0.1f;
-                if (hardness < 0.0f) hardness = 0.0f;
-            }
+            ui.Click(mousePos, mouse.LeftButton);
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
@@ -184,10 +165,10 @@ namespace Larx
                     WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
 
                 if (e.Control && e.Keyboard[Key.W])
-                    polygonMode = polygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
+                    State.PolygonMode = State.PolygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
 
                 if (e.Control && e.Keyboard[Key.G])
-                    terrain.ShowGridLines = !terrain.ShowGridLines;
+                    State.ShowGridLines = !State.ShowGridLines;
             }
 
             if (!e.Control)

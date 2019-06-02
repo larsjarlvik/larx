@@ -11,16 +11,11 @@ namespace Larx.UserInterFace
 {
     public class Ui : Builder
     {
-
-        private List<string> elevationTools;
-        private List<string> terrainPaint;
-        private List<string> activeTopMenu;
-
+        private List<ToolbarItem> tools;
 
         public Ui() : base()
         {
-            elevationTools = new List<string>();
-            terrainPaint = new List<string>();
+            tools = new List<ToolbarItem>();
             build();
         }
 
@@ -34,16 +29,18 @@ namespace Larx.UserInterFace
             AddButton(Keys.ElevationTools, "ui/terrain.bmp");
             AddButton(Keys.TerrainPaint, "ui/paint.bmp");
 
-            elevationTools.Add(AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.bmp"));
-            elevationTools.Add(AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.bmp"));
-            elevationTools.Add(AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.bmp"));
-            elevationTools.Add(AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.bmp"));
+            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.bmp")));
 
-            terrainPaint.Add(AddButton(Keys.Paint.Grass, "textures/grass-albedo.bmp"));
-            terrainPaint.Add(AddButton(Keys.Paint.RoughGrass, "textures/rocky-grass-albedo.bmp"));
-            terrainPaint.Add(AddButton(Keys.Paint.Cliff, "textures/cliff-albedo.bmp"));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Grass, "textures/grass-albedo.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.RoughGrass, "textures/rocky-grass-albedo.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Cliff, "textures/cliff-albedo.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Sand, "textures/sand-albedo.bmp")));
 
-            activeTopMenu = elevationTools;
+
+            State.ActiveTopMenu = TopMenu.Terrain;
             buttons[Keys.ElevationTools].Active = true;
         }
 
@@ -51,30 +48,46 @@ namespace Larx.UserInterFace
         {
             updateButtonPositions();
 
-            var toCheck = new List<string> { Keys.ElevationTools, Keys.TerrainPaint };
-            toCheck.AddRange(activeTopMenu);
+            UpdateText("size", $"Tool Size: {State.ToolRadius}");
+            UpdateText("hardness", $"Hardness: {MathF.Round(State.ToolHardness, 1)}");
 
-            return MouseUiIntersect(toCheck, mousePos, leftButton) != null;
+            return MouseUiIntersect(getVisibleTools(), mousePos, leftButton) != null;
         }
 
         public string Click(Point mousePos, ButtonState leftButton)
         {
             if (leftButton != ButtonState.Pressed) return null;
 
-            var toCheck = new List<string> { Keys.ElevationTools, Keys.TerrainPaint };
-            toCheck.AddRange(activeTopMenu);
-
-            var uiIntersect = MouseUiIntersect(toCheck, mousePos, leftButton);
+            var uiIntersect = MouseUiIntersect(getVisibleTools(), mousePos, leftButton);
             switch(uiIntersect) {
                 case Keys.ElevationTools:
-                    activeTopMenu = elevationTools;
-                    buttons[Keys.ElevationTools].Active = true;
-                    buttons[Keys.TerrainPaint].Active = false;
+                    State.ActiveTopMenu = TopMenu.Terrain;
                     break;
                 case Keys.TerrainPaint:
-                    activeTopMenu = terrainPaint;
-                    buttons[Keys.ElevationTools].Active = false;
-                    buttons[Keys.TerrainPaint].Active = true;
+                    State.ActiveTopMenu = TopMenu.Paint;
+                    break;
+                case Keys.Terrain.SizeIncrease:
+                    State.ToolRadius ++;
+                    if (State.ToolRadius > 12.0f) State.ToolRadius = 12.0f;
+                    break;
+                case Keys.Terrain.SizeDecrease:
+                    State.ToolRadius --;
+                    if (State.ToolRadius < 0.0f) State.ToolRadius = 0.0f;
+                    break;
+                case Keys.Terrain.HardnessIncrease:
+                    State.ToolHardness += 0.1f;
+                    if (State.ToolHardness > 1.0f) State.ToolHardness = 1.0f;
+                    break;
+                case Keys.Terrain.HardnessDecrease:
+                    State.ToolHardness -= 0.1f;
+                    if (State.ToolHardness < 0.0f) State.ToolHardness = 0.0f;
+                    break;
+                default:
+                    if(byte.TryParse(uiIntersect, out byte texture)) {
+                        State.ActiveTexture = texture;
+                        tools.Where(t => t.TopMenu == TopMenu.Paint).ToList().ForEach(t => buttons[t.Key].Active = false);
+                        buttons[uiIntersect].Active = true;
+                    }
                     break;
             }
 
@@ -89,7 +102,7 @@ namespace Larx.UserInterFace
             position = setButtonPosition(Keys.TerrainPaint, position);
             position.X += 10.0f;
 
-            foreach(var key in activeTopMenu) {
+            foreach(var key in tools.Where(t => t.TopMenu == State.ActiveTopMenu).Select(k => k.Key)) {
                 position = setButtonPosition(key, position);
             }
         }
@@ -110,16 +123,17 @@ namespace Larx.UserInterFace
             for(var i = 0; i < texts.Count; i ++)
                 texts.Values.ElementAt(i).Render(pMatrix, new Vector2(10, 20 + i * 20), 0.65f, 1.6f);
 
-            // Category buttons
-            buttons[Keys.ElevationTools].Render(pMatrix);
-            buttons[Keys.TerrainPaint].Render(pMatrix);
-
-            // Child menu
-            foreach(var key in activeTopMenu) {
+            foreach(var key in getVisibleTools())
                 buttons[key].Render(pMatrix);
-            }
 
             GL.Disable(EnableCap.Blend);
+        }
+
+        private List<string> getVisibleTools()
+        {
+            var visble = new List<string> { Keys.ElevationTools, Keys.TerrainPaint };
+            visble.AddRange(tools.Where(t => t.TopMenu == State.ActiveTopMenu).Select(t => t.Key));
+            return visble;
         }
     }
 }

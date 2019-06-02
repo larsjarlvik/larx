@@ -15,9 +15,10 @@ namespace Larx.UserInterFace
 
         public static class Paint
         {
-            public const string Grass = "paint_grass";
-            public const string RoughGrass = "paint_rough_grass";
-            public const string Cliff = "paint_cliff";
+            public const string Grass = "0";
+            public const string RoughGrass = "1";
+            public const string Cliff = "2";
+            public const string Sand = "3";
         }
     }
 }

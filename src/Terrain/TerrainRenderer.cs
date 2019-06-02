@@ -24,8 +24,6 @@ namespace Larx.Terrain
         private readonly TerrainShader shader;
         private readonly Texture texture;
 
-        public bool ShowGridLines { get; set; }
-
         public TerrainRenderer()
         {
             shader = new TerrainShader();
@@ -41,16 +39,19 @@ namespace Larx.Terrain
                 Path.Combine("resources", "textures", "rocky-grass-rough.bmp"),
                 Path.Combine("resources", "textures", "cliff-albedo.bmp"),
                 Path.Combine("resources", "textures", "cliff-normal.bmp"),
-                Path.Combine("resources", "textures", "cliff-rough.bmp")
+                Path.Combine("resources", "textures", "cliff-rough.bmp"),
+                Path.Combine("resources", "textures", "sand-albedo.bmp"),
+                Path.Combine("resources", "textures", "sand-normal.bmp"),
+                Path.Combine("resources", "textures", "sand-rough.bmp")
             }, true);
 
             build();
         }
 
-        public void ChangeElevation(float offset, float radius, float hardness, MousePicker picker)
+        public void ChangeElevation(float offset, MousePicker picker)
         {
             var position = GetPosition(picker);
-            var toUpdate = getTilesInArea(position, radius);
+            var toUpdate = getTilesInArea(position, State.ToolRadius);
 
             foreach (var i in toUpdate)
             {
@@ -61,7 +62,7 @@ namespace Larx.Terrain
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
                 var amount = Vector3.Distance(position, vertex);
-                var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / radius > hardness ? amount : 0.0f) / radius))) * offset;
+                var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / State.ToolRadius > State.ToolHardness ? amount : 0.0f) / State.ToolRadius))) * offset;
 
                 vertices[indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
 
@@ -72,6 +73,17 @@ namespace Larx.Terrain
             }
 
             updateBuffers();
+        }
+
+        public void Paint(MousePicker picker)
+        {
+            var position = (GetPosition(picker).Xz / mapSize);
+            position.X = (position.X + 0.5f) * SplatMap.Detail;
+            position.Y = (position.Y + 0.5f) * SplatMap.Detail;
+
+            var splatMapRadius = (int)(State.ToolRadius * SplatMap.Detail / mapSize);
+
+            splatMap.Update(position, splatMapRadius, State.ActiveTexture);
         }
 
         private List<int> getTilesInArea(Vector3 center, float radius)
@@ -101,7 +113,7 @@ namespace Larx.Terrain
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
                     vertices.Add(new Vector3(x, 0f, z));
-                    coords.Add(new Vector2((x + halfMapSize), (z + halfMapSize)));
+                    coords.Add(new Vector2((x + halfMapSize) / mapSize, (z + halfMapSize) / mapSize));
                     normals.Add(new Vector3(0f, 1f, 0f).Normalized());
 
                     if (x < halfMapSize && z < halfMapSize)
@@ -180,7 +192,7 @@ namespace Larx.Terrain
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
             GL.Uniform3(shader.Specular, 0.4f, 0.4f, 0.4f);
             GL.Uniform1(shader.Shininess, 2f);
-            GL.Uniform1(shader.GridLines, ShowGridLines ? 1 : 0);
+            GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
 
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);

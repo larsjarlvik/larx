@@ -64,8 +64,8 @@ vec3 finalTexture(float index) {
 }
 
 void main() {
-    vec3 textureIds = texture(uTextureId, position.xz).rgb * 255;
-    vec3 textureIntensities = texture(uTextureIntensity, position.xz).rgb;
+    vec3 textureIds = texture(uTextureId, texCoord).rgb * 255;
+    vec3 textureIntensities = texture(uTextureIntensity, texCoord).rgb;
 
     vec3 t1 = textureIntensities.r > 0.0 ? finalTexture(textureIds.r) : vec3(0.0);
     vec3 t2 = textureIntensities.g > 0.0 ? finalTexture(textureIds.g) : vec3(0.0);
