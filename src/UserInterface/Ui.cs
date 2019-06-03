@@ -38,6 +38,7 @@ namespace Larx.UserInterFace
             tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.RoughGrass, "textures/rocky-grass-albedo.bmp")));
             tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Cliff, "textures/cliff-albedo.bmp")));
             tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Sand, "textures/sand-albedo.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Snow, "textures/snow-albedo.bmp")));
 
 
             State.ActiveTopMenu = TopMenu.Terrain;
@@ -62,9 +63,13 @@ namespace Larx.UserInterFace
             switch(uiIntersect) {
                 case Keys.ElevationTools:
                     State.ActiveTopMenu = TopMenu.Terrain;
+                    buttons[Keys.ElevationTools].Active = true;
+                    buttons[Keys.TerrainPaint].Active = false;
                     break;
                 case Keys.TerrainPaint:
                     State.ActiveTopMenu = TopMenu.Paint;
+                    buttons[Keys.ElevationTools].Active = false;
+                    buttons[Keys.TerrainPaint].Active = true;
                     break;
                 case Keys.Terrain.SizeIncrease:
                     State.ToolRadius ++;

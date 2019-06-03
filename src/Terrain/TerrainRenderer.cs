@@ -42,7 +42,10 @@ namespace Larx.Terrain
                 Path.Combine("resources", "textures", "cliff-rough.bmp"),
                 Path.Combine("resources", "textures", "sand-albedo.bmp"),
                 Path.Combine("resources", "textures", "sand-normal.bmp"),
-                Path.Combine("resources", "textures", "sand-rough.bmp")
+                Path.Combine("resources", "textures", "sand-rough.bmp"),
+                Path.Combine("resources", "textures", "snow-albedo.bmp"),
+                Path.Combine("resources", "textures", "snow-normal.bmp"),
+                Path.Combine("resources", "textures", "snow-rough.bmp")
             }, true);
 
             build();
@@ -190,7 +193,7 @@ namespace Larx.Terrain
 
             GL.Uniform3(shader.Ambient, 0.3f, 0.3f, 0.3f);
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
-            GL.Uniform3(shader.Specular, 0.4f, 0.4f, 0.4f);
+            GL.Uniform3(shader.Specular, 0.8f, 0.8f, 0.8f);
             GL.Uniform1(shader.Shininess, 2f);
             GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
 

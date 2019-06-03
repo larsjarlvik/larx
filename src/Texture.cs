@@ -86,7 +86,7 @@ namespace Larx
             TextureId = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, TextureId);
 
-            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 5, SizedInternalFormat.Rgba32f, Size.X, Size.Y, buffers.Count());
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 8, SizedInternalFormat.Rgba32f, Size.X, Size.Y, buffers.Count());
 
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, new[] { (int)TextureMagFilter.Linear });
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, new[] { mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear });

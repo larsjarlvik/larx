@@ -23,7 +23,7 @@ namespace Larx.Terrain
 
             TextureId = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, TextureId);
-            GL.TexStorage2D(TextureTarget2d.Texture2D, 1, SizedInternalFormat.Rgba16, Detail, Detail);
+            GL.TexStorage2D(TextureTarget2d.Texture2D, 1, SizedInternalFormat.Rgba16ui, Detail, Detail);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, new[] { (int)TextureMagFilter.Nearest });
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, new[] { (int)TextureMinFilter.Nearest });
 
@@ -97,7 +97,7 @@ namespace Larx.Terrain
             fixed (byte* p = idArr)
             {
                 var ptr = (IntPtr)p;
-                GL.TextureSubImage2D(TextureId, 0, 0, 0, Detail, Detail, PixelFormat.Rgb, PixelType.UnsignedByte, ptr);
+                GL.TextureSubImage2D(TextureId, 0, 0, 0, Detail, Detail, PixelFormat.RgbInteger, PixelType.UnsignedByte, ptr);
             }
 
             GL.BindTexture(TextureTarget.Texture2D, TextureIntensity);

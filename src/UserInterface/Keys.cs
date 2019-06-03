@@ -19,6 +19,7 @@ namespace Larx.UserInterFace
             public const string RoughGrass = "1";
             public const string Cliff = "2";
             public const string Sand = "3";
+            public const string Snow = "4";
         }
     }
 }

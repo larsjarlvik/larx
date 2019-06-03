@@ -2,7 +2,7 @@
 precision highp float;
 
 uniform sampler2DArray uTexture;
-uniform sampler2D uTextureId;
+uniform isampler2D uTextureId;
 uniform sampler2D uTextureIntensity;
 
 in vec3 position;
@@ -25,7 +25,7 @@ uniform vec3 uLightSpecular;
 uniform float uShininess;
 uniform int uGridLines;
 
-vec3 getTriPlanarTexture(float textureId) {
+vec3 getTriPlanarTexture(int textureId) {
     vec3 n = normalize(normal);
     vec3 blending = abs(n);
     blending = normalize(max(blending, 0.00001));
@@ -59,12 +59,12 @@ vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
     return ambient + diffuse + specular;
 }
 
-vec3 finalTexture(float index) {
+vec3 finalTexture(int index) {
     return getTriPlanarTexture(index * 3) * calculateLight(getTriPlanarTexture(index * 3 + 1), getTriPlanarTexture(index * 3 + 2));
 }
 
 void main() {
-    vec3 textureIds = texture(uTextureId, texCoord).rgb * 255;
+    ivec3 textureIds = texture(uTextureId, texCoord).rgb;
     vec3 textureIntensities = texture(uTextureIntensity, texCoord).rgb;
 
     vec3 t1 = textureIntensities.r > 0.0 ? finalTexture(textureIds.r) : vec3(0.0);
