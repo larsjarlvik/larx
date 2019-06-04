@@ -57,8 +57,10 @@ namespace Larx.Terrain
                 {
                     if (x1 >= Detail || x1 < 0 || z1 >= Detail || z1 < 0) continue;
 
-                    var amount = Vector2.Distance(pos, new Vector2(x1, z1));
-                    var n = calcP(MathF.Min(1f, MathF.Sqrt((amount / radius > State.ToolHardness ? amount : 0.0f) / radius)));
+                    var distance = Vector2.Distance(pos, new Vector2(x1, z1));
+                    if (distance > radius) continue;
+
+                    var n = calcP(MathF.Min(1f, MathF.Sqrt((distance / radius > State.ToolHardness ? distance : 0.0f) / radius)));
 
                     var freeSlot = findFreeSlot((int)z1, (int)x1 * 3, textureId);
                     var result = intensity[(int)z1, (int)x1 * 3 + freeSlot] + (n * 255);
