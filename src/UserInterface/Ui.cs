@@ -12,10 +12,12 @@ namespace Larx.UserInterFace
     public class Ui : Builder
     {
         private List<ToolbarItem> tools;
+        private List<ToolbarItem> alignRight;
 
         public Ui() : base()
         {
             tools = new List<ToolbarItem>();
+            alignRight = new List<ToolbarItem>();
             build();
         }
 
@@ -29,10 +31,10 @@ namespace Larx.UserInterFace
             AddButton(Keys.ElevationTools, "ui/terrain.bmp");
             AddButton(Keys.TerrainPaint, "ui/paint.bmp");
 
-            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.bmp")));
-            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.bmp")));
-            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.bmp")));
-            tools.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.bmp")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.bmp")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.bmp")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.bmp")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.bmp")));
 
             tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Grass, "textures/grass-albedo.bmp")));
             tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.RoughGrass, "textures/rocky-grass-albedo.bmp")));
@@ -110,12 +112,17 @@ namespace Larx.UserInterFace
             foreach(var key in tools.Where(t => t.TopMenu == State.ActiveTopMenu).Select(k => k.Key)) {
                 position = setButtonPosition(key, position);
             }
+
+            position = new Vector2(uiSize.Width - 70.0f, uiSize.Height - 70.0f);
+            foreach(var key in alignRight.Select(k => k.Key)) {
+                position = setButtonPosition(key, position, true);
+            }
         }
 
-        private Vector2 setButtonPosition(string key, Vector2 position)
+        private Vector2 setButtonPosition(string key, Vector2 position, bool floatRight = false)
         {
             buttons[key].Position = position;
-            position.X += buttons[key].Size.X + (buttons[key].Size.X / 10);
+            position.X += (buttons[key].Size.X + (buttons[key].Size.X / 10)) * (floatRight ? -1 : 1);
 
             return position;
         }
@@ -138,6 +145,7 @@ namespace Larx.UserInterFace
         {
             var visble = new List<string> { Keys.ElevationTools, Keys.TerrainPaint };
             visble.AddRange(tools.Where(t => t.TopMenu == State.ActiveTopMenu).Select(t => t.Key));
+            visble.AddRange(alignRight.Select(t => t.Key));
             return visble;
         }
     }
