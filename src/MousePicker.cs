@@ -14,11 +14,11 @@ namespace Larx
             this.camera = camera;
         }
 
-        public void Update(int mouseX, int mouseY, int viewportWidth, int viewportHeight)
+        public void Update()
         {
             var normalizedMouse = new Vector2(
-                (2f * mouseX) / viewportWidth - 1f,
-                -((2f * mouseY) / viewportHeight - 1f)
+                (2f * State.Mouse.Position.X) / State.Window.Size.Width - 1f,
+                -((2f * State.Mouse.Position.Y) / State.Window.Size.Height - 1f)
             );
 
             var clipCoords = new Vector4(normalizedMouse.X, normalizedMouse.Y, -1f, 1f);

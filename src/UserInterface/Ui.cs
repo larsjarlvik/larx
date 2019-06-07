@@ -5,7 +5,6 @@ using Larx.Button;
 using Larx.UserInterFace;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 namespace Larx.UserInterFace
 {
@@ -47,21 +46,26 @@ namespace Larx.UserInterFace
             buttons[Keys.ElevationTools].Active = true;
         }
 
-        public bool Update(Point mousePos, ButtonState leftButton)
+        public bool Update()
         {
             updateButtonPositions();
 
             UpdateText("size", $"Tool Size: {State.ToolRadius}");
             UpdateText("hardness", $"Hardness: {MathF.Round(State.ToolHardness, 1)}");
 
-            return MouseUiIntersect(getVisibleTools(), mousePos, leftButton) != null;
+            var uiIntersect = UiIntersect(getVisibleTools(), State.Mouse.Position);
+            if (uiIntersect != null) {
+                buttons[uiIntersect].State = State.Mouse.LeftButton ? ButtonState.Pressed : ButtonState.Hover;
+            }
+
+            return uiIntersect != null;
         }
 
-        public string Click(Point mousePos, ButtonState leftButton)
+        public string Click()
         {
-            if (leftButton != ButtonState.Pressed) return null;
+            if (!State.Mouse.LeftButton) return null;
 
-            var uiIntersect = MouseUiIntersect(getVisibleTools(), mousePos, leftButton);
+            var uiIntersect = UiIntersect(getVisibleTools(), State.Mouse.Position);
             switch(uiIntersect) {
                 case Keys.ElevationTools:
                     State.ActiveTopMenu = TopMenu.Terrain;
@@ -103,7 +107,7 @@ namespace Larx.UserInterFace
 
         private void updateButtonPositions()
         {
-            var position = new Vector2(10.0f, uiSize.Height - 70.0f);
+            var position = new Vector2(10.0f, State.Window.Size.Height - 70.0f);
 
             position = setButtonPosition(Keys.ElevationTools, position);
             position = setButtonPosition(Keys.TerrainPaint, position);
@@ -113,7 +117,7 @@ namespace Larx.UserInterFace
                 position = setButtonPosition(key, position);
             }
 
-            position = new Vector2(uiSize.Width - 70.0f, uiSize.Height - 70.0f);
+            position = new Vector2(State.Window.Size.Width - 70.0f, State.Window.Size.Height - 70.0f);
             foreach(var key in alignRight.Select(k => k.Key)) {
                 position = setButtonPosition(key, position, true);
             }
@@ -130,7 +134,7 @@ namespace Larx.UserInterFace
         public void Render()
         {
             GL.Enable(EnableCap.Blend);
-            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, uiSize.Width, uiSize.Height, 0f, 0f, -1.0f);
+            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, State.Window.Size.Width, State.Window.Size.Height, 0f, 0f, -1.0f);
 
             for(var i = 0; i < texts.Count; i ++)
                 texts.Values.ElementAt(i).Render(pMatrix, new Vector2(10, 20 + i * 20), 0.65f, 1.6f);

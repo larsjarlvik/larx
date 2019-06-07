@@ -6,24 +6,24 @@ using OpenTK.Input;
 
 namespace Larx.Button
 {
+    public enum ButtonState
+    {
+        Default = 0,
+        Hover = 1,
+        Pressed = 2,
+    }
+
     public class ButtonRenderer
     {
-        enum State
-        {
-            Default = 0,
-            Hover = 1,
-            Pressed = 2,
-        }
-
         public ButtonShader Shader { get; }
         public Vector2 Position { get; set; }
         public Vector2 Size { get; set; }
         public bool Active { get; set; }
+        public ButtonState State;
 
         private int vertexBuffer;
         private int textureBuffer;
         private Texture texture;
-        private State state;
 
         public ButtonRenderer(string texturePath, Vector2 size)
         {
@@ -81,7 +81,7 @@ namespace Larx.Button
             GL.Uniform1(Shader.Texture, 0);
             GL.Uniform2(Shader.Position, Position);
             GL.Uniform2(Shader.Size, Size);
-            GL.Uniform1(Shader.State, (int)state);
+            GL.Uniform1(Shader.State, (int)State);
             GL.Uniform1(Shader.Active, Active ? 1 : 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
@@ -93,15 +93,14 @@ namespace Larx.Button
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
         }
 
-        public bool MouseIntersect(Point mousePos, ButtonState leftButton)
+        public bool Intersect(Vector2 position)
         {
-            if (mousePos.X >= Position.X && mousePos.X < Position.X + Size.X &&
-                mousePos.Y >= Position.Y && mousePos.Y < Position.Y + Size.Y) {
-                state = leftButton == ButtonState.Pressed ? State.Pressed : State.Hover;
+            if (position.X >= Position.X && position.X < Position.X + Size.X &&
+                position.Y >= Position.Y && position.Y < Position.Y + Size.Y) {
                 return true;
             }
 
-            state = State.Default;
+            State = ButtonState.Default;
             return false;
         }
     }

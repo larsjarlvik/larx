@@ -4,8 +4,6 @@ namespace Larx
 {
     public class Multisampling
     {
-        private int width;
-        private int height;
         private int samples;
 
         private int texture;
@@ -13,7 +11,7 @@ namespace Larx
         private int depthBuffer;
         private int colorBuffer;
 
-        public Multisampling(int width, int height, int samples)
+        public Multisampling(int samples)
         {
             this.samples = samples;
 
@@ -23,8 +21,6 @@ namespace Larx
             texture = GL.GenTexture();
             colorBuffer = GL.GenRenderbuffer();
             depthBuffer = GL.GenRenderbuffer();
-
-            RefreshBuffers(width, height);
         }
 
         private void createFramebuffer()
@@ -35,14 +31,14 @@ namespace Larx
         private void createMultisampleTexture()
         {
             GL.BindTexture(TextureTarget.Texture2DMultisample, texture);
-            GL.TexImage2DMultisample(TextureTargetMultisample.Texture2DMultisample, samples, PixelInternalFormat.Rgb, width, height, true);
+            GL.TexImage2DMultisample(TextureTargetMultisample.Texture2DMultisample, samples, PixelInternalFormat.Rgb, State.Window.Size.Width, State.Window.Size.Height, true);
             GL.BindTexture(TextureTarget.Texture2DMultisample, 0);
         }
 
         private void createColorBuffer()
         {
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, colorBuffer);
-            GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, RenderbufferStorage.Rgba8, width, height);
+            GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, RenderbufferStorage.Rgba8, State.Window.Size.Width, State.Window.Size.Height);
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, RenderbufferTarget.Renderbuffer, colorBuffer);
         }
@@ -50,16 +46,13 @@ namespace Larx
         private void createDepthBuffer()
         {
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, depthBuffer);
-            GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, RenderbufferStorage.DepthComponent, width, height);
+            GL.RenderbufferStorageMultisample(RenderbufferTarget.Renderbuffer, samples, RenderbufferStorage.DepthComponent, State.Window.Size.Width, State.Window.Size.Height);
             GL.BindRenderbuffer(RenderbufferTarget.Renderbuffer, 0);
             GL.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, depthBuffer);
         }
 
-        public void RefreshBuffers(int width, int height)
+        public void RefreshBuffers()
         {
-            this.width = width;
-            this.height = height;
-
             createMultisampleTexture();
             createFramebuffer();
             createColorBuffer();
@@ -78,7 +71,7 @@ namespace Larx
             GL.Disable(EnableCap.DepthTest);
             GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, framebuffer);
             GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
-            GL.BlitFramebuffer(0, 0, width, height, 0, 0, width, height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+            GL.BlitFramebuffer(0, 0, State.Window.Size.Width, State.Window.Size.Height, 0, 0, State.Window.Size.Width, State.Window.Size.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
             GL.Enable(EnableCap.DepthTest);
         }
     }

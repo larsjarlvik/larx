@@ -13,10 +13,7 @@ namespace Larx
 {
     class Program : GameWindow
     {
-        private int FPS;
-        private double lastFPSUpdate;
         private Multisampling multisampling;
-
         private Camera camera;
         private Light light;
         private ObjectRenderer debug;
@@ -24,19 +21,12 @@ namespace Larx
         private MousePicker mousePicker;
         private Ui ui;
 
-        private KeyboardState keyboard;
-
-        private int lastScroll;
-        private Point lastMouse;
-
         public Program() : base(
             1280, 720,
             new GraphicsMode(32, 24, 0, 0), "Larx", 0,
             DisplayDevice.Default, 4, 0,
-            GraphicsContextFlags.ForwardCompatible | GraphicsContextFlags.Debug)
+            GraphicsContextFlags.Debug)
         {
-            lastMouse = new Point();
-            lastFPSUpdate = 0;
             State.PolygonMode = PolygonMode.Fill;
             State.ToolRadius = 3f;
             State.ToolHardness = 0.5f;
@@ -44,7 +34,7 @@ namespace Larx
 
         protected override void OnLoad(EventArgs e)
         {
-            multisampling = new Multisampling(ClientSize.Width, ClientSize.Width, 8);
+            multisampling = new Multisampling(4);
 
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             GL.Enable(EnableCap.Texture2D);
@@ -67,25 +57,28 @@ namespace Larx
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             var mouse = Mouse.GetCursorState();
-            var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
-            var uiIntersect = ui.Update(mousePos, mouse.LeftButton);
 
-            if (mouse.ScrollWheelValue > lastScroll) camera.Zoom(-0.2f);
-            if (mouse.ScrollWheelValue < lastScroll) camera.Zoom( 0.2f);
-            if (mouse.MiddleButton == ButtonState.Pressed) camera.Rotate(new Vector2((float)(mousePos.X - lastMouse.X), (float)(mousePos.Y - lastMouse.Y)));
+            State.Mouse.Set(PointToClient(new Point(mouse.X, mouse.Y)), mouse);
+            State.Time.Set(e.Time);
 
-            if (keyboard[Key.W]) camera.Move(new Vector3( 0.0f, 0.0f, 1.0f));
-            if (keyboard[Key.S]) camera.Move(new Vector3( 0.0f, 0.0f,-1.0f));
-            if (keyboard[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
-            if (keyboard[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
+            var uiIntersect = ui.Update();
 
-            if (keyboard[Key.Up]) light.Position += new Vector3( 0.0f, 0.0f, 1.0f);
-            if (keyboard[Key.Down]) light.Position += new Vector3( 0.0f, 0.0f,-1.0f);
-            if (keyboard[Key.Left]) light.Position += new Vector3( 1.0f, 0.0f, 0.0f);
-            if (keyboard[Key.Right]) light.Position += new Vector3(-1.0f, 0.0f, 0.0f);
+            if (State.Mouse.ScrollDelta > 0) camera.Zoom(-0.2f);
+            if (State.Mouse.ScrollDelta < 0) camera.Zoom( 0.2f);
+            if (mouse.MiddleButton == ButtonState.Pressed) camera.Rotate(State.Mouse.Delta);
+
+            if (State.Keyboard.Key[Key.W]) camera.Move(new Vector3( 0.0f, 0.0f, 1.0f));
+            if (State.Keyboard.Key[Key.S]) camera.Move(new Vector3( 0.0f, 0.0f,-1.0f));
+            if (State.Keyboard.Key[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
+            if (State.Keyboard.Key[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
+
+            if (State.Keyboard.Key[Key.Up]) light.Position += new Vector3( 0.0f, 0.0f, 1.0f);
+            if (State.Keyboard.Key[Key.Down]) light.Position += new Vector3( 0.0f, 0.0f,-1.0f);
+            if (State.Keyboard.Key[Key.Left]) light.Position += new Vector3( 1.0f, 0.0f, 0.0f);
+            if (State.Keyboard.Key[Key.Right]) light.Position += new Vector3(-1.0f, 0.0f, 0.0f);
 
             camera.Update((float)e.Time);
-            mousePicker.Update(mousePos.X, mousePos.Y, Width, Height);
+            mousePicker.Update();
 
             if (!uiIntersect) {
                 switch (State.ActiveTopMenu)
@@ -100,25 +93,15 @@ namespace Larx
                 }
             }
 
-            lastFPSUpdate += e.Time;
-            if (lastFPSUpdate > 1)
-            {
-                Title = $"Larx (Vsync: {VSync}) - FPS: {FPS}";
-                FPS = 0;
-                lastFPSUpdate %= 1;
-            }
-
-            lastScroll = mouse.ScrollWheelValue;
-            lastMouse = new Point(mousePos.X, mousePos.Y);
-
             var pos = terrain.GetPosition(mousePicker);
             ui.UpdateText("position", $"Position: {pos.X:0.##} {pos.Z:0.##}");
+            Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             multisampling.Bind();
-            FPS++;
+            State.Time.CountFPS();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
@@ -140,18 +123,16 @@ namespace Larx
 
         protected override void OnResize(EventArgs e)
         {
-            camera.AspectRatio = (float)Width / (float)Height;
-            ui.Resize(new SizeF(Width, Height));
-
+            State.Window.Set(Width, Height);
             GL.Viewport(0, 0, Width, Height);
-            multisampling.RefreshBuffers(Width, Height);
+            multisampling.RefreshBuffers();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             var mouse = Mouse.GetCursorState();
-            var mousePos = this.PointToClient(new Point(mouse.X, mouse.Y));
-            ui.Click(mousePos, mouse.LeftButton);
+            State.Mouse.Set(PointToClient(new Point(mouse.X, mouse.Y)), mouse);
+            ui.Click();
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
@@ -172,12 +153,12 @@ namespace Larx
             }
 
             if (!e.Control)
-                keyboard = e.Keyboard;
+                State.Keyboard.Set(e.Keyboard);
         }
 
         protected override void OnKeyUp(KeyboardKeyEventArgs e)
         {
-            keyboard = e.Keyboard;
+            State.Keyboard.Set(e.Keyboard);
         }
 
         public static void Main(string[] args)

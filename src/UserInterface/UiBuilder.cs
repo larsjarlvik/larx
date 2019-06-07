@@ -12,7 +12,6 @@ namespace Larx.UserInterFace
     {
         protected Dictionary<string, TextRenderer> texts;
         protected Dictionary<string, ButtonRenderer> buttons;
-        protected SizeF uiSize;
 
         public Builder()
         {
@@ -40,14 +39,9 @@ namespace Larx.UserInterFace
             return key;
         }
 
-        public void Resize(SizeF uiSize)
+        public string UiIntersect(List<string> keys, Vector2 position)
         {
-            this.uiSize = uiSize;
-        }
-
-        public string MouseUiIntersect(List<string> keys, Point mousePos, ButtonState leftButton)
-        {
-            return buttons.Where(x => keys.Contains(x.Key) && x.Value.MouseIntersect(mousePos, leftButton)).FirstOrDefault().Key;
+            return buttons.Where(x => keys.Contains(x.Key) && x.Value.Intersect(position)).FirstOrDefault().Key;
         }
     }
 }

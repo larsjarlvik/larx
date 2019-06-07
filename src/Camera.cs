@@ -16,12 +16,11 @@ namespace Larx
         public Vector2 Rotation;
         public Vector3 LookSpeed;
         public Vector2 RotationSpeed;
+        public Vector3 Position;
 
-        public float AspectRatio { get; set; }
         public Matrix4 ProjectionMatrix;
         public Matrix4 ViewMatrix;
 
-        public Vector3 Position;
 
 
         private float DegToRad(float input) {
@@ -97,7 +96,7 @@ namespace Larx
                 Look.Z - (MathF.Cos(rx) * MathF.Cos(ry) * cameraDistance)
             );
 
-            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, AspectRatio, 1, 1000);
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, 1, 1000);
             ViewMatrix = Matrix4.LookAt(Position, Look, new Vector3(0, 1, 0));
         }
 
