@@ -14,6 +14,7 @@ namespace Larx.Terrain
         public int GridLines { get; private set; }
         public int SplatMap { get; private set; }
         public int SplatCount { get; private set; }
+        public int TextureNoise { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -27,6 +28,7 @@ namespace Larx.Terrain
             GridLines = GL.GetUniformLocation(Program, "uGridLines");
             SplatMap = GL.GetUniformLocation(Program, "uSplatMap");
             SplatCount = GL.GetUniformLocation(Program, "uSplatCount");
+            TextureNoise = GL.GetUniformLocation(Program, "uTextureNoise");
         }
     }
 }

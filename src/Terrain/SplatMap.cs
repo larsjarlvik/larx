@@ -66,7 +66,7 @@ namespace Larx.Terrain
             }
         }
 
-        private unsafe void toTexture(int textureId)
+        private void toTexture(int textureId)
         {
             GL.BindTexture(TextureTarget.Texture2DArray, Texture);
             GL.TexSubImage3D<float>(TextureTarget.Texture2DArray, 0, 0, 0, textureId, Detail, Detail, 1, PixelFormat.Red, PixelType.Float, splats[textureId]);

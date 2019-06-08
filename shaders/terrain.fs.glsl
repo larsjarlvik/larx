@@ -3,6 +3,7 @@ precision highp float;
 
 uniform sampler2DArray uTexture;
 uniform sampler2DArray uSplatMap;
+uniform sampler2D uTextureNoise;
 
 in vec3 position;
 in vec2 texCoord;
@@ -60,10 +61,16 @@ vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
 }
 
 vec3 finalTexture(int index) {
-    return getTriPlanarTexture(index * 3) * calculateLight(getTriPlanarTexture(index * 3 + 1), getTriPlanarTexture(index * 3 + 2));
+    float n1 = (texture(uTextureNoise, texCoord).r * 0.05) + 0.95;
+    float n2 = (texture(uTextureNoise, texCoord / 5).r * 0.1) + 0.90;
+
+    float noise = (n1 + n2) / 2;
+
+    return (getTriPlanarTexture(index * 3) * noise) * calculateLight(getTriPlanarTexture(index * 3 + 1), getTriPlanarTexture(index * 3 + 2));
 }
 
 void main() {
+
     vec3 color = vec3(0);
     for (int i = 0; i < uSplatCount; i++) {
         float intesity = texture(uSplatMap, vec3(texCoord.x, texCoord.y, i)).r;

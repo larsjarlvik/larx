@@ -21,6 +21,7 @@ namespace Larx.Terrain
         private List<int> indices = new List<int>();
 
         private readonly SplatMap splatMap;
+        private readonly TextureNoise textureNoise;
         private readonly TerrainShader shader;
         private readonly Texture texture;
 
@@ -36,6 +37,7 @@ namespace Larx.Terrain
 
             shader = new TerrainShader();
             splatMap = new SplatMap(textures.Length);
+            textureNoise = new TextureNoise(12312234);
 
             texture = new Texture();
 
@@ -190,6 +192,10 @@ namespace Larx.Terrain
             GL.BindTexture(TextureTarget.Texture2DArray, splatMap.Texture);
             GL.Uniform1(shader.SplatMap, 1);
             GL.Uniform1(shader.SplatCount, splatMap.SplatCount);
+
+            GL.ActiveTexture(TextureUnit.Texture2);
+            GL.BindTexture(TextureTarget.Texture2D, textureNoise.Texture);
+            GL.Uniform1(shader.TextureNoise, 2);
 
             GL.Uniform3(shader.Ambient, 0.3f, 0.3f, 0.3f);
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);

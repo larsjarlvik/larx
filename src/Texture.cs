@@ -53,33 +53,28 @@ namespace Larx
             return buffer;
         }
 
-        public unsafe void LoadTexture(string path, bool mipMap = false)
+        public void LoadTexture(string path, bool mipMap = false)
         {
             var buffer = readTextureData(path);
 
-            fixed (byte* p = buffer)
-            {
-                var ptr = (IntPtr)p;
+            TextureId = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, TextureId);
+            GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
-                TextureId = GL.GenTexture();
-                GL.BindTexture(TextureTarget.Texture2D, TextureId);
-                GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+            GL.TexImage2D<byte>(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Size.X, Size.Y, 0, pixelFormat, PixelType.UnsignedByte, buffer);
 
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Size.X, Size.Y, 0, pixelFormat, PixelType.UnsignedByte, ptr);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
+            if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
-                if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-            }
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
-        public unsafe void LoadTexture(string[] path, bool mipMap = false)
+        public void LoadTexture(string[] path, bool mipMap = false)
         {
             var buffers = path.Select(p => readTextureData(p)).ToList();
 
@@ -100,6 +95,8 @@ namespace Larx
             }
 
             if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
         private FileStream readFile(string path)
