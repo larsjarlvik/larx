@@ -67,8 +67,8 @@ namespace Larx
 
                 GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Size.X, Size.Y, 0, pixelFormat, PixelType.UnsignedByte, ptr);
 
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, new[] { (int)TextureMinFilter.Linear });
-                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, new[] { mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear });
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
 
                 if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
 
@@ -88,19 +88,15 @@ namespace Larx
 
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, 8, SizedInternalFormat.Rgba32f, Size.X, Size.Y, buffers.Count());
 
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, new[] { (int)TextureMagFilter.Linear });
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, new[] { mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear });
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
 
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
 
             for (var i = 0; i < buffers.Count(); i ++)
             {
-                fixed (byte* p = buffers[i])
-                {
-                    var ptr = (IntPtr)p;
-                    GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, i, Size.X, Size.Y, 1, pixelFormat, PixelType.UnsignedByte, ptr);
-                }
+                GL.TexSubImage3D<byte>(TextureTarget.Texture2DArray, 0, 0, 0, i, Size.X, Size.Y, 1, pixelFormat, PixelType.UnsignedByte, buffers[i]);
             }
 
             if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);

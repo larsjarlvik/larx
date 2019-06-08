@@ -101,7 +101,6 @@ namespace Larx
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             multisampling.Bind();
-            State.Time.CountFPS();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
@@ -119,6 +118,7 @@ namespace Larx
             ui.Render();
 
             SwapBuffers();
+            State.Time.CountFPS();
         }
 
         protected override void OnResize(EventArgs e)

@@ -2,8 +2,7 @@
 precision highp float;
 
 uniform sampler2DArray uTexture;
-uniform isampler2D uTextureId;
-uniform sampler2D uTextureIntensity;
+uniform sampler2DArray uSplatMap;
 
 in vec3 position;
 in vec2 texCoord;
@@ -24,6 +23,7 @@ uniform vec3 uLightSpecular;
 
 uniform float uShininess;
 uniform int uGridLines;
+uniform int uSplatCount;
 
 vec3 getTriPlanarTexture(int textureId) {
     vec3 n = normalize(normal);
@@ -64,17 +64,13 @@ vec3 finalTexture(int index) {
 }
 
 void main() {
-    ivec3 textureIds = texture(uTextureId, texCoord).rgb;
-    vec3 textureIntensities = texture(uTextureIntensity, texCoord).rgb;
-
-    vec3 t1 = textureIntensities.r > 0.0 ? finalTexture(textureIds.r) : vec3(0.0);
-    vec3 t2 = textureIntensities.g > 0.0 ? finalTexture(textureIds.g) : vec3(0.0);
-    vec3 t3 = textureIntensities.b > 0.0 ? finalTexture(textureIds.b) : vec3(0.0);
-
-    vec3 color =
-        t1 * textureIntensities.r +
-        t2 * textureIntensities.g +
-        t3 * textureIntensities.b;
+    vec3 color = vec3(0);
+    for (int i = 0; i < uSplatCount; i++) {
+        float intesity = texture(uSplatMap, vec3(texCoord.x, texCoord.y, i)).r;
+        if (intesity > 0.0) {
+            color += finalTexture(i) * intesity;
+        }
+    }
 
     outputColor = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
 }

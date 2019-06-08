@@ -8,113 +8,68 @@ namespace Larx.Terrain
     public class SplatMap
     {
         public const int Detail = 1024;
+        public readonly int SplatCount;
+        private float[][,] splats;
+        public int Texture;
 
-        private byte[,] id;
-        private byte[,] intensity;
-
-        public int TextureId;
-        public int TextureIntensity;
-
-
-        public SplatMap()
+        public SplatMap(int textureCount)
         {
-            id = new byte[Detail, Detail * 3];
-            intensity = new byte[Detail, Detail * 3];
+            SplatCount = textureCount;
+            splats = new float[SplatCount][,];
 
-            TextureId = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, TextureId);
-            GL.TexStorage2D(TextureTarget2d.Texture2D, 1, SizedInternalFormat.Rgba16ui, Detail, Detail);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, new[] { (int)TextureMagFilter.Nearest });
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, new[] { (int)TextureMinFilter.Nearest });
+            for(var i = 0; i < SplatCount; i++) splats[i] = new float[Detail, Detail];
 
-            TextureIntensity = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, TextureIntensity);
-            GL.TexStorage2D(TextureTarget2d.Texture2D, 1, SizedInternalFormat.Rgba16, Detail, Detail);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, new[] { (int)TextureMagFilter.Nearest });
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, new[] { (int)TextureMinFilter.Nearest });
-
+            Texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2DArray, Texture);
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 1, SizedInternalFormat.R8, Detail, Detail, SplatCount);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             build();
         }
 
         private void build()
         {
             for (var z = 0; z < Detail; z ++)
-                for (var x = 0; x < Detail * 3; x += 3)
-                {
-                    id[z, x] = 0;
-                    intensity[z, x] = 255;
-                }
+                for (var x = 0; x < Detail; x ++)
+                    splats[0][z, x] = 1.0f;
 
-            toTexture();
+            for(var i = 0; i < SplatCount; i++) toTexture(i);
         }
 
-        public void Update(Vector2 pos, float radius, byte textureId)
+        public void Update(Vector2 pos, float radius, byte splatId)
         {
             Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
-            for (var z1 = pos.Y - radius; z1 < pos.Y + radius; z1 ++)
-                for (var x1 = pos.X - radius; x1 < pos.X + radius; x1 ++)
+            for (var z1 = (int)(pos.Y - radius); z1 < pos.Y + radius; z1 ++)
+                for (var x1 = (int)(pos.X - radius); x1 < pos.X + radius; x1 ++)
                 {
                     if (x1 >= Detail || x1 < 0 || z1 >= Detail || z1 < 0) continue;
 
                     var distance = Vector2.Distance(pos, new Vector2(x1, z1));
                     if (distance > radius) continue;
 
-                    var n = calcP(MathF.Min(1f, MathF.Sqrt((distance / radius > State.ToolHardness ? distance : 0.0f) / radius)));
+                    var n = calcP(MathF.Min(1.0f, MathF.Sqrt((distance / radius > State.ToolHardness ? distance : 0.0f) / radius)));
+                    var result = splats[splatId][z1, x1] + n;
 
-                    var freeSlot = findFreeSlot((int)z1, (int)x1 * 3, textureId);
-                    var result = intensity[(int)z1, (int)x1 * 3 + freeSlot] + (n * 255);
-
-                    intensity[(int)z1, (int)x1 * 3 + freeSlot] = (byte)(result > 255 ? 255 : result);
-
-                    var intensities = new Vector3(intensity[(int)z1, (int)x1 * 3], intensity[(int)z1, (int)x1 * 3 + 1], intensity[(int)z1, (int)x1 * 3 + 2]);
-                    var avg = 255.0f / (intensities.X + intensities.Y + intensities.Z);
-
-                    id[(int)z1, (int)x1 * 3 + freeSlot] = textureId;
-
-                    intensity[(int)z1, (int)x1 * 3] = (byte)(intensities.X * avg);
-                    intensity[(int)z1, (int)x1 * 3 + 1] = (byte)(intensities.Y * avg);
-                    intensity[(int)z1, (int)x1 * 3 + 2] = (byte)(intensities.Z * avg);
+                    splats[splatId][z1, x1] += result > 1.0f ? 1.0f : result;
+                    average(z1, x1);
                 }
 
-            toTexture();
+            for(var i = 0; i < SplatCount; i++) toTexture(i);
         }
 
-        private int findFreeSlot(int z, int x, byte textureId)
+        private void average(int z, int x)
         {
-            if (id[z, x] == textureId) return 0;
-            if (id[z, x + 1] == textureId) return 1;
-            if (id[z, x + 2] == textureId) return 2;
-
-            var items = new [] { intensity[z, x], intensity[z, x + 1], intensity[z, x + 2] };
-            return Array.IndexOf(items, items.Min());
-        }
-
-        private unsafe void toTexture()
-        {
-            var idArr = toOneDimensional(id);
-            var intensityArr = toOneDimensional(intensity);
-
-            GL.BindTexture(TextureTarget.Texture2D, TextureId);
-            fixed (byte* p = idArr)
-            {
-                var ptr = (IntPtr)p;
-                GL.TextureSubImage2D(TextureId, 0, 0, 0, Detail, Detail, PixelFormat.RgbInteger, PixelType.UnsignedByte, ptr);
-            }
-
-            GL.BindTexture(TextureTarget.Texture2D, TextureIntensity);
-            fixed (byte* p = intensityArr)
-            {
-                var ptr = (IntPtr)p;
-                GL.TextureSubImage2D(TextureIntensity, 0, 0, 0, Detail, Detail, PixelFormat.Rgb, PixelType.UnsignedByte, ptr);
+            var split = 1.0f / splats.Sum(s => s[z, x]);
+            foreach(var splat in splats) {
+                splat[z, x] *= split;
             }
         }
 
-        private byte[] toOneDimensional(byte[,] input)
+        private unsafe void toTexture(int textureId)
         {
-            byte[] output = new byte[Detail * Detail * 3];
-            System.Buffer.BlockCopy(input, 0, output, 0, output.Length);
-            return output;
+            GL.BindTexture(TextureTarget.Texture2DArray, Texture);
+            GL.TexSubImage3D<float>(TextureTarget.Texture2DArray, 0, 0, 0, textureId, Detail, Detail, 1, PixelFormat.Red, PixelType.Float, splats[textureId]);
         }
     }
 }

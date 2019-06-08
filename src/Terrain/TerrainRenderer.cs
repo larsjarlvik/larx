@@ -26,29 +26,32 @@ namespace Larx.Terrain
 
         public TerrainRenderer()
         {
+            var textures = new [] {
+                "grass",
+                "rocky-grass",
+                "cliff",
+                "sand",
+                "snow",
+            };
+
             shader = new TerrainShader();
-            splatMap = new SplatMap();
+            splatMap = new SplatMap(textures.Length);
 
             texture = new Texture();
-            texture.LoadTexture(new [] {
-                Path.Combine("resources", "textures", "grass-albedo.bmp"),
-                Path.Combine("resources", "textures", "grass-normal.bmp"),
-                Path.Combine("resources", "textures", "grass-rough.bmp"),
-                Path.Combine("resources", "textures", "rocky-grass-albedo.bmp"),
-                Path.Combine("resources", "textures", "rocky-grass-normal.bmp"),
-                Path.Combine("resources", "textures", "rocky-grass-rough.bmp"),
-                Path.Combine("resources", "textures", "cliff-albedo.bmp"),
-                Path.Combine("resources", "textures", "cliff-normal.bmp"),
-                Path.Combine("resources", "textures", "cliff-rough.bmp"),
-                Path.Combine("resources", "textures", "sand-albedo.bmp"),
-                Path.Combine("resources", "textures", "sand-normal.bmp"),
-                Path.Combine("resources", "textures", "sand-rough.bmp"),
-                Path.Combine("resources", "textures", "snow-albedo.bmp"),
-                Path.Combine("resources", "textures", "snow-normal.bmp"),
-                Path.Combine("resources", "textures", "snow-rough.bmp")
-            }, true);
 
+            loadTextures(textures);
             build();
+        }
+
+        private void loadTextures(string[] textures)
+        {
+            var paths = new List<string>();
+            foreach(var texture in textures) {
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-albedo.bmp"));
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-normal.bmp"));
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-rough.bmp"));
+            }
+            texture.LoadTexture(paths.ToArray(), true);
         }
 
         public void ChangeElevation(float offset, MousePicker picker)
@@ -184,12 +187,9 @@ namespace Larx.Terrain
             GL.Uniform1(shader.Texture, 0);
 
             GL.ActiveTexture(TextureUnit.Texture1);
-            GL.BindTexture(TextureTarget.Texture2D, splatMap.TextureId);
-            GL.Uniform1(shader.TextureId, 1);
-
-            GL.ActiveTexture(TextureUnit.Texture2);
-            GL.BindTexture(TextureTarget.Texture2D, splatMap.TextureIntensity);
-            GL.Uniform1(shader.TextureIntensity, 2);
+            GL.BindTexture(TextureTarget.Texture2DArray, splatMap.Texture);
+            GL.Uniform1(shader.SplatMap, 1);
+            GL.Uniform1(shader.SplatCount, splatMap.SplatCount);
 
             GL.Uniform3(shader.Ambient, 0.3f, 0.3f, 0.3f);
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
