@@ -8,7 +8,7 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Larx.Terrain
 {
-    public class TerrainRenderer : TerrainPicker
+    public class TerrainRenderer
     {
         private const int mapSize = 128;
         private int indexCount = 0;
@@ -25,6 +25,9 @@ namespace Larx.Terrain
         private readonly TextureNoise textureNoise;
         private readonly TerrainShader shader;
         private readonly Texture texture;
+        private readonly TerrainPicker picker;
+
+        public Vector3 MousePosition;
 
         public TerrainRenderer()
         {
@@ -39,6 +42,7 @@ namespace Larx.Terrain
             shader = new TerrainShader();
             splatMap = new SplatMap(textures.Length);
             textureNoise = new TextureNoise(12312234);
+            picker = new TerrainPicker(this);
 
             texture = new Texture();
 
@@ -59,8 +63,7 @@ namespace Larx.Terrain
 
         public void ChangeElevation(float offset, MousePicker picker)
         {
-            var position = GetPosition(picker, this);
-            var toUpdate = getTilesInArea(position, State.ToolRadius);
+            var toUpdate = getTilesInArea(MousePosition, State.ToolRadius);
 
             foreach (var i in toUpdate)
             {
@@ -70,7 +73,7 @@ namespace Larx.Terrain
 
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
-                var amount = Vector3.Distance(position, vertex);
+                var amount = Vector3.Distance(MousePosition, vertex);
                 var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / State.ToolRadius > State.ToolHardness ? amount : 0.0f) / State.ToolRadius))) * offset;
 
                 vertices[indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
@@ -84,9 +87,9 @@ namespace Larx.Terrain
             updateBuffers();
         }
 
-        public void Paint(MousePicker picker)
+        public void Paint()
         {
-            var position = (GetPosition(picker, this).Xz / mapSize);
+            var position = (MousePosition.Xz / mapSize);
             position.X = (position.X + 0.5f) * SplatMap.Detail;
             position.Y = (position.Y + 0.5f) * SplatMap.Detail;
 
@@ -200,6 +203,11 @@ namespace Larx.Terrain
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
         }
 
+        public void Update(MousePicker mouse)
+        {
+            MousePosition = picker.GetPosition(mouse);
+        }
+
         public void Render(Camera camera, Light light)
         {
             GL.EnableVertexAttribArray(0);
@@ -208,6 +216,8 @@ namespace Larx.Terrain
 
             GL.UseProgram(shader.Program);
 
+            GL.Uniform3(shader.MousePosition, MousePosition);
+            GL.Uniform1(shader.SelectionSize, State.ToolRadius);
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);

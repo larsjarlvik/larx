@@ -26,6 +26,9 @@ uniform float uShininess;
 uniform int uGridLines;
 uniform int uSplatCount;
 
+uniform vec3 uMousePosition;
+uniform float uSelectionSize;
+
 vec3 getTriPlanarTexture(int textureId) {
     vec3 n = normalize(normal);
     vec3 blending = abs(n);
@@ -69,8 +72,16 @@ vec3 finalTexture(int index) {
     return (getTriPlanarTexture(index * 3) * noise) * calculateLight(getTriPlanarTexture(index * 3 + 1), getTriPlanarTexture(index * 3 + 2));
 }
 
-void main() {
+float circle() {
+    float radius = uSelectionSize;
+    float border = 0.08;
+    float dist = distance(uMousePosition.xz, position.xz);
 
+    return 1.0 + smoothstep(radius, radius + border, dist)
+               - smoothstep(radius - border, radius, dist);
+}
+
+void main() {
     vec3 color = vec3(0);
     for (int i = 0; i < uSplatCount; i++) {
         float intesity = texture(uSplatMap, vec3(texCoord.x, texCoord.y, i)).r;
@@ -79,5 +90,6 @@ void main() {
         }
     }
 
-    outputColor = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
+    vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
+    outputColor = mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle());
 }

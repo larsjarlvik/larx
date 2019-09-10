@@ -79,6 +79,7 @@ namespace Larx
 
             camera.Update((float)e.Time);
             mousePicker.Update();
+            terrain.Update(mousePicker);
 
             if (!uiIntersect) {
                 switch (State.ActiveTopMenu)
@@ -88,13 +89,12 @@ namespace Larx
                         if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, mousePicker);
                         break;
                     case TopMenu.Paint:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint(mousePicker);
+                        if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
                         break;
                 }
             }
 
-            var pos = terrain.GetPosition(mousePicker, terrain);
-            ui.UpdateText("position", $"Position: {pos.X:0.##} {pos.Z:0.##}");
+            ui.UpdateText("position", $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
             Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
 
@@ -108,14 +108,6 @@ namespace Larx
             GL.Enable(EnableCap.DepthTest);
 
             terrain.Render(camera, light);
-
-            // Temporary terrain intersection debug code
-            var pos = terrain.GetPosition(mousePicker, terrain);
-            var elev = terrain.GetElevationAtPoint(pos);
-            if (elev != null) {
-                debug.Render(camera, new Vector3(pos.X, (float)elev, pos.Z));
-            }
-
             multisampling.Draw();
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
