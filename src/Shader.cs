@@ -37,7 +37,6 @@ namespace Larx
             GL.UseProgram(Program);
 
             GL.ValidateProgram(Program);
-            Console.WriteLine(GL.GetProgramInfoLog(Program));
 
             SetUniformsLocations();
         }

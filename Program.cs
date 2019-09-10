@@ -93,7 +93,7 @@ namespace Larx
                 }
             }
 
-            var pos = terrain.GetPosition(mousePicker);
+            var pos = terrain.GetPosition(mousePicker, terrain);
             ui.UpdateText("position", $"Position: {pos.X:0.##} {pos.Z:0.##}");
             Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
@@ -108,7 +108,14 @@ namespace Larx
             GL.Enable(EnableCap.DepthTest);
 
             terrain.Render(camera, light);
-            debug.Render(camera, light.Position / 10.0f);
+
+            // Temporary terrain intersection debug code
+            var pos = terrain.GetPosition(mousePicker, terrain);
+            var elev = terrain.GetElevationAtPoint(pos);
+            if (elev != null) {
+                debug.Render(camera, new Vector3(pos.X, (float)elev, pos.Z));
+            }
+
             multisampling.Draw();
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);

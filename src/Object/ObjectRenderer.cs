@@ -13,7 +13,7 @@ namespace Larx.Object
         private int vertexBuffer;
         private int indexBuffer;
 
-        public ObjectRenderer() 
+        public ObjectRenderer()
         {
             shader = new ObjectShader();
             build();
@@ -23,15 +23,15 @@ namespace Larx.Object
         {
             var vertices = new Vector3[] {
                 // Front
-                new Vector3(-1.0f,-1.0f, 1.0f),
-                new Vector3( 1.0f,-1.0f, 1.0f),
-                new Vector3( 1.0f, 1.0f, 1.0f),
-                new Vector3(-1.0f, 1.0f, 1.0f),
+                new Vector3(-0.25f,-0.05f, 0.25f),
+                new Vector3( 0.25f,-0.05f, 0.25f),
+                new Vector3( 0.25f, 0.05f, 0.25f),
+                new Vector3(-0.25f, 0.05f, 0.25f),
                 // Back
-                new Vector3(-1.0f,-1.0f,-1.0f),
-                new Vector3( 1.0f,-1.0f,-1.0f),
-                new Vector3( 1.0f, 1.0f,-1.0f),
-                new Vector3(-1.0f, 1.0f,-1.0f),
+                new Vector3(-0.25f,-0.05f,-0.25f),
+                new Vector3( 0.25f,-0.05f,-0.25f),
+                new Vector3( 0.25f, 0.05f,-0.25f),
+                new Vector3(-0.25f, 0.05f,-0.25f),
             };
 
             var indices = new int[] {
@@ -49,7 +49,7 @@ namespace Larx.Object
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-            
+
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
         }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Larx.Utils;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -58,7 +59,7 @@ namespace Larx.Terrain
 
         public void ChangeElevation(float offset, MousePicker picker)
         {
-            var position = GetPosition(picker);
+            var position = GetPosition(picker, this);
             var toUpdate = getTilesInArea(position, State.ToolRadius);
 
             foreach (var i in toUpdate)
@@ -85,7 +86,7 @@ namespace Larx.Terrain
 
         public void Paint(MousePicker picker)
         {
-            var position = (GetPosition(picker).Xz / mapSize);
+            var position = (GetPosition(picker, this).Xz / mapSize);
             position.X = (position.X + 0.5f) * SplatMap.Detail;
             position.Y = (position.Y + 0.5f) * SplatMap.Detail;
 
@@ -151,13 +152,37 @@ namespace Larx.Terrain
 
         private int? getTileIndex(Vector3 position)
         {
-            var x = (int)MathF.Floor(position.X + (mapSize / 2));
+            var x = (int)MathF.Round(position.X + (mapSize / 2));
             if (x < 0 || x > mapSize) return null;
 
-            var z = (int)MathF.Floor(position.Z + (mapSize / 2));
+            var z = (int)MathF.Round(position.Z + (mapSize / 2));
             if (z < 0 || z > mapSize) return null;
 
-            return ((z * mapSize) + x) * 6;
+            var index = ((z * mapSize) + x) * 6;
+            if (index >= indices.Count) return null;
+
+            return index;
+        }
+
+        public float? GetElevationAtPoint(Vector3 position)
+        {
+            int? index0;
+            int? index1;
+            int? index2;
+
+            if ((position.X % 1) + (position.Z % 1) > 1.0f) {
+                index0 = getTileIndex(new Vector3(MathF.Floor(position.X), position.Y, MathF.Floor(position.Z)));
+                index1 = getTileIndex(new Vector3(MathF.Floor(position.X) + 1, position.Y, MathF.Floor(position.Z)));
+                index2 = getTileIndex(new Vector3(MathF.Floor(position.X), position.Y, MathF.Floor(position.Z) + 1));
+            } else {
+                index0 = getTileIndex(new Vector3(MathF.Floor(position.X) + 1, position.Y, MathF.Floor(position.Z)));
+                index1 = getTileIndex(new Vector3(MathF.Floor(position.X), position.Y, MathF.Floor(position.Z) + 1));
+                index2 = getTileIndex(new Vector3(MathF.Floor(position.X) + 1, position.Y, MathF.Floor(position.Z) + 1));
+            }
+
+            if (index0 == null || index1 == null || index2 == null) return null;
+
+            return MathLarx.BaryCentric(vertices[indices[(int)index0]], vertices[indices[(int)index1]], vertices[indices[(int)index2]], new Vector2(position.X, position.Z));
         }
 
         private void updateBuffers()
