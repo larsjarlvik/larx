@@ -8,6 +8,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using GL4 = OpenTK.Graphics.OpenGL4;
+using Larx.Water;
 
 namespace Larx
 {
@@ -18,6 +19,7 @@ namespace Larx
         private Light light;
         private ObjectRenderer debug;
         private TerrainRenderer terrain;
+        private WaterRenderer water;
         private MousePicker mousePicker;
         private Ui ui;
 
@@ -48,6 +50,7 @@ namespace Larx
 
             ui = new Ui();
             terrain = new TerrainRenderer();
+            water = new WaterRenderer();
             debug = new ObjectRenderer();
             camera = new Camera();
             light = new Light();
@@ -108,6 +111,7 @@ namespace Larx
             GL.Enable(EnableCap.DepthTest);
 
             terrain.Render(camera, light);
+            water.Render(camera, light);
             multisampling.Draw();
 
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);

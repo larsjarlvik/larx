@@ -17,12 +17,12 @@ out vec3 outputColor;
 uniform vec3 uAmbient;
 uniform vec3 uDiffuse;
 uniform vec3 uSpecular;
+uniform float uShininess;
 
 uniform vec3 uLightAmbient;
 uniform vec3 uLightDiffuse;
 uniform vec3 uLightSpecular;
 
-uniform float uShininess;
 uniform int uGridLines;
 uniform int uSplatCount;
 

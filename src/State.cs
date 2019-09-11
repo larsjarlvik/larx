@@ -19,6 +19,7 @@ namespace Larx
 
         public static TopMenu ActiveTopMenu;
         public static byte ActiveTexture;
+        public const int MapSize = 128;
 
         public static class Window
         {

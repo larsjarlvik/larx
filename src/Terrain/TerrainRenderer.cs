@@ -10,7 +10,6 @@ namespace Larx.Terrain
 {
     public class TerrainRenderer
     {
-        private const int mapSize = 128;
         private int indexCount = 0;
         private int vertexBuffer;
         private int coordBuffer;
@@ -89,11 +88,11 @@ namespace Larx.Terrain
 
         public void Paint()
         {
-            var position = (MousePosition.Xz / mapSize);
+            var position = (MousePosition.Xz / State.MapSize);
             position.X = (position.X + 0.5f) * SplatMap.Detail;
             position.Y = (position.Y + 0.5f) * SplatMap.Detail;
 
-            var splatMapRadius = (int)(State.ToolRadius * SplatMap.Detail / mapSize);
+            var splatMapRadius = (int)(State.ToolRadius * SplatMap.Detail / State.MapSize);
 
             splatMap.Update(position, splatMapRadius, State.ActiveTexture);
         }
@@ -116,7 +115,7 @@ namespace Larx.Terrain
 
         private void build()
         {
-            var halfMapSize = (float)(mapSize / 2);
+            var halfMapSize = (float)(State.MapSize / 2);
             var rnd = new Random();
             var i = 0;
 
@@ -124,15 +123,15 @@ namespace Larx.Terrain
             {
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
-                    vertices.Add(new Vector3(x, 0f, z));
-                    coords.Add(new Vector2((x + halfMapSize) / mapSize, (z + halfMapSize) / mapSize));
+                    vertices.Add(new Vector3(x, 1f, z));
+                    coords.Add(new Vector2((x + halfMapSize) / State.MapSize, (z + halfMapSize) / State.MapSize));
                     normals.Add(new Vector3(0f, 1f, 0f).Normalized());
 
                     if (x < halfMapSize && z < halfMapSize)
                     {
                         indices.AddRange(new int[] {
-                            (i), (i + mapSize + 1), (i + 1),
-                            (i + 1), (i + mapSize + 1), (i + mapSize + 2)
+                            (i), (i + State.MapSize + 1), (i + 1),
+                            (i + 1), (i + State.MapSize + 1), (i + State.MapSize + 2)
                         });
                     }
 
@@ -155,13 +154,13 @@ namespace Larx.Terrain
 
         private int? getTileIndex(Vector3 position)
         {
-            var x = (int)MathF.Round(position.X + (mapSize / 2));
-            if (x < 0 || x > mapSize) return null;
+            var x = (int)MathF.Round(position.X + (State.MapSize / 2));
+            if (x < 0 || x > State.MapSize) return null;
 
-            var z = (int)MathF.Round(position.Z + (mapSize / 2));
-            if (z < 0 || z > mapSize) return null;
+            var z = (int)MathF.Round(position.Z + (State.MapSize / 2));
+            if (z < 0 || z > State.MapSize) return null;
 
-            var index = ((z * mapSize) + x) * 6;
+            var index = ((z * State.MapSize) + x) * 6;
             if (index >= indices.Count) return null;
 
             return index;
