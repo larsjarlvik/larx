@@ -13,7 +13,7 @@ namespace Larx
 {
     class Program : GameWindow
     {
-        private Multisampling multisampling;
+        private Framebuffer multisampling;
         private Camera camera;
         private Light light;
         private ObjectRenderer debug;
@@ -34,7 +34,7 @@ namespace Larx
 
         protected override void OnLoad(EventArgs e)
         {
-            multisampling = new Multisampling(4);
+            multisampling = new Framebuffer(4, State.Window.Size);
 
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             GL.Enable(EnableCap.Texture2D);
@@ -124,6 +124,8 @@ namespace Larx
         {
             State.Window.Set(Width, Height);
             GL.Viewport(0, 0, Width, Height);
+
+            multisampling.Size = State.Window.Size;
             multisampling.RefreshBuffers();
         }
 
