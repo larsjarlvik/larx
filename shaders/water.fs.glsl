@@ -1,6 +1,9 @@
 #version 330
 
 in vec3 lightVector;
+in vec4 clipSpace;
+
+uniform sampler2D uRefractionTexture;
 
 uniform vec3 uLightAmbient;
 uniform vec3 uLightDiffuse;
@@ -20,5 +23,6 @@ vec3 calculateLight() {
 }
 
 void main() {
-    outputColor = vec3(0.61, 0.90, 0.79) * calculateLight();
+    vec2 ndc = (clipSpace.xy / clipSpace.w) / 2.0 + 0.5;
+    outputColor = texture(uRefractionTexture, ndc).rgb * 0.5;
 }

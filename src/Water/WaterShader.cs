@@ -10,13 +10,12 @@ namespace Larx.Water
         public int Diffuse { get; private set; }
         public int Specular { get; private set; }
         public int Shininess { get; private set; }
-        public int Texture { get; private set; }
+        public int RefractionTexture { get; private set; }
 
         protected override void SetUniformsLocations()
         {
             base.SetUniformsLocations();
-
-            Texture = GL.GetUniformLocation(Program, "uTexture");
+            RefractionTexture = GL.GetUniformLocation(Program, "uRefractionTexture");
         }
     }
 }

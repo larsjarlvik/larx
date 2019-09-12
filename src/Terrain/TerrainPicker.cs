@@ -4,7 +4,7 @@ using OpenTK;
 namespace Larx.Terrain
 {
     public class TerrainPicker {
-        private const float RayRange = 1000;
+        private const float RayRange = 2000;
         private const int MaxRecursions = 300;
         private readonly TerrainRenderer renderer;
 

@@ -17,6 +17,8 @@ namespace Larx.Terrain
         public int TextureNoise { get; private set; }
         public int MousePosition { get; private set; }
         public int SelectionSize { get; private set; }
+        public int ClipPlane { get; private set; }
+        public int ShowOverlays { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -34,6 +36,8 @@ namespace Larx.Terrain
             SplatCount = GL.GetUniformLocation(Program, "uSplatCount");
             MousePosition = GL.GetUniformLocation(Program, "uMousePosition");
             SelectionSize = GL.GetUniformLocation(Program, "uSelectionSize");
+            ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
+            ShowOverlays = GL.GetUniformLocation(Program, "uShowOverlays");
         }
     }
 }

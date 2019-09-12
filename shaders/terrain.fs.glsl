@@ -25,6 +25,7 @@ uniform vec3 uLightSpecular;
 
 uniform int uGridLines;
 uniform int uSplatCount;
+uniform int uShowOverlays;
 
 uniform vec3 uMousePosition;
 uniform float uSelectionSize;
@@ -88,6 +89,11 @@ void main() {
         if (intesity > 0.0) {
             color += finalTexture(i) * intesity;
         }
+    }
+
+    if (uShowOverlays == 0) {
+        outputColor = color;
+        return;
     }
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());

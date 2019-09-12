@@ -8,6 +8,12 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Larx.Terrain
 {
+    public enum ClipPlane {
+        None = 0,
+        ClipBottom = 1,
+        ClipTop = 2,
+    }
+
     public class TerrainRenderer
     {
         private int indexCount = 0;
@@ -207,7 +213,7 @@ namespace Larx.Terrain
             MousePosition = picker.GetPosition(mouse);
         }
 
-        public void Render(Camera camera, Light light)
+        public void Render(Camera camera, Light light, bool showOverlays, ClipPlane clip = ClipPlane.None)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -217,6 +223,10 @@ namespace Larx.Terrain
 
             GL.Uniform3(shader.MousePosition, MousePosition);
             GL.Uniform1(shader.SelectionSize, State.ToolRadius);
+            GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
+            GL.Uniform1(shader.ShowOverlays, showOverlays ? 1 : 0);
+
+            GL.Uniform1(shader.ClipPlane, (int)clip);
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2DArray, texture.TextureId);
@@ -235,7 +245,6 @@ namespace Larx.Terrain
             GL.Uniform3(shader.Diffuse, 0.6f, 0.6f, 0.6f);
             GL.Uniform3(shader.Specular, 0.8f, 0.8f, 0.8f);
             GL.Uniform1(shader.Shininess, 2f);
-            GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
 
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);

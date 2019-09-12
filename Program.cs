@@ -14,7 +14,7 @@ namespace Larx
 {
     class Program : GameWindow
     {
-        private Framebuffer multisampling;
+        private Multisampling multisampling;
         private Camera camera;
         private Light light;
         private ObjectRenderer debug;
@@ -36,15 +36,18 @@ namespace Larx
 
         protected override void OnLoad(EventArgs e)
         {
-            multisampling = new Framebuffer(4, State.Window.Size);
+            multisampling = new Multisampling(4);
 
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
+            GL.ClearColor(Color.FromArgb(255, 156, 207, 210));
+
             GL.Enable(EnableCap.Texture2D);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.ClipDistance0);
+
             GL.Enable(EnableCap.Blend);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
-            GL.Enable(EnableCap.DepthTest);
-            GL.ClearColor(Color.FromArgb(255, 24, 24, 24));
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
@@ -103,22 +106,31 @@ namespace Larx
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            multisampling.Bind();
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
+            GL.PolygonMode(MaterialFace.Front, State.PolygonMode);
             GL.Disable(EnableCap.Blend);
             GL.Enable(EnableCap.DepthTest);
 
-            terrain.Render(camera, light);
+            // Water refraction rendering
+            water.RefractionBuffer.Bind();
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            terrain.Render(camera, light, true, ClipPlane.ClipTop);
+
+            // Main rendering
+            multisampling.Bind();
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            terrain.Render(camera, light, true, ClipPlane.ClipBottom);
             water.Render(camera, light);
+
+            // Draw to screen
             multisampling.Draw();
 
-            GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Fill);
+            // UI and debug
+            GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.Disable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Blend);
 
             ui.Render();
+            // water.RefractionBuffer.Draw(new Point(10, 10), new Size(320, 180));
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -129,8 +141,9 @@ namespace Larx
             State.Window.Set(Width, Height);
             GL.Viewport(0, 0, Width, Height);
 
-            multisampling.Size = State.Window.Size;
             multisampling.RefreshBuffers();
+            water.RefractionBuffer.Size = State.Window.Size;
+            water.RefractionBuffer.RefreshBuffers();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)

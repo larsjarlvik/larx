@@ -10,9 +10,12 @@ namespace Larx.Water
         private int vertexBuffer;
         private int indexBuffer;
 
+        public readonly Framebuffer RefractionBuffer;
+
         public WaterRenderer()
         {
             shader = new WaterShader();
+            RefractionBuffer = new Framebuffer(0, State.Window.Size);
             build();
         }
 
@@ -45,10 +48,18 @@ namespace Larx.Water
         public void Render(Camera camera, Light light)
         {
             GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+
             GL.UseProgram(shader.Program);
 
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            RefractionBuffer.Copy(State.Window.Size);
+
+            GL.BindTexture(TextureTarget.Texture2D, RefractionBuffer.ColorTexture);
+            GL.Uniform1(shader.RefractionTexture, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
