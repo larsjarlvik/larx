@@ -96,7 +96,7 @@ namespace Larx
                 Look.Z - (MathF.Cos(rx) * MathF.Cos(ry) * cameraDistance)
             );
 
-            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, 1, 1000);
+            ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, State.Near, State.Far);
             ViewMatrix = Matrix4.LookAt(Position, Look, new Vector3(0, 1, 0));
         }
 

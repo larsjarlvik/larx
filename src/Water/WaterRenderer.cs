@@ -55,11 +55,16 @@ namespace Larx.Water
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);
 
-            GL.ActiveTexture(TextureUnit.Texture0);
-            RefractionBuffer.Copy(State.Window.Size);
+            GL.Uniform1(shader.Near, State.Near);
+            GL.Uniform1(shader.Far, State.Far);
 
+            GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, RefractionBuffer.ColorTexture);
-            GL.Uniform1(shader.RefractionTexture, 0);
+            GL.Uniform1(shader.RefractionColorTexture, 0);
+
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, RefractionBuffer.DepthTexture);
+            GL.Uniform1(shader.RefractionDepthTexture, 1);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
