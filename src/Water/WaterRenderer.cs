@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -8,7 +9,10 @@ namespace Larx.Water
     {
         private readonly WaterShader shader;
         private int vertexBuffer;
+        private int coordBuffer;
         private int indexBuffer;
+        private Texture dudvMap;
+        private Texture normalMap;
 
         public readonly Framebuffer RefractionBuffer;
 
@@ -16,6 +20,12 @@ namespace Larx.Water
         {
             shader = new WaterShader();
             RefractionBuffer = new Framebuffer(0, State.Window.Size);
+
+            dudvMap = new Texture();
+            normalMap = new Texture();
+            dudvMap.LoadTexture(Path.Combine("resources", "textures", "water-dudv.bmp"));
+            normalMap.LoadTexture(Path.Combine("resources", "textures", "water-normal.bmp"));
+
             build();
         }
 
@@ -30,16 +40,28 @@ namespace Larx.Water
                 new Vector3(-halfMapSize, 0.0f,-halfMapSize),
             };
 
+            var coords = new Vector2[] {
+                new Vector2(0.0f, 1.0f),
+                new Vector2(1.0f, 1.0f),
+                new Vector2(1.0f, 0.0f),
+                new Vector2(0.0f, 0.0f),
+            };
+
             var indices = new int[] {
                 0, 1, 2, 2, 3, 0,
             };
 
             vertexBuffer = GL.GenBuffer();
+            coordBuffer = GL.GenBuffer();
             indexBuffer = GL.GenBuffer();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
+            GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, coords.Length * Vector2.SizeInBytes, coords, BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
@@ -66,8 +88,19 @@ namespace Larx.Water
             GL.BindTexture(TextureTarget.Texture2D, RefractionBuffer.DepthTexture);
             GL.Uniform1(shader.RefractionDepthTexture, 1);
 
+            GL.ActiveTexture(TextureUnit.Texture2);
+            GL.BindTexture(TextureTarget.Texture2D, dudvMap.TextureId);
+            GL.Uniform1(shader.DuDvMap, 2);
+
+            GL.ActiveTexture(TextureUnit.Texture3);
+            GL.BindTexture(TextureTarget.Texture2D, normalMap.TextureId);
+            GL.Uniform1(shader.NormalMap, 3);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, IntPtr.Zero);

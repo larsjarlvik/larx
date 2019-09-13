@@ -14,6 +14,8 @@ namespace Larx.Water
         public int RefractionDepthTexture { get; private set; }
         public int Near { get; private set; }
         public int Far { get; private set; }
+        public int NormalMap { get; private set; }
+        public int DuDvMap { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -22,6 +24,8 @@ namespace Larx.Water
             RefractionDepthTexture = GL.GetUniformLocation(Program, "uRefractionDepthTexture");
             Near = GL.GetUniformLocation(Program, "uNear");
             Far = GL.GetUniformLocation(Program, "uFar");
+            NormalMap = GL.GetUniformLocation(Program, "uNormalMap");
+            DuDvMap = GL.GetUniformLocation(Program, "uDuDvMap");
         }
     }
 }

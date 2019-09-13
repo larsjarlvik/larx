@@ -2,9 +2,12 @@
 
 in vec3 lightVector;
 in vec4 clipSpace;
+in vec2 texCoord;
 
 uniform sampler2D uRefractionColorTexture;
 uniform sampler2D uRefractionDepthTexture;
+uniform sampler2D uDuDvMap;
+uniform sampler2D uNormalMap;
 
 uniform vec3 uLightAmbient;
 uniform vec3 uLightDiffuse;
