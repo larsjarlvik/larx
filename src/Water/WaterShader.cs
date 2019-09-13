@@ -16,6 +16,7 @@ namespace Larx.Water
         public int Far { get; private set; }
         public int NormalMap { get; private set; }
         public int DuDvMap { get; private set; }
+        public int TimeOffset { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -26,6 +27,7 @@ namespace Larx.Water
             Far = GL.GetUniformLocation(Program, "uFar");
             NormalMap = GL.GetUniformLocation(Program, "uNormalMap");
             DuDvMap = GL.GetUniformLocation(Program, "uDuDvMap");
+            TimeOffset = GL.GetUniformLocation(Program, "uTimeOffset");
         }
     }
 }

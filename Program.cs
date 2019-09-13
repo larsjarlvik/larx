@@ -44,9 +44,6 @@ namespace Larx
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
 
-            GL.Enable(EnableCap.Blend);
-            GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
-
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
@@ -121,6 +118,7 @@ namespace Larx
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
 
             GL.Disable(EnableCap.ClipDistance0);
+
             water.Render(camera, light);
 
             // Draw to screen
@@ -130,6 +128,7 @@ namespace Larx
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.Disable(EnableCap.DepthTest);
             GL.Enable(EnableCap.Blend);
+            GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
             ui.Render();
             // water.RefractionBuffer.Draw(new Point(10, 10), new Size(320, 180));

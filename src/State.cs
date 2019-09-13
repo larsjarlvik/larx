@@ -42,12 +42,15 @@ namespace Larx
 
 
             public static double Elapsed { get; private set; }
+            public static double Total { get; private set; }
             public static int FPS { get; private set; }
 
             public static void Set(double time)
             {
                 Elapsed = time;
+                Total += time;
                 lastFPSUpdate += time;
+
                 if (lastFPSUpdate > 1)
                 {
                     FPS = currentFPS;

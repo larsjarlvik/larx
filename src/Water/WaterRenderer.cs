@@ -71,6 +71,8 @@ namespace Larx.Water
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.UseProgram(shader.Program);
 
@@ -79,6 +81,7 @@ namespace Larx.Water
 
             GL.Uniform1(shader.Near, State.Near);
             GL.Uniform1(shader.Far, State.Far);
+            GL.Uniform1(shader.TimeOffset, (float)(State.Time.Total * 0.002 % 1));
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, RefractionBuffer.ColorTexture);
@@ -104,6 +107,8 @@ namespace Larx.Water
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
+
+            GL.Disable(EnableCap.Blend);
         }
     }
 }
