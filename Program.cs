@@ -43,7 +43,6 @@ namespace Larx
 
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.ClipDistance0);
 
             GL.Enable(EnableCap.Blend);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
@@ -108,6 +107,7 @@ namespace Larx
         {
             GL.PolygonMode(MaterialFace.Front, State.PolygonMode);
             GL.Disable(EnableCap.Blend);
+            GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
             // Water refraction rendering
@@ -119,6 +119,8 @@ namespace Larx
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+
+            GL.Disable(EnableCap.ClipDistance0);
             water.Render(camera, light);
 
             // Draw to screen

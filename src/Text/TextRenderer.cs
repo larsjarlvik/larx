@@ -41,6 +41,7 @@ namespace Larx.Text
             GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
             GL.Uniform2(Shader.Position, position);
 
+            GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, texture.TextureId);
             GL.Uniform1(Shader.Texture, 0);
             GL.Uniform2(Shader.TextSize, new Vector2(texture.Size.X, texture.Size.Y));

@@ -14,7 +14,7 @@ void main() {
     vec4 worldPosition = (uViewMatrix * vec4(vPosition, 1.0));
 
     lightVector = normalize(uViewMatrix * vec4(uLightPosition, 1.0) - worldPosition).xyz;
-
     clipSpace = uProjectionMatrix * worldPosition;
+
     gl_Position = clipSpace;
 }
