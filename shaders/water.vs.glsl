@@ -18,7 +18,7 @@ void main() {
 
     texCoord = vTexCoord;
     eyeVector = -normalize(worldPosition).xyz;
-    lightVector = normalize(uViewMatrix * vec4(uLightPosition, 1.0) - worldPosition).xyz;
+    lightVector = worldPosition.xyz - uLightPosition;
     clipSpace = uProjectionMatrix * worldPosition;
 
     gl_Position = clipSpace;

@@ -119,6 +119,7 @@ namespace Larx
 
             GL.Disable(EnableCap.ClipDistance0);
 
+            // debug.Render(camera, light.Position);
             water.Render(camera, light);
 
             // Draw to screen
