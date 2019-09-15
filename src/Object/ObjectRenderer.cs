@@ -23,15 +23,15 @@ namespace Larx.Object
         {
             var vertices = new Vector3[] {
                 // Front
-                new Vector3(-0.25f,-0.05f, 0.25f),
-                new Vector3( 0.25f,-0.05f, 0.25f),
-                new Vector3( 0.25f, 0.05f, 0.25f),
-                new Vector3(-0.25f, 0.05f, 0.25f),
+                new Vector3(-1.0f,-1.0f, 1.0f),
+                new Vector3( 1.0f,-1.0f, 1.0f),
+                new Vector3( 1.0f, 1.0f, 1.0f),
+                new Vector3(-1.0f, 1.0f, 1.0f),
                 // Back
-                new Vector3(-0.25f,-0.05f,-0.25f),
-                new Vector3( 0.25f,-0.05f,-0.25f),
-                new Vector3( 0.25f, 0.05f,-0.25f),
-                new Vector3(-0.25f, 0.05f,-0.25f),
+                new Vector3(-1.0f,-1.0f,-1.0f),
+                new Vector3( 1.0f,-1.0f,-1.0f),
+                new Vector3( 1.0f, 1.0f,-1.0f),
+                new Vector3(-1.0f, 1.0f,-1.0f),
             };
 
             var indices = new int[] {

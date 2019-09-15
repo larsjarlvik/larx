@@ -10,13 +10,15 @@ uniform vec3 uLightPosition;
 
 out vec4 clipSpace;
 out vec3 lightVector;
+out vec3 eyeVector;
 out vec2 texCoord;
 
 void main() {
     vec4 worldPosition = (uViewMatrix * vec4(vPosition, 1.0));
 
     texCoord = vTexCoord;
-    lightVector = normalize(uViewMatrix * vec4(uLightPosition, 1.0) - worldPosition).xyz;
+    eyeVector = -normalize(worldPosition).xyz;
+    lightVector = worldPosition.xyz - uLightPosition;
     clipSpace = uProjectionMatrix * worldPosition;
 
     gl_Position = clipSpace;
