@@ -41,6 +41,7 @@ namespace Larx
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             GL.ClearColor(Color.FromArgb(255, 156, 207, 210));
 
+            GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
 
@@ -103,7 +104,7 @@ namespace Larx
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.PolygonMode(MaterialFace.Front, State.PolygonMode);
-            GL.Disable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
@@ -112,12 +113,18 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, true, ClipPlane.ClipTop);
 
+            // Water reflection rendering
+            camera.InvertY();
+            water.ReflectionBuffer.Bind();
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+            camera.Reset();
+
             // Main rendering
+            GL.Disable(EnableCap.ClipDistance0);
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
-
-            GL.Disable(EnableCap.ClipDistance0);
 
             // debug.Render(camera, light.Position);
             water.Render(camera, light);
@@ -128,11 +135,10 @@ namespace Larx
             // UI and debug
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.Disable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.Blend);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
             ui.Render();
-            // water.RefractionBuffer.Draw(new Point(10, 10), new Size(320, 180));
+            // water.ReflectionBuffer.Draw(new Point(State.Window.Size.Width - 330, State.Window.Size.Height - 190), new Size(320, 180));
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -146,6 +152,9 @@ namespace Larx
             multisampling.RefreshBuffers();
             water.RefractionBuffer.Size = State.Window.Size;
             water.RefractionBuffer.RefreshBuffers();
+
+            water.ReflectionBuffer.Size = State.Window.Size;
+            water.ReflectionBuffer.RefreshBuffers();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)

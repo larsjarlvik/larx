@@ -133,7 +133,6 @@ namespace Larx.UserInterFace
 
         public void Render()
         {
-            GL.Enable(EnableCap.Blend);
             var pMatrix = Matrix4.CreateOrthographicOffCenter(0, State.Window.Size.Width, State.Window.Size.Height, 0f, 0f, -1.0f);
 
             for(var i = 0; i < texts.Count; i ++)
@@ -141,8 +140,6 @@ namespace Larx.UserInterFace
 
             foreach(var key in getVisibleTools())
                 buttons[key].Render(pMatrix);
-
-            GL.Disable(EnableCap.Blend);
         }
 
         private List<string> getVisibleTools()

@@ -12,7 +12,7 @@ in vec3 lightVector;
 in vec3 normalVector;
 in vec3 eyeVector;
 
-out vec3 outputColor;
+out vec4 outputColor;
 
 uniform vec3 uAmbient;
 uniform vec3 uDiffuse;
@@ -92,10 +92,10 @@ void main() {
     }
 
     if (uShowOverlays == 0) {
-        outputColor = color;
+        outputColor = vec4(color, 0);
         return;
     }
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
-    outputColor = mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle());
+    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);
 }

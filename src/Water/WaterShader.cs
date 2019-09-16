@@ -12,6 +12,7 @@ namespace Larx.Water
         public int Shininess { get; private set; }
         public int RefractionColorTexture { get; private set; }
         public int RefractionDepthTexture { get; private set; }
+        public int ReflectionColorTexture { get; private set; }
         public int Near { get; private set; }
         public int Far { get; private set; }
         public int NormalMap { get; private set; }
@@ -23,6 +24,7 @@ namespace Larx.Water
             base.SetUniformsLocations();
             RefractionColorTexture = GL.GetUniformLocation(Program, "uRefractionColorTexture");
             RefractionDepthTexture = GL.GetUniformLocation(Program, "uRefractionDepthTexture");
+            ReflectionColorTexture = GL.GetUniformLocation(Program, "uReflectionColorTexture");
             Near = GL.GetUniformLocation(Program, "uNear");
             Far = GL.GetUniformLocation(Program, "uFar");
             NormalMap = GL.GetUniformLocation(Program, "uNormalMap");

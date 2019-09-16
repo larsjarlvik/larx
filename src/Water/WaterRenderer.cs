@@ -15,11 +15,13 @@ namespace Larx.Water
         private Texture normalMap;
 
         public readonly Framebuffer RefractionBuffer;
+        public readonly Framebuffer ReflectionBuffer;
 
         public WaterRenderer()
         {
             shader = new WaterShader();
             RefractionBuffer = new Framebuffer(0, State.Window.Size);
+            ReflectionBuffer = new Framebuffer(0, State.Window.Size);
 
             dudvMap = new Texture();
             normalMap = new Texture();
@@ -71,8 +73,6 @@ namespace Larx.Water
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.UseProgram(shader.Program);
 
@@ -92,12 +92,16 @@ namespace Larx.Water
             GL.Uniform1(shader.RefractionDepthTexture, 1);
 
             GL.ActiveTexture(TextureUnit.Texture2);
-            GL.BindTexture(TextureTarget.Texture2D, dudvMap.TextureId);
-            GL.Uniform1(shader.DuDvMap, 2);
+            GL.BindTexture(TextureTarget.Texture2D, ReflectionBuffer.ColorTexture);
+            GL.Uniform1(shader.ReflectionColorTexture, 2);
 
             GL.ActiveTexture(TextureUnit.Texture3);
+            GL.BindTexture(TextureTarget.Texture2D, dudvMap.TextureId);
+            GL.Uniform1(shader.DuDvMap, 3);
+
+            GL.ActiveTexture(TextureUnit.Texture4);
             GL.BindTexture(TextureTarget.Texture2D, normalMap.TextureId);
-            GL.Uniform1(shader.NormalMap, 3);
+            GL.Uniform1(shader.NormalMap, 4);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
@@ -107,8 +111,6 @@ namespace Larx.Water
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
-
-            GL.Disable(EnableCap.Blend);
         }
     }
 }

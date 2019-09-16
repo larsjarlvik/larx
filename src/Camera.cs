@@ -81,6 +81,17 @@ namespace Larx
             cameraDistanceSpeed /= (frameTime * DistanceDeceleration) + 1.0f;
         }
 
+        public void InvertY()
+        {
+            var invertedPosition = new Vector3(Position.X, -Position.Y, Position.Z);
+            ViewMatrix = Matrix4.LookAt(invertedPosition, Look, new Vector3(0, -1, 0));
+        }
+
+        public void Reset()
+        {
+            ViewMatrix = Matrix4.LookAt(Position, Look, new Vector3(0, 1, 0));
+        }
+
         public void Update(float frameTime)
         {
             move(frameTime);
