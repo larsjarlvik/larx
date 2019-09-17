@@ -35,7 +35,7 @@ namespace Larx.Terrain
             var endPoint = picker.GetPointOnRay(finish);
             var endElev = renderer.GetElevationAtPoint(endPoint);
 
-            if (endElev == null) endElev = 0.0f;
+            if (endElev == null) return true;
 
             return endPoint.Y < (float)endElev;
         }
