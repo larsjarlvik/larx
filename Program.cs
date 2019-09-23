@@ -9,6 +9,7 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using GL4 = OpenTK.Graphics.OpenGL4;
 using Larx.Water;
+using Larx.Mesh;
 
 namespace Larx
 {
@@ -21,6 +22,7 @@ namespace Larx
         private TerrainRenderer terrain;
         private WaterRenderer water;
         private MousePicker mousePicker;
+        private MeshRenderer cube;
         private Ui ui;
 
         public Program() : base(
@@ -45,8 +47,8 @@ namespace Larx
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
 
-            GL.Enable(EnableCap.CullFace);
-            GL.CullFace(CullFaceMode.Back);
+            // GL.Enable(EnableCap.CullFace);
+            // GL.CullFace(CullFaceMode.Back);
 
             ui = new Ui();
             terrain = new TerrainRenderer();
@@ -54,6 +56,7 @@ namespace Larx
             debug = new ObjectRenderer();
             camera = new Camera();
             light = new Light();
+            cube = new MeshRenderer("cube");
             mousePicker = new MousePicker(camera);
         }
 
@@ -124,10 +127,10 @@ namespace Larx
             GL.Disable(EnableCap.ClipDistance0);
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+            // terrain.Render(camera, light, true, ClipPlane.ClipBottom);
 
-            // debug.Render(camera, light.Position);
-            water.Render(camera, light);
+            cube.Render(camera, new Vector3(0, 0, 0));
+            // water.Render(camera, light);
 
             // Draw to screen
             multisampling.Draw();
