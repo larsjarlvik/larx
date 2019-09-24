@@ -50,6 +50,8 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
+            GL.BindVertexArray(GL.GenVertexArray());
+
             ui = new Ui();
             terrain = new TerrainRenderer();
             water = new WaterRenderer();
