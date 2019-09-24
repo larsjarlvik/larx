@@ -12,8 +12,8 @@ namespace Larx
 
         public Light()
         {
-            Ambient = new Vector3(0.5f, 0.5f, 0.5f);
-            Diffuse = new Vector3(1.0f, 1.0f, 1.0f);
+            Ambient = new Vector3(0.3f, 0.3f, 0.3f);
+            Diffuse = new Vector3(0.5f, 0.5f, 0.5f);
             Specular = new Vector3(1.0f, 1.0f, 1.0f);
             Position = new Vector3(350.0f, 750.0f, 350.0f);
         }

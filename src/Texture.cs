@@ -47,8 +47,6 @@ namespace Larx
             imageStream.Read(buffer, 0, Size.X * Size.Y * pixelSize);
 
             InvertRows(buffer, Size.Y, Size.X * pixelSize);
-            if (pixelFormat == PixelFormat.Bgra)
-                reorganizeBuffer(buffer);
 
             return buffer;
         }

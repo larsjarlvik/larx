@@ -64,12 +64,12 @@
         {
             "mimeType" : "image/png",
             "name" : "Tree Normal",
-            "uri" : "Tree Normal.png"
+            "uri" : "Tree Normal.bmp"
         },
         {
             "mimeType" : "image/png",
             "name" : "Tree Diffuse",
-            "uri" : "Tree Diffuse.png"
+            "uri" : "Tree Diffuse.bmp"
         }
     ],
     "accessors" : [

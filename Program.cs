@@ -1,7 +1,6 @@
 ﻿using System;
 using Larx.Terrain;
 using Larx.Object;
-using Larx.Text;
 using Larx.UserInterFace;
 using OpenTK;
 using OpenTK.Graphics;
@@ -9,7 +8,8 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using GL4 = OpenTK.Graphics.OpenGL4;
 using Larx.Water;
-using Larx.Mesh;
+using Larx.GltfModel;
+using System.Collections.Generic;
 
 namespace Larx
 {
@@ -22,7 +22,7 @@ namespace Larx
         private TerrainRenderer terrain;
         private WaterRenderer water;
         private MousePicker mousePicker;
-        private MeshRenderer cube;
+        private ModelRenderer model;
         private Ui ui;
 
         public Program() : base(
@@ -58,7 +58,7 @@ namespace Larx
             debug = new ObjectRenderer();
             camera = new Camera();
             light = new Light();
-            cube = new MeshRenderer("tree");
+            model = new ModelRenderer("tree");
             mousePicker = new MousePicker(camera);
         }
 
@@ -123,16 +123,19 @@ namespace Larx
             water.ReflectionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+            GL.Disable(EnableCap.ClipDistance0);
+
+            model.Render(camera, light, new Vector3(0.0f, (float)terrain.GetElevationAtPoint(new Vector3(0.0f, 0.0f, 0.0f)), 0.0f));
             camera.Reset();
 
             // Main rendering
             GL.Disable(EnableCap.ClipDistance0);
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            // terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+            terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+            model.Render(camera, light, new Vector3(0.0f, (float)terrain.GetElevationAtPoint(new Vector3(0.0f, 0.0f, 0.0f)), 0.0f));
 
-            cube.Render(camera, new Vector3(0, 0, 0));
-            // water.Render(camera, light);
+            water.Render(camera, light);
 
             // Draw to screen
             multisampling.Draw();
