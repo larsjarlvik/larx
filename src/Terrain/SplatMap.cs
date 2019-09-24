@@ -36,8 +36,9 @@ namespace Larx.Terrain
             for(var i = 0; i < SplatCount; i++) toTexture(i);
         }
 
-        public void Update(Vector2 pos, float radius, byte splatId)
+        public void Update(Vector2 pos, byte splatId)
         {
+            var radius = (int)(State.ToolRadius * SplatMap.Detail / State.MapSize);
             Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
             for (var z1 = (int)(pos.Y - radius); z1 < pos.Y + radius; z1 ++)
@@ -51,7 +52,7 @@ namespace Larx.Terrain
                     var n = calcP(MathF.Min(1.0f, MathF.Sqrt((distance / radius > State.ToolHardness ? distance : 0.0f) / radius)));
                     var result = splats[splatId][z1, x1] + n;
 
-                    splats[splatId][z1, x1] += result > 1.0f ? 1.0f : result;
+                    splats[splatId][z1, x1] = result > 1.0f ? 1.0f : result;
                     average(z1, x1);
                 }
 

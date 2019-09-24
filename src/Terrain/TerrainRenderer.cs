@@ -98,9 +98,7 @@ namespace Larx.Terrain
             position.X = (position.X + 0.5f) * SplatMap.Detail;
             position.Y = (position.Y + 0.5f) * SplatMap.Detail;
 
-            var splatMapRadius = (int)(State.ToolRadius * SplatMap.Detail / State.MapSize);
-
-            splatMap.Update(position, splatMapRadius, State.ActiveTexture);
+            splatMap.Update(position, State.ActiveTexture);
         }
 
         private List<int> getTilesInArea(Vector3 center, float radius)

@@ -6,10 +6,6 @@ namespace Larx.Terrain
     {
         public TerrainShader() : base("terrain") { }
 
-        public int Ambient { get; private set; }
-        public int Diffuse { get; private set; }
-        public int Specular { get; private set; }
-        public int Shininess { get; private set; }
         public int Texture { get; private set; }
         public int GridLines { get; private set; }
         public int SplatMap { get; private set; }

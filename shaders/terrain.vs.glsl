@@ -27,9 +27,9 @@ void main()
     normal = vNormal;
 
     if (uClipPlane == CLIP_BOTTOM) {
-        gl_ClipDistance[0] = vPosition.y + 0.9;
+        gl_ClipDistance[0] = vPosition.y + 0.05;
     } else if (uClipPlane == CLIP_TOP) {
-        gl_ClipDistance[0] = -vPosition.y + 0.9;
+        gl_ClipDistance[0] = -vPosition.y + 0.05;
     }
 
     vec4 worldPosition = (uViewMatrix * vec4(vPosition, 1.0));
