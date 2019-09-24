@@ -9,6 +9,7 @@ namespace Larx.GltfModel
         public int Position { get; private set; }
         public int BaseColorTexture { get; private set; }
         public int NormalTexture { get; private set; }
+        public int Roughness { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -16,6 +17,7 @@ namespace Larx.GltfModel
             Position = GL.GetUniformLocation(Program, "uPosition");
             BaseColorTexture = GL.GetUniformLocation(Program, "uBaseColorTexture");
             NormalTexture = GL.GetUniformLocation(Program, "uNormalTexture");
+            Roughness = GL.GetUniformLocation(Program, "uRoughness");
         }
     }
 }

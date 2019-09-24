@@ -42,13 +42,17 @@ namespace Larx.GltfModel
 
             GL.UseProgram(shader.Program);
             GL.Uniform3(shader.Position, position);
-            GL.Disable(EnableCap.CullFace);
 
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);
 
             foreach(var mesh in meshes)
             {
+                if (mesh.Material.DoubleSided) GL.Disable(EnableCap.CullFace);
+                else GL.Enable(EnableCap.CullFace);
+
+                GL.Uniform1(shader.Roughness, mesh.Material.Roughness);
+
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
                 GL.Uniform1(shader.BaseColorTexture, 0);
