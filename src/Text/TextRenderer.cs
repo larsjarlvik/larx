@@ -111,9 +111,6 @@ namespace Larx.Text
         }
 
         public void CreateText(string text, float size) {
-            var vertexArray = GL.GenVertexArray();
-            GL.BindVertexArray(vertexArray);
-
             var vertexElements = new List<Vector2>();
             var textureElements = new List<Vector2>();
 
