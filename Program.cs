@@ -47,8 +47,8 @@ namespace Larx
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
 
-            // GL.Enable(EnableCap.CullFace);
-            // GL.CullFace(CullFaceMode.Back);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
 
             ui = new Ui();
             terrain = new TerrainRenderer();
@@ -56,7 +56,7 @@ namespace Larx
             debug = new ObjectRenderer();
             camera = new Camera();
             light = new Light();
-            cube = new MeshRenderer("cube");
+            cube = new MeshRenderer("tree");
             mousePicker = new MousePicker(camera);
         }
 

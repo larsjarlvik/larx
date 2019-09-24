@@ -42,7 +42,7 @@ namespace Larx.Mesh
             var floatArray = new float[accessor.Count * 3];
             System.Buffer.BlockCopy(buffer, 0, floatArray, 0, buffer.Length);
 
-            for(var i = 0; i < accessor.Count; i += 3) {
+            for(var i = 0; i < accessor.Count * 3; i += 3) {
                 result.Add(new Vector3(floatArray[i], floatArray[i + 1], floatArray[i + 2]));
             }
 
