@@ -17,7 +17,6 @@ out vec4 outputColor;
 
 vec3 calculateLight() {
     vec3 normal = texture(uNormalTexture, texCoord).rgb * 2.0 - 1.0;
-
     vec3 n = normalize(normalVector + normal);
     vec3 diffuse = max(dot(lightVector, n), 0.0) * uLightDiffuse;
     vec3 halfwayVector = normalize(lightVector + eyeVector);
@@ -27,5 +26,8 @@ vec3 calculateLight() {
 }
 
 void main() {
-    outputColor = texture(uBaseColorTexture, texCoord) * vec4(calculateLight(), 1.0);
+    vec4 tex = texture(uBaseColorTexture, texCoord);
+    if (tex.a < 0.5) discard;
+
+    outputColor = tex * vec4(calculateLight(), 1.0);
 }
