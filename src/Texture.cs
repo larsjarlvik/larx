@@ -31,29 +31,29 @@ namespace Larx
             }
         }
 
-        private byte[] readTextureData(string path)
+        public byte[] imageToByteArray(string path)
         {
-            var imageStream = readFile(path);
+            var image = new System.Drawing.Bitmap(path);
+            var pixelSize = image.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb ? 3 : 4;
 
-            // Read bitmap header
-            var header = new byte[BitmapHeaderLength];
-            imageStream.Read(header, 0, BitmapHeaderLength);
-            var start = parseHeader(header);
+            pixelFormat = pixelSize == 3 ? PixelFormat.Bgr : PixelFormat.Bgra;
+            Size = new Point(image.Width, image.Height);
 
-            // Read bitmap data
-            var pixelSize = pixelFormat == PixelFormat.Bgr ? 3 : 4;
-            var buffer = new byte[Size.X * Size.Y * pixelSize];
-            imageStream.Seek(start, SeekOrigin.Begin);
-            imageStream.Read(buffer, 0, Size.X * Size.Y * pixelSize);
+            var buffer = new byte[image.Width * image.Height * pixelSize];
+            using(var ms = new MemoryStream())
+            {
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
+                ms.Seek(BitmapHeaderLength, SeekOrigin.Begin);
+                ms.Read(buffer, 0, image.Width * image.Height * pixelSize);
 
-            InvertRows(buffer, Size.Y, Size.X * pixelSize);
-
-            return buffer;
+                InvertRows(buffer, image.Height, image.Width * pixelSize);
+                return buffer;
+            }
         }
 
         public void LoadTexture(string path, bool mipMap = false)
         {
-            var buffer = readTextureData(path);
+            var buffer = imageToByteArray(path);
 
             TextureId = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, TextureId);
@@ -74,7 +74,7 @@ namespace Larx
 
         public void LoadTexture(string[] path, bool mipMap = false)
         {
-            var buffers = path.Select(p => readTextureData(p)).ToList();
+            var buffers = path.Select(p => imageToByteArray(p)).ToList();
 
             TextureId = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, TextureId);
@@ -95,39 +95,6 @@ namespace Larx
             if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
 
             GL.BindTexture(TextureTarget.Texture2D, 0);
-        }
-
-        private FileStream readFile(string path)
-        {
-            return File.OpenRead(path);
-        }
-
-        private int parseHeader(byte[] header)
-        {
-            var fileType = Encoding.ASCII.GetString(header.Take(2).ToArray());
-            if (fileType != "BM")
-                throw new ApplicationException($"Texture has invalid file type, expected BM got {fileType}!");
-
-            var format = BitConverter.ToInt32(header, 30);
-            if (format != 0 && format != 3)
-                throw new ApplicationException("Unsupported bitmap format!");
-
-            pixelFormat = format == 0 ? PixelFormat.Bgr : PixelFormat.Bgra;
-            Size = new Point(BitConverter.ToInt32(header, 18), BitConverter.ToInt32(header, 22));
-
-            return BitConverter.ToInt32(header, 10); // Start of image data
-        }
-
-        private void reorganizeBuffer(byte[] buffer)
-        {
-            for (var i = 0; i < buffer.Count() - 4; i += 4)
-            {
-                var src = buffer.Skip(i).Take(4).ToArray();
-                buffer[i] = src[1];
-                buffer[i + 1] = src[2];
-                buffer[i + 2] = src[3];
-                buffer[i + 3] = src[0];
-            }
         }
     }
 }

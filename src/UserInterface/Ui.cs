@@ -27,19 +27,19 @@ namespace Larx.UserInterFace
             AddText("hardness", $"Hardness: 0");
             AddText("position", $"Position: 0 0");
 
-            AddButton(Keys.ElevationTools, "ui/terrain.bmp");
-            AddButton(Keys.TerrainPaint, "ui/paint.bmp");
+            AddButton(Keys.ElevationTools, "ui/terrain.png");
+            AddButton(Keys.TerrainPaint, "ui/paint.png");
 
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.bmp")));
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.bmp")));
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.bmp")));
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.bmp")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.png")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.png")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.png")));
+            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.png")));
 
-            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Grass, "textures/grass-albedo.bmp")));
-            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.RoughGrass, "textures/rocky-grass-albedo.bmp")));
-            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Cliff, "textures/cliff-albedo.bmp")));
-            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Sand, "textures/sand-albedo.bmp")));
-            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Snow, "textures/snow-albedo.bmp")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Grass, "textures/grass-albedo.png")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.RoughGrass, "textures/rocky-grass-albedo.png")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Cliff, "textures/cliff-albedo.png")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Sand, "textures/sand-albedo.png")));
+            tools.Add(new ToolbarItem(TopMenu.Paint, AddButton(Keys.Paint.Snow, "textures/snow-albedo.png")));
 
 
             State.ActiveTopMenu = TopMenu.Terrain;

@@ -32,7 +32,7 @@
                     "texCoord" : 0
                 },
                 "metallicFactor" : 0,
-                "roughnessFactor" : 0.4000000059604645
+                "roughnessFactor" : 1.0
             }
         }
     ],
@@ -64,12 +64,12 @@
         {
             "mimeType" : "image/png",
             "name" : "Tree Normal",
-            "uri" : "Tree Normal.bmp"
+            "uri" : "Tree Normal.png"
         },
         {
             "mimeType" : "image/png",
             "name" : "Tree Diffuse",
-            "uri" : "Tree Diffuse.bmp"
+            "uri" : "Tree Diffuse.png"
         }
     ],
     "accessors" : [
