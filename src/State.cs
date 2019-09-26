@@ -8,6 +8,7 @@ namespace Larx
     {
         Terrain,
         Paint,
+        Assets,
     }
 
     public static class State
@@ -15,10 +16,22 @@ namespace Larx
         public static bool ShowGridLines;
         public static PolygonMode PolygonMode;
         public static float ToolRadius;
+        public static float SelectionCircleRadius
+        {
+            get
+            {
+                if (State.ActiveTopMenu == TopMenu.Assets)
+                    return 1.0f;
+
+                return ToolRadius;
+            }
+        }
+
+
         public static float ToolHardness;
 
         public static TopMenu ActiveTopMenu;
-        public static byte ActiveTexture;
+        public static string ActiveToolBarItem;
         public const int MapSize = 256;
         public const float Near = 1.0f;
         public const float Far = 1000.0f;

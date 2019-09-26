@@ -4,6 +4,7 @@ namespace Larx.UserInterFace
     {
         public const string ElevationTools = "elevation";
         public const string TerrainPaint = "paint";
+        public const string AddAssets = "assets";
 
         public static class Terrain
         {
@@ -20,6 +21,11 @@ namespace Larx.UserInterFace
             public const string Cliff = "2";
             public const string Sand = "3";
             public const string Snow = "4";
+        }
+
+        public static class Assets
+        {
+            public const string Tree = "assets_tree";
         }
     }
 }

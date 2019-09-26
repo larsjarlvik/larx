@@ -9,7 +9,7 @@ using OpenTK.Input;
 using GL4 = OpenTK.Graphics.OpenGL4;
 using Larx.Water;
 using Larx.GltfModel;
-using System.Collections.Generic;
+using Larx.Map;
 
 namespace Larx
 {
@@ -22,7 +22,7 @@ namespace Larx
         private TerrainRenderer terrain;
         private WaterRenderer water;
         private MousePicker mousePicker;
-        private ModelRenderer model;
+        private Assets assets;
         private Ui ui;
 
         public Program() : base(
@@ -58,7 +58,7 @@ namespace Larx
             debug = new ObjectRenderer();
             camera = new Camera();
             light = new Light();
-            model = new ModelRenderer("tree");
+            assets = new Assets(ui);
             mousePicker = new MousePicker(camera);
         }
 
@@ -125,7 +125,7 @@ namespace Larx
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
             GL.Disable(EnableCap.ClipDistance0);
 
-            model.Render(camera, light, new Vector3(0.0f, (float)terrain.GetElevationAtPoint(new Vector3(0.0f, 0.0f, 0.0f)), 0.0f));
+            assets.Render(camera, light, terrain);
             camera.Reset();
 
             // Main rendering
@@ -133,7 +133,7 @@ namespace Larx
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
-            model.Render(camera, light, new Vector3(0.0f, (float)terrain.GetElevationAtPoint(new Vector3(0.0f, 0.0f, 0.0f)), 0.0f));
+            assets.Render(camera, light, terrain);
 
             water.Render(camera, light);
 
@@ -169,7 +169,16 @@ namespace Larx
         {
             var mouse = Mouse.GetCursorState();
             State.Mouse.Set(PointToClient(new Point(mouse.X, mouse.Y)), mouse);
-            ui.Click();
+            var intersection = ui.Click();
+
+            if (intersection == null) {
+                switch (State.ActiveTopMenu)
+                {
+                    case TopMenu.Assets:
+                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition(mousePicker), terrain);
+                        break;
+                }
+            }
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)

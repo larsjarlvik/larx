@@ -31,7 +31,7 @@ namespace Larx.Button
 
             Shader = new ButtonShader();
             texture = new Texture();
-            texture.LoadTexture(Path.Combine("resources", texturePath));
+            texture.LoadTexture(Path.Combine("resources", texturePath), true);
 
             build();
         }

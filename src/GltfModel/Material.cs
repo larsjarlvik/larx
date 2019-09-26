@@ -11,7 +11,7 @@ namespace Larx.GltfModel
         public readonly bool DoubleSided;
         public readonly float Roughness;
 
-        public Material(Gltf.Gltf model, Gltf.Mesh mesh)
+        public Material(string rootPath, Gltf.Gltf model, Gltf.Mesh mesh)
         {
             var materialId = mesh.Primitives[0].Material;
             if (materialId == null)
@@ -26,10 +26,10 @@ namespace Larx.GltfModel
             var baseColorTextureName = model.Images[(int)model.Textures[baseColorTextureIndex].Source].Uri;
 
             NormalTexture = new Texture();
-            NormalTexture.LoadTexture(Path.Combine("resources", "models", normalTextureName), true);
+            NormalTexture.LoadTexture(Path.Combine(rootPath, normalTextureName), true);
 
             BaseColorTexture = new Texture();
-            BaseColorTexture.LoadTexture(Path.Combine("resources", "models", baseColorTextureName), true);
+            BaseColorTexture.LoadTexture(Path.Combine(rootPath, baseColorTextureName), true);
 
             DoubleSided = material.DoubleSided;
             Roughness = material.PbrMetallicRoughness.RoughnessFactor;

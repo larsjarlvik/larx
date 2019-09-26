@@ -10,31 +10,30 @@ namespace Larx.GltfModel
     public class ModelRenderer
     {
         private readonly ModelShader shader;
-        private readonly Gltf model;
-        private string modelName;
-        private List<Mesh> meshes;
 
-        public ModelRenderer(string name)
+        public ModelRenderer()
         {
-            modelName = name;
-            meshes = new List<Mesh>();
             shader = new ModelShader();
-
-            using(var fs = new FileStream(Path.Combine("resources", "models", $"{modelName}.gltf"), FileMode.Open))
-                model = glTFLoader.Interface.LoadModel(fs);
-
-            build();
         }
 
-
-        private void build()
+        public static Model Load(string name)
         {
-            foreach(var mesh in model.Meshes) {
-                meshes.Add(new Mesh(model, mesh));
+            var meshes = new List<Mesh>();
+            var rootPath = Path.Combine("resources", "models", name);
+
+            using(var fs = new FileStream(Path.Combine(rootPath, $"{name}.gltf"), FileMode.Open))
+            {
+                var root = glTFLoader.Interface.LoadModel(fs);
+
+                foreach(var mesh in root.Meshes) {
+                    meshes.Add(new Mesh(rootPath, root, mesh));
+                }
             }
+
+            return new Model(name, meshes);
         }
 
-        public void Render(Camera camera, Light light, Vector3 position)
+        public void Render(Camera camera, Light light, Model model, Vector3 position)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -46,7 +45,7 @@ namespace Larx.GltfModel
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);
 
-            foreach(var mesh in meshes)
+            foreach(var mesh in model.Meshes)
             {
                 if (mesh.Material.DoubleSided) GL.Disable(EnableCap.CullFace);
                 else GL.Enable(EnableCap.CullFace);

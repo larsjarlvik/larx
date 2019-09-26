@@ -13,15 +13,15 @@ namespace Larx.GltfModel
         public readonly int IndexCount;
         public readonly Material Material;
 
-        public Mesh(Gltf.Gltf model, Gltf.Mesh mesh)
+        public Mesh(string rootPath, Gltf.Gltf model, Gltf.Mesh mesh)
         {
-            var vertices = BufferReader.readVec3(model, mesh, "POSITION");
-            var normals = BufferReader.readVec3(model, mesh, "NORMAL");
-            var texCoords = BufferReader.readVec2(model, mesh, "TEXCOORD_0");
-            var indices = BufferReader.readIndices(model, mesh);
+            var vertices = BufferReader.readVec3(rootPath, model, mesh, "POSITION");
+            var normals = BufferReader.readVec3(rootPath, model, mesh, "NORMAL");
+            var texCoords = BufferReader.readVec2(rootPath, model, mesh, "TEXCOORD_0");
+            var indices = BufferReader.readIndices(rootPath, model, mesh);
 
             IndexCount = indices.Length;
-            Material = new Material(model, mesh);
+            Material = new Material(rootPath, model, mesh);
 
             VertexBuffer = GL.GenBuffer();
             NormalBuffer = GL.GenBuffer();

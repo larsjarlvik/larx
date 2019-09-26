@@ -18,12 +18,12 @@ namespace Larx.GltfModel
             throw new Exception($"Accessor not found! ({key})");
         }
 
-        private static byte[] readBuffer(Gltf.Gltf model, Gltf.Accessor accessor)
+        private static byte[] readBuffer(string rootPath, Gltf.Gltf model, Gltf.Accessor accessor)
         {
             var bufferView = model.BufferViews[(int)accessor.BufferView];
             var buffer = model.Buffers[bufferView.Buffer];
 
-            using(var fs = new FileStream(Path.Combine("resources", "models", buffer.Uri), FileMode.Open))
+            using(var fs = new FileStream(Path.Combine(rootPath, buffer.Uri), FileMode.Open))
                 using(var reader = new BinaryReader(fs))
                 {
                     var byteArray = new byte[bufferView.ByteLength];
@@ -33,12 +33,12 @@ namespace Larx.GltfModel
                 }
         }
 
-        public static Vector3[] readVec3(Gltf.Gltf model, Gltf.Mesh mesh, string key)
+        public static Vector3[] readVec3(string rootPath, Gltf.Gltf model, Gltf.Mesh mesh, string key)
         {
             var result = new List<Vector3>();
             var accessor = getAccessor(model, mesh, key);
 
-            var buffer = readBuffer(model, accessor);
+            var buffer = readBuffer(rootPath, model, accessor);
             var floatArray = new float[accessor.Count * 3];
             System.Buffer.BlockCopy(buffer, 0, floatArray, 0, buffer.Length);
 
@@ -49,12 +49,12 @@ namespace Larx.GltfModel
             return result.ToArray();
         }
 
-        public static Vector2[] readVec2(Gltf.Gltf model, Gltf.Mesh mesh, string key)
+        public static Vector2[] readVec2(string rootPath, Gltf.Gltf model, Gltf.Mesh mesh, string key)
         {
             var result = new List<Vector2>();
             var accessor = getAccessor(model, mesh, key);
 
-            var buffer = readBuffer(model, accessor);
+            var buffer = readBuffer(rootPath, model, accessor);
             var floatArray = new float[accessor.Count * 2];
             System.Buffer.BlockCopy(buffer, 0, floatArray, 0, buffer.Length);
 
@@ -65,10 +65,10 @@ namespace Larx.GltfModel
             return result.ToArray();
         }
 
-        public static ushort[] readIndices(Gltf.Gltf model, Gltf.Mesh mesh)
+        public static ushort[] readIndices(string rootPath, Gltf.Gltf model, Gltf.Mesh mesh)
         {
             var accessor = model.Accessors[(int)mesh.Primitives[0].Indices];
-            var buffer = readBuffer(model, accessor);
+            var buffer = readBuffer(rootPath, model, accessor);
 
             var indexArray = new ushort[accessor.Count];
             System.Buffer.BlockCopy(buffer, 0, indexArray, 0, buffer.Length);

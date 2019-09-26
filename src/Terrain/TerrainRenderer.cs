@@ -30,7 +30,7 @@ namespace Larx.Terrain
         private readonly TextureNoise textureNoise;
         private readonly TerrainShader shader;
         private readonly Texture texture;
-        private readonly TerrainPicker picker;
+        public readonly TerrainPicker Picker;
 
         public Vector3 MousePosition;
 
@@ -47,7 +47,7 @@ namespace Larx.Terrain
             shader = new TerrainShader();
             splatMap = new SplatMap(textures.Length);
             textureNoise = new TextureNoise(12312234);
-            picker = new TerrainPicker(this);
+            Picker = new TerrainPicker(this);
 
             texture = new Texture();
 
@@ -68,7 +68,7 @@ namespace Larx.Terrain
 
         public void ChangeElevation(float offset, MousePicker picker)
         {
-            var toUpdate = getTilesInArea(MousePosition, State.ToolRadius);
+            var toUpdate = getTilesInArea(MousePosition, State.SelectionCircleRadius);
 
             foreach (var i in toUpdate)
             {
@@ -94,11 +94,13 @@ namespace Larx.Terrain
 
         public void Paint()
         {
+            if (State.ActiveToolBarItem == null) return;
+
             var position = (MousePosition.Xz / State.MapSize);
             position.X = (position.X + 0.5f) * SplatMap.Detail;
             position.Y = (position.Y + 0.5f) * SplatMap.Detail;
 
-            splatMap.Update(position, State.ActiveTexture);
+            splatMap.Update(position, byte.Parse(State.ActiveToolBarItem));
         }
 
         private List<int> getTilesInArea(Vector3 center, float radius)
@@ -208,7 +210,7 @@ namespace Larx.Terrain
 
         public void Update(MousePicker mouse)
         {
-            MousePosition = picker.GetPosition(mouse);
+            MousePosition = Picker.GetPosition(mouse);
         }
 
         public void Render(Camera camera, Light light, bool showOverlays, ClipPlane clip = ClipPlane.None)
@@ -220,7 +222,7 @@ namespace Larx.Terrain
             GL.UseProgram(shader.Program);
 
             GL.Uniform3(shader.MousePosition, MousePosition);
-            GL.Uniform1(shader.SelectionSize, State.ToolRadius);
+            GL.Uniform1(shader.SelectionSize, State.SelectionCircleRadius);
             GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
             GL.Uniform1(shader.ShowOverlays, showOverlays ? 1 : 0);
 
