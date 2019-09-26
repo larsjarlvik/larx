@@ -74,19 +74,19 @@ namespace Larx.Terrain
             {
                 if (i >= indices.Count) continue;
 
-                var vertex = vertices[indices[(int)i]];
+                var vertex = vertices[indices[i]];
 
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
                 var amount = Vector3.Distance(MousePosition, vertex);
                 var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / State.ToolRadius > State.ToolHardness ? amount : 0.0f) / State.ToolRadius))) * offset;
 
-                vertices[indices[(int)i]] = new Vector3(vertex.X, elev, vertex.Z);
+                vertices[indices[i]] = new Vector3(vertex.X, elev, vertex.Z);
 
                 var v1 = vertices[indices[i]];
                 var v2 = vertices[indices[i + 1]];
                 var v3 = vertices[indices[i + 2]];
-                normals[indices[i]] = Vector3.Cross(v2 - v1, v3 - v1).Normalized();
+                normals[indices[i]] = Vector3.Cross(v2 - v1, v3 - v1);
             }
 
             updateBuffers();

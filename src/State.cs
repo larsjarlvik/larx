@@ -19,7 +19,7 @@ namespace Larx
 
         public static TopMenu ActiveTopMenu;
         public static byte ActiveTexture;
-        public const int MapSize = 128;
+        public const int MapSize = 256;
         public const float Near = 1.0f;
         public const float Far = 1000.0f;
 

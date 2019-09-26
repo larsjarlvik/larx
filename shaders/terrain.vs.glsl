@@ -27,12 +27,12 @@ void main()
     normal = vNormal;
 
     if (uClipPlane == CLIP_BOTTOM) {
-        gl_ClipDistance[0] = vPosition.y + 0.05;
+        gl_ClipDistance[0] = position.y + 0.05;
     } else if (uClipPlane == CLIP_TOP) {
-        gl_ClipDistance[0] = -vPosition.y + 0.05;
+        gl_ClipDistance[0] = -position.y + 0.05;
     }
 
-    vec4 worldPosition = (uViewMatrix * vec4(vPosition, 1.0));
+    vec4 worldPosition = uViewMatrix * vec4(position, 1.0);
     mat3 normalMatrix = transpose(inverse(mat3(uViewMatrix)));
 
     lightVector = normalize(uViewMatrix * vec4(uLightPosition, 1.0) - worldPosition).xyz;
