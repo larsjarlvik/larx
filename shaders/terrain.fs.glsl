@@ -14,11 +14,6 @@ in vec3 eyeVector;
 
 out vec4 outputColor;
 
-uniform vec3 uAmbient;
-uniform vec3 uDiffuse;
-uniform vec3 uSpecular;
-uniform float uShininess;
-
 uniform vec3 uLightAmbient;
 uniform vec3 uLightDiffuse;
 uniform vec3 uLightSpecular;
@@ -56,12 +51,11 @@ float gridLine() {
 
 vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
     vec3 n = normalize(normalVector * normalMap);
-    vec3 ambient = uAmbient * uLightAmbient;
-    vec3 diffuse = max(dot(lightVector, n), 0.0) * uDiffuse * uLightDiffuse;
+    vec3 diffuse = max(dot(lightVector, n), 0.0) * uLightDiffuse;
     vec3 halfwayVector = normalize(lightVector + eyeVector);
-    vec3 specular = pow(max(dot(n, halfwayVector), 0.0), (roughMap.r * 50.0)) * uSpecular * uLightSpecular;
+    vec3 specular = pow(max(dot(n, halfwayVector), 0.0), (roughMap.r * 50.0)) * uLightSpecular;
 
-    return ambient + diffuse + specular;
+    return uLightAmbient + diffuse + specular;
 }
 
 vec3 finalTexture(int index) {

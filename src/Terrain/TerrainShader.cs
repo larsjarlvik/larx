@@ -20,10 +20,6 @@ namespace Larx.Terrain
         {
             base.SetUniformsLocations();
 
-            Ambient = GL.GetUniformLocation(Program, "uAmbient");
-            Diffuse = GL.GetUniformLocation(Program, "uDiffuse");
-            Specular = GL.GetUniformLocation(Program, "uSpecular");
-            Shininess = GL.GetUniformLocation(Program, "uShininess");
             Texture = GL.GetUniformLocation(Program, "uTexture");
             GridLines = GL.GetUniformLocation(Program, "uGridLines");
             SplatMap = GL.GetUniformLocation(Program, "uSplatMap");
