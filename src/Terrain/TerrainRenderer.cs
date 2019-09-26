@@ -59,9 +59,9 @@ namespace Larx.Terrain
         {
             var paths = new List<string>();
             foreach(var texture in textures) {
-                paths.Add(Path.Combine("resources", "textures", $"{texture}-albedo.bmp"));
-                paths.Add(Path.Combine("resources", "textures", $"{texture}-normal.bmp"));
-                paths.Add(Path.Combine("resources", "textures", $"{texture}-rough.bmp"));
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-albedo.png"));
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-normal.png"));
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-rough.png"));
             }
             texture.LoadTexture(paths.ToArray(), true);
         }

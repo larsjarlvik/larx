@@ -25,8 +25,8 @@ namespace Larx.Water
 
             dudvMap = new Texture();
             normalMap = new Texture();
-            dudvMap.LoadTexture(Path.Combine("resources", "textures", "water-dudv.bmp"));
-            normalMap.LoadTexture(Path.Combine("resources", "textures", "water-normal.bmp"));
+            dudvMap.LoadTexture(Path.Combine("resources", "textures", "water-dudv.png"));
+            normalMap.LoadTexture(Path.Combine("resources", "textures", "water-normal.png"));
 
             build();
         }
