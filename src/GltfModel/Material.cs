@@ -19,17 +19,19 @@ namespace Larx.GltfModel
 
             var material = model.Materials[(int)materialId];
 
-            var normalTextureIndex = material.NormalTexture.Index;
+
             var baseColorTextureIndex = material.PbrMetallicRoughness.BaseColorTexture.Index;
-
-            var normalTextureName = model.Images[(int)model.Textures[normalTextureIndex].Source].Uri;
             var baseColorTextureName = model.Images[(int)model.Textures[baseColorTextureIndex].Source].Uri;
-
-            NormalTexture = new Texture();
-            NormalTexture.LoadTexture(Path.Combine(rootPath, normalTextureName), true);
-
             BaseColorTexture = new Texture();
             BaseColorTexture.LoadTexture(Path.Combine(rootPath, baseColorTextureName), true);
+
+            if (material.NormalTexture != null)
+            {
+                var normalTextureIndex = material.NormalTexture.Index;
+                var normalTextureName = model.Images[(int)model.Textures[normalTextureIndex].Source].Uri;
+                NormalTexture = new Texture();
+                NormalTexture.LoadTexture(Path.Combine(rootPath, normalTextureName), true);
+            }
 
             DoubleSided = material.DoubleSided;
             Roughness = material.PbrMetallicRoughness.RoughnessFactor;

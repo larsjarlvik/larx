@@ -8,8 +8,8 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using GL4 = OpenTK.Graphics.OpenGL4;
 using Larx.Water;
-using Larx.GltfModel;
-using Larx.Map;
+using Larx.MapAssets;
+using Larx.Sky;
 
 namespace Larx
 {
@@ -22,6 +22,7 @@ namespace Larx
         private TerrainRenderer terrain;
         private WaterRenderer water;
         private MousePicker mousePicker;
+        private SkyRenderer sky;
         private Assets assets;
         private Ui ui;
 
@@ -41,7 +42,7 @@ namespace Larx
             multisampling = new Multisampling(4);
 
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
-            GL.ClearColor(Color.FromArgb(255, 156, 207, 210));
+            GL.ClearColor(Color.FromArgb(255, 193, 213, 230));
 
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.Texture2D);
@@ -60,6 +61,7 @@ namespace Larx
             light = new Light();
             assets = new Assets(ui);
             mousePicker = new MousePicker(camera);
+            sky = new SkyRenderer();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -123,6 +125,7 @@ namespace Larx
             water.ReflectionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+            sky.Render(camera);
             GL.Disable(EnableCap.ClipDistance0);
 
             assets.Render(camera, light, terrain);
@@ -132,10 +135,11 @@ namespace Larx
             GL.Disable(EnableCap.ClipDistance0);
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
             assets.Render(camera, light, terrain);
-
             water.Render(camera, light);
+            sky.Render(camera);
 
             // Draw to screen
             multisampling.Draw();

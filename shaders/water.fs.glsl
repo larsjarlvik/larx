@@ -3,8 +3,8 @@
 const float waveStrength = 0.01;
 const float waveScale = 0.08;
 
-const float uShininess = 350.0;
-const float reflectivity = 0.15;
+const float uShininess = 0.8;
+const float reflectivity = 0.05;
 
 in vec3 lightVector;
 in vec3 normalVector;
@@ -64,6 +64,6 @@ void main() {
     vec3 normalTexture = texture(uNormalMap, vec2(texCoord.x + uTimeOffset, texCoord.y) * 16.0).rgb;
     vec3 normal = vec3(normalTexture.r * 2.0 - 1.0, normalTexture.b, normalTexture.g * 2.0 - 1.0);
 
-    vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 15.0 + 0.1, 0.0, 1.0)) + calculateLight(normal);
+    vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 25.0 + 0.3, 0.0, 1.0)) + calculateLight(normal);
     outputColor = vec4(waterColor, clamp(waterDepth, 0.0, 1.0));
 }

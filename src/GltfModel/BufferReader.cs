@@ -15,7 +15,7 @@ namespace Larx.GltfModel
             if (gltfMesh.Primitives[0].Attributes.TryGetValue(key, out var index))
                 return gltfModel.Accessors[index];
 
-            throw new Exception($"Accessor not found! ({key})");
+            return null;
         }
 
         private static byte[] readBuffer(string rootPath, Gltf.Gltf model, Gltf.Accessor accessor)
@@ -37,6 +37,8 @@ namespace Larx.GltfModel
         {
             var result = new List<Vector3>();
             var accessor = getAccessor(model, mesh, key);
+            if (accessor == null)
+                return new Vector3[] { };
 
             var buffer = readBuffer(rootPath, model, accessor);
             var floatArray = new float[accessor.Count * 3];
@@ -53,6 +55,8 @@ namespace Larx.GltfModel
         {
             var result = new List<Vector2>();
             var accessor = getAccessor(model, mesh, key);
+            if (accessor == null)
+                return new Vector2[] { };
 
             var buffer = readBuffer(rootPath, model, accessor);
             var floatArray = new float[accessor.Count * 2];

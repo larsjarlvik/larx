@@ -24,7 +24,6 @@ namespace Larx.GltfModel
             Material = new Material(rootPath, model, mesh);
 
             VertexBuffer = GL.GenBuffer();
-            NormalBuffer = GL.GenBuffer();
             TexCoordBuffer = GL.GenBuffer();
             IndexBuffer = GL.GenBuffer();
 
@@ -36,9 +35,12 @@ namespace Larx.GltfModel
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, texCoords.Length * Vector2.SizeInBytes, texCoords, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, NormalBuffer);
-            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Length * Vector3.SizeInBytes, normals, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            if (normals.Length > 0) {
+                NormalBuffer = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, NormalBuffer);
+                GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Length * Vector3.SizeInBytes, normals, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            }
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, IndexBuffer);
             GL.BufferData<ushort>(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(ushort), indices, BufferUsageHint.StaticDraw);
