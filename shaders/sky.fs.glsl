@@ -1,11 +1,9 @@
 #version 330
 
-// TODO: Move to uniform
-const vec4 uClearColor = vec4(0.754, 0.832, 0.898, 1.0);
-
 out vec4 outputColor;
 
 uniform sampler2D uBaseColorTexture;
+uniform vec4 uClearColor;
 
 in vec2 texCoord;
 in float yPosition;

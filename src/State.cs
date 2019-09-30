@@ -35,6 +35,7 @@ namespace Larx
         public const int MapSize = 256;
         public const float Near = 1.0f;
         public const float Far = 1000.0f;
+        public static readonly Color ClearColor = Color.FromArgb(255, 193, 213, 230);
 
         public static class Window
         {

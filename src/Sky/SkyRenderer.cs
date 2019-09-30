@@ -24,7 +24,10 @@ namespace Larx.Sky
             GL.UseProgram(shader.Program);
 
             camera.ApplyCamera(shader);
-            GL.Uniform3(shader.CameraPosition, new Vector3(camera.Position.X, camera.Position.Y - 150.0f, camera.Position.Z));
+
+            GL.Uniform1(shader.FarPlane, State.Far);
+            GL.Uniform4(shader.ClearColor, State.ClearColor);
+            GL.Uniform3(shader.CameraPosition, new Vector3(camera.Position.X, camera.Position.Y - 50.0f, camera.Position.Z));
 
             foreach(var mesh in model.Meshes)
             {

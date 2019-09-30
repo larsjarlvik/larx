@@ -42,7 +42,7 @@ namespace Larx
             multisampling = new Multisampling(4);
 
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
-            GL.ClearColor(Color.FromArgb(255, 193, 213, 230));
+            GL.ClearColor(State.ClearColor);
 
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.Texture2D);
