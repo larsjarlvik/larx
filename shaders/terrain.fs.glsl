@@ -50,9 +50,11 @@ float gridLine() {
 
 vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
     vec3 n = normalize(normal + (normalMap * 2.0) - 1.0);
-    vec3 diffuse = max(dot(n, lightVector), 0.0) * uLightDiffuse;
-    vec3 halfwayVector = normalize(lightVector + eyeVector);
-    vec3 specular = pow(max(dot(n, halfwayVector), 0.0), (1.0 - roughMap.r) * 10.0) * uLightSpecular;
+    vec3 diffuse = max(dot(n, -lightVector), 0.0) * uLightDiffuse;
+
+    vec3 lightDir = normalize(-lightVector);
+    vec3 reflectDir = reflect(-lightDir, n);
+    vec3 specular = pow(max(dot(eyeVector, reflectDir), 0.0), (1.0 - roughMap.r)) * uLightSpecular;
 
     return uLightAmbient + diffuse + specular;
 }

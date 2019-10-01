@@ -12,6 +12,7 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 uniform vec3 uLightDirection;
 uniform int uClipPlane;
+uniform vec3 uCameraPosition;
 
 out vec3 position;
 out vec2 texCoord;
@@ -32,9 +33,8 @@ void main()
     }
 
     vec4 worldPosition = uViewMatrix * vec4(position, 1.0);
-
     lightVector = normalize(vec4(uLightDirection, 1.0)).xyz;
-    eyeVector = -normalize(worldPosition).xyz;
+    eyeVector = normalize(uCameraPosition - position.xyz);
 
     gl_Position = uProjectionMatrix * worldPosition;
 }
