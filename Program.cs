@@ -82,10 +82,10 @@ namespace Larx
             if (State.Keyboard.Key[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
             if (State.Keyboard.Key[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
 
-            if (State.Keyboard.Key[Key.Up]) light.Position += new Vector3( 0.0f, 0.0f, 1.0f);
-            if (State.Keyboard.Key[Key.Down]) light.Position += new Vector3( 0.0f, 0.0f,-1.0f);
-            if (State.Keyboard.Key[Key.Left]) light.Position += new Vector3( 1.0f, 0.0f, 0.0f);
-            if (State.Keyboard.Key[Key.Right]) light.Position += new Vector3(-1.0f, 0.0f, 0.0f);
+            if (State.Keyboard.Key[Key.Up]) light.Direction += new Vector3( 0.0f, 0.0f, 1.0f);
+            if (State.Keyboard.Key[Key.Down]) light.Direction += new Vector3( 0.0f, 0.0f,-1.0f);
+            if (State.Keyboard.Key[Key.Left]) light.Direction += new Vector3( 1.0f, 0.0f, 0.0f);
+            if (State.Keyboard.Key[Key.Right]) light.Direction += new Vector3(-1.0f, 0.0f, 0.0f);
 
             camera.Update((float)e.Time);
             mousePicker.Update();

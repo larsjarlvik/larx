@@ -3,11 +3,10 @@
 const float waveStrength = 0.01;
 const float waveScale = 0.08;
 
-const float uShininess = 0.8;
+const float uShininess = 20.0;
 const float reflectivity = 0.05;
 
 in vec3 lightVector;
-in vec3 normalVector;
 in vec4 clipSpace;
 in vec2 texCoord;
 in vec3 eyeVector;
@@ -28,8 +27,10 @@ uniform float uTimeOffset;
 
 out vec4 outputColor;
 
-vec3 calculateLight(vec3 normal) {
-    vec3 n = normalize(normalVector * normal);
+vec3 calculateLight() {
+    vec3 normalTexture = texture(uNormalMap, vec2(texCoord.x + uTimeOffset, texCoord.y) * 16.0).rgb;
+    vec3 n = vec3(normalTexture.r * 2.0 - 1.0, normalTexture.b, normalTexture.g * 2.0 - 1.0);
+
     vec3 halfwayVector = normalize(lightVector + eyeVector);
     vec3 specular = pow(max(dot(n, halfwayVector), 0.0), uShininess) * uLightSpecular;
 
@@ -60,10 +61,6 @@ void main() {
     vec3 refractionTexture = texture(uRefractionColorTexture, clamp(ndc + totalDistortion, 0.001, 0.999)).rgb;
 
     vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb;
-
-    vec3 normalTexture = texture(uNormalMap, vec2(texCoord.x + uTimeOffset, texCoord.y) * 16.0).rgb;
-    vec3 normal = vec3(normalTexture.r * 2.0 - 1.0, normalTexture.b, normalTexture.g * 2.0 - 1.0);
-
-    vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 25.0 + 0.3, 0.0, 1.0)) + calculateLight(normal);
+    vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 25.0 + 0.3, 0.0, 1.0)) + calculateLight();
     outputColor = vec4(waterColor, clamp(waterDepth, 0.0, 1.0));
 }

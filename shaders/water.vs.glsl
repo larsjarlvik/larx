@@ -6,7 +6,7 @@ layout(location = 1) in vec2 vTexCoord;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 
-uniform vec3 uLightPosition;
+uniform vec3 uLightDirection;
 
 out vec4 clipSpace;
 out vec3 lightVector;
@@ -20,8 +20,7 @@ void main() {
     vec4 worldPosition = (uViewMatrix * vec4(vPosition, 1.0));
     mat3 normalMatrix = transpose(inverse(mat3(uViewMatrix)));
 
-    lightVector = normalize(uViewMatrix * vec4(uLightPosition, 1.0) - worldPosition).xyz;
-    normalVector = normalize(normalMatrix * vec3(0, 1, 0));
+    lightVector = normalize(vec4(uLightDirection, 1.0) - worldPosition).xyz;
     eyeVector = -normalize(worldPosition).xyz;
     clipSpace = uProjectionMatrix * worldPosition;
 
