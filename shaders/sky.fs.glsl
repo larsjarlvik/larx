@@ -4,10 +4,16 @@ out vec4 outputColor;
 
 uniform sampler2D uBaseColorTexture;
 uniform vec4 uClearColor;
+uniform vec3 uLightDirection;
 
 in vec2 texCoord;
-in float yPosition;
+in vec3 position;
+in vec3 normal;
 
 void main() {
-    outputColor = mix(uClearColor, texture(uBaseColorTexture, texCoord), clamp(yPosition * 15 - 0.05, 0.0, 1.0));
+    outputColor = texture(uBaseColorTexture, texCoord);
+
+    float sunFactor = pow(max(dot(normalize(normal), normalize(-uLightDirection)), 0.0), 200);
+    outputColor += sunFactor;
+    outputColor = mix(uClearColor, outputColor, clamp(position.y * 15 - 0.05, 0.0, 1.0));
 }

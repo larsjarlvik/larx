@@ -33,7 +33,7 @@ void main()
 
     vec4 worldPosition = uViewMatrix * vec4(position, 1.0);
 
-    lightVector = normalize(vec4(uLightDirection, 1.0) - worldPosition).xyz;
+    lightVector = normalize(vec4(uLightDirection, 1.0)).xyz;
     eyeVector = -normalize(worldPosition).xyz;
 
     gl_Position = uProjectionMatrix * worldPosition;

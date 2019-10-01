@@ -18,9 +18,8 @@ void main() {
     texCoord = vTexCoord;
 
     vec4 worldPosition = (uViewMatrix * vec4(vPosition, 1.0));
-    mat3 normalMatrix = transpose(inverse(mat3(uViewMatrix)));
 
-    lightVector = normalize(vec4(uLightDirection, 1.0) - worldPosition).xyz;
+    lightVector = normalize(vec4(uLightDirection, 1.0)).xyz;
     eyeVector = -normalize(worldPosition).xyz;
     clipSpace = uProjectionMatrix * worldPosition;
 

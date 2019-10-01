@@ -1,4 +1,5 @@
 using System;
+using Larx.Utils;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -23,10 +24,6 @@ namespace Larx
 
 
 
-        private float DegToRad(float input) {
-            return (MathF.PI / 180) * input;
-        }
-
         public Camera()
         {
             Look = new Vector3();
@@ -45,7 +42,7 @@ namespace Larx
 
         private void move(float frameTime)
         {
-            var rx = DegToRad(Rotation.X);
+            var rx = MathLarx.DegToRad(Rotation.X);
 
             Look.Z += LookSpeed.Z * MathF.Cos(rx);
             Look.X += LookSpeed.Z * MathF.Sin(rx);
@@ -98,8 +95,8 @@ namespace Larx
             rotate(frameTime);
             zoom(frameTime);
 
-            var rx = DegToRad(Rotation.X);
-            var ry = DegToRad(Rotation.Y);
+            var rx = MathLarx.DegToRad(Rotation.X);
+            var ry = MathLarx.DegToRad(Rotation.Y);
 
             Position = new Vector3(
                 Look.X - (MathF.Sin(rx) * MathF.Cos(ry) * cameraDistance),

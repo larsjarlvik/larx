@@ -82,10 +82,10 @@ namespace Larx
             if (State.Keyboard.Key[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
             if (State.Keyboard.Key[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
 
-            if (State.Keyboard.Key[Key.Up]) light.Direction += new Vector3( 0.0f, 0.0f, 1.0f);
-            if (State.Keyboard.Key[Key.Down]) light.Direction += new Vector3( 0.0f, 0.0f,-1.0f);
-            if (State.Keyboard.Key[Key.Left]) light.Direction += new Vector3( 1.0f, 0.0f, 0.0f);
-            if (State.Keyboard.Key[Key.Right]) light.Direction += new Vector3(-1.0f, 0.0f, 0.0f);
+            if (State.Keyboard.Key[Key.Up]) light.Rotation.Y += 0.01f;
+            if (State.Keyboard.Key[Key.Down]) light.Rotation.Y -= 0.01f;
+            if (State.Keyboard.Key[Key.Left]) light.Rotation.X += 0.01f;
+            if (State.Keyboard.Key[Key.Right]) light.Rotation.X -= 0.01f;
 
             camera.Update((float)e.Time);
             mousePicker.Update();
@@ -125,7 +125,7 @@ namespace Larx
             water.ReflectionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
-            sky.Render(camera);
+            sky.Render(camera, light);
             GL.Disable(EnableCap.ClipDistance0);
 
             assets.Render(camera, light, terrain);
@@ -139,7 +139,7 @@ namespace Larx
             terrain.Render(camera, light, true, ClipPlane.ClipBottom);
             assets.Render(camera, light, terrain);
             water.Render(camera, light);
-            sky.Render(camera);
+            sky.Render(camera, light);
 
             // Draw to screen
             multisampling.Draw();

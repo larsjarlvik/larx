@@ -16,7 +16,7 @@ namespace Larx.Sky
             model = Model.Load("skydome");
         }
 
-        public void Render(Camera camera)
+        public void Render(Camera camera, Light light)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -24,6 +24,7 @@ namespace Larx.Sky
             GL.UseProgram(shader.Program);
 
             camera.ApplyCamera(shader);
+            light.ApplyLight(shader);
 
             GL.Uniform1(shader.FarPlane, State.Far);
             GL.Uniform4(shader.ClearColor, State.ClearColor);
@@ -40,6 +41,9 @@ namespace Larx.Sky
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.TexCoordBuffer);
                 GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.NormalBuffer);
+                GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
                 GL.DrawElements(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);
