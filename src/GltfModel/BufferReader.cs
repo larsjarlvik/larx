@@ -33,6 +33,24 @@ namespace Larx.GltfModel
                 }
         }
 
+        public static Vector4[] readVec4(string rootPath, Gltf.Gltf model, Gltf.Mesh mesh, string key)
+        {
+            var result = new List<Vector4>();
+            var accessor = getAccessor(model, mesh, key);
+            if (accessor == null)
+                return new Vector4[] { };
+
+            var buffer = readBuffer(rootPath, model, accessor);
+            var floatArray = new float[accessor.Count * 4];
+            System.Buffer.BlockCopy(buffer, 0, floatArray, 0, buffer.Length);
+
+            for(var i = 0; i < accessor.Count * 4; i += 4) {
+                result.Add(new Vector4(floatArray[i], floatArray[i + 1], floatArray[i + 2], floatArray[i + 3]));
+            }
+
+            return result.ToArray();
+        }
+
         public static Vector3[] readVec3(string rootPath, Gltf.Gltf model, Gltf.Mesh mesh, string key)
         {
             var result = new List<Vector3>();

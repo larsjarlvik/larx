@@ -32,7 +32,7 @@
                     "texCoord" : 0
                 },
                 "metallicFactor" : 0,
-                "roughnessFactor" : 0.4
+                "roughnessFactor" : 0.4000000059604645
             }
         }
     ],
@@ -44,9 +44,10 @@
                     "attributes" : {
                         "POSITION" : 0,
                         "NORMAL" : 1,
-                        "TEXCOORD_0" : 2
+                        "TANGENT" : 2,
+                        "TEXCOORD_0" : 3
                     },
-                    "indices" : 3,
+                    "indices" : 4,
                     "material" : 0
                 }
             ]
@@ -76,33 +77,39 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 1838,
+            "count" : 663,
             "max" : [
-                1.6243293285369873,
-                4.1743483543396,
-                1.8217743635177612
+                1.5702173709869385,
+                4.053038120269775,
+                1.6446934938430786
             ],
             "min" : [
-                -2.536541700363159,
+                -2.5568535327911377,
                 -0.20925064384937286,
-                -2.2384254932403564
+                -2.0374786853790283
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 1838,
+            "count" : 663,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 1838,
-            "type" : "VEC2"
+            "count" : 663,
+            "type" : "VEC4"
         },
         {
             "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 663,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 4,
             "componentType" : 5123,
             "count" : 2484,
             "type" : "SCALAR"
@@ -111,28 +118,33 @@
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 22056,
+            "byteLength" : 7956,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 22056,
-            "byteOffset" : 22056
+            "byteLength" : 7956,
+            "byteOffset" : 7956
         },
         {
             "buffer" : 0,
-            "byteLength" : 14704,
-            "byteOffset" : 44112
+            "byteLength" : 10608,
+            "byteOffset" : 15912
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 5304,
+            "byteOffset" : 26520
         },
         {
             "buffer" : 0,
             "byteLength" : 4968,
-            "byteOffset" : 58816
+            "byteOffset" : 31824
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 63784,
+            "byteLength" : 36792,
             "uri" : "tree.bin"
         }
     ]

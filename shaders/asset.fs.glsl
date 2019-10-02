@@ -17,8 +17,9 @@ out vec4 outputColor;
 
 vec3 calculateLight() {
     vec3 normalMap = texture(uNormalTexture, texCoord).rgb * 2.0 - 1.0;
-    vec3 n = normalize(normal + normalMap);
+    vec3 n = normalize(normalMap);
     vec3 diffuse = max(dot(n, lightVector), 0.0) * uLightDiffuse;
+
     vec3 lightDir = normalize(-lightVector);
     vec3 reflectDir = reflect(-lightDir, n);
     vec3 specular = pow(max(dot(eyeVector, reflectDir), 0.0), uRoughness) * uLightSpecular;
