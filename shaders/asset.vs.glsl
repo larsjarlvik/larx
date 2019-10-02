@@ -19,8 +19,7 @@ out vec3 normal;
 
 void main() {
     vec4 position = vec4(vPosition + uPosition, 1.0);
-    vec4 worldPosition = (uViewMatrix * position);
-    mat3 normalMatrix = transpose(inverse(mat3(uViewMatrix)));
+    vec4 worldPosition = uViewMatrix * position;
 
     normal = vNormal;
     texCoord = vTexCoord;
