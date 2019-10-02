@@ -20,8 +20,18 @@ void main() {
     texCoord = vTexCoord;
     clipSpace = uProjectionMatrix * worldPosition;
     position = vPosition;
-    lightVector = normalize(vec4(uLightDirection, 1.0)).xyz;
-    eyeVector = normalize(uCameraPosition - position.xyz);
+
+    vec3 normal = normalize(vec3(0, 1, 0));
+    vec3 tangent = normalize((uViewMatrix * vec4(1, 0, 0, 0)).xyz);
+    vec3 biTangent = normalize(cross(normal, tangent));
+    mat3 toTangentSpace = mat3(
+        tangent.x, biTangent.x, normal.x,
+        tangent.y, biTangent.y, normal.y,
+        tangent.z, biTangent.z, normal.z
+    );
+
+    lightVector = toTangentSpace * -uLightDirection;
+    eyeVector = toTangentSpace * -(uCameraPosition - position);
 
     gl_Position = clipSpace;
 }

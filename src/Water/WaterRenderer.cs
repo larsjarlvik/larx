@@ -81,7 +81,7 @@ namespace Larx.Water
 
             GL.Uniform1(shader.Near, State.Near);
             GL.Uniform1(shader.Far, State.Far);
-            GL.Uniform1(shader.TimeOffset, (float)(State.Time.Total * 0.002 % 1));
+            GL.Uniform1(shader.TimeOffset, (float)(State.Time.Total * 0.001 % 1));
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, RefractionBuffer.ColorTexture);
