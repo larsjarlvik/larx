@@ -1,7 +1,7 @@
 #version 330
 
 const float waveStrength = 0.03;
-const float waveScale = 0.5;
+const float waveScale = 0.1;
 
 const float uShininess = 50.0;
 const float reflectivity = 1.0;
