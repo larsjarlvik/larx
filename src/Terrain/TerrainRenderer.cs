@@ -39,11 +39,19 @@ namespace Larx.Terrain
         public TerrainRenderer()
         {
             var textures = new [] {
-                "grass",
-                "rocky-grass",
-                "cliff",
-                "sand",
-                "snow",
+                "grass-1",
+                "grass-2",
+                "grass-3",
+                "grass-4",
+                "bare-1",
+                "bare-2",
+                "bare-3",
+                "sand-1",
+                "sand-2",
+                "sand-3",
+                "sand-4",
+                "rock-1",
+                "rock-2"
             };
 
             shader = new TerrainShader();
@@ -63,7 +71,7 @@ namespace Larx.Terrain
             foreach(var texture in textures) {
                 paths.Add(Path.Combine("resources", "textures", $"{texture}-albedo.png"));
                 paths.Add(Path.Combine("resources", "textures", $"{texture}-normal.png"));
-                paths.Add(Path.Combine("resources", "textures", $"{texture}-rough.png"));
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-specular.png"));
             }
             texture.LoadTexture(paths.ToArray(), true);
         }
