@@ -8,6 +8,7 @@ namespace Larx.GltfModel
     {
         public readonly int VertexBuffer;
         public readonly int NormalBuffer;
+        public readonly int TangentBuffer;
         public readonly int TexCoordBuffer;
         public readonly int IndexBuffer;
         public readonly int IndexCount;
@@ -17,6 +18,7 @@ namespace Larx.GltfModel
         {
             var vertices = BufferReader.readVec3(rootPath, model, mesh, "POSITION");
             var normals = BufferReader.readVec3(rootPath, model, mesh, "NORMAL");
+            var tangents = BufferReader.readVec4(rootPath, model, mesh, "TANGENT");
             var texCoords = BufferReader.readVec2(rootPath, model, mesh, "TEXCOORD_0");
             var indices = BufferReader.readIndices(rootPath, model, mesh);
 
@@ -40,6 +42,13 @@ namespace Larx.GltfModel
                 GL.BindBuffer(BufferTarget.ArrayBuffer, NormalBuffer);
                 GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Length * Vector3.SizeInBytes, normals, BufferUsageHint.StaticDraw);
                 GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            }
+
+            if (tangents.Length > 0) {
+                TangentBuffer = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ArrayBuffer, TangentBuffer);
+                GL.BufferData<Vector4>(BufferTarget.ArrayBuffer, tangents.Length * Vector4.SizeInBytes, tangents, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 0, 0);
             }
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, IndexBuffer);

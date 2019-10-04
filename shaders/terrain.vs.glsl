@@ -7,11 +7,13 @@ const int CLIP_TOP = 2;
 layout(location = 0) in vec3 vPosition;
 layout(location = 1) in vec2 vTexCoord;
 layout(location = 2) in vec3 vNormal;
+layout(location = 3) in vec3 vTangent;
 
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 uniform vec3 uLightDirection;
 uniform int uClipPlane;
+uniform vec3 uCameraPosition;
 
 out vec3 position;
 out vec2 texCoord;
@@ -31,10 +33,17 @@ void main()
         gl_ClipDistance[0] = -position.y + 0.05;
     }
 
-    vec4 worldPosition = uViewMatrix * vec4(position, 1.0);
+    vec3 tangent = normalize((uViewMatrix * vec4(vTangent, 0.0)).xyz);
+    vec3 biTangent = normalize(cross(normal, tangent));
+    mat3 tangentSpace = mat3(
+        tangent.x, biTangent.x, normal.x,
+        tangent.y, biTangent.y, normal.y,
+        tangent.z, biTangent.z, normal.z
+    );
+    lightVector = tangentSpace * -uLightDirection;
+    eyeVector = tangentSpace * -(uCameraPosition - position);
 
-    lightVector = normalize(vec4(uLightDirection, 1.0)).xyz;
-    eyeVector = -normalize(worldPosition).xyz;
+    vec4 worldPosition = uViewMatrix * vec4(position, 1.0);
 
     gl_Position = uProjectionMatrix * worldPosition;
 }

@@ -21,9 +21,11 @@ namespace Larx.Terrain
         private int coordBuffer;
         private int indexBuffer;
         private int normalBuffer;
+        private int tangentBuffer;
         private List<Vector3> vertices = new List<Vector3>();
         private List<Vector2> coords = new List<Vector2>();
         private List<Vector3> normals = new List<Vector3>();
+        private List<Vector3> tangents = new List<Vector3>();
         private List<int> indices = new List<int>();
 
         private readonly SplatMap splatMap;
@@ -37,11 +39,19 @@ namespace Larx.Terrain
         public TerrainRenderer()
         {
             var textures = new [] {
-                "grass",
-                "rocky-grass",
-                "cliff",
-                "sand",
-                "snow",
+                "grass-1",
+                "grass-2",
+                "grass-3",
+                "grass-4",
+                "bare-1",
+                "bare-2",
+                "bare-3",
+                "sand-1",
+                "sand-2",
+                "sand-3",
+                "sand-4",
+                "rock-1",
+                "rock-2"
             };
 
             shader = new TerrainShader();
@@ -61,7 +71,7 @@ namespace Larx.Terrain
             foreach(var texture in textures) {
                 paths.Add(Path.Combine("resources", "textures", $"{texture}-albedo.png"));
                 paths.Add(Path.Combine("resources", "textures", $"{texture}-normal.png"));
-                paths.Add(Path.Combine("resources", "textures", $"{texture}-rough.png"));
+                paths.Add(Path.Combine("resources", "textures", $"{texture}-specular.png"));
             }
             texture.LoadTexture(paths.ToArray(), true);
         }
@@ -87,6 +97,7 @@ namespace Larx.Terrain
                 var v2 = vertices[indices[i + 1]];
                 var v3 = vertices[indices[i + 2]];
                 normals[indices[i]] = Vector3.Cross(v2 - v1, v3 - v1);
+                tangents[indices[i]] = MathLarx.CalculateTangent(normals[indices[i]]);
             }
 
             updateBuffers();
@@ -132,12 +143,13 @@ namespace Larx.Terrain
                     vertices.Add(new Vector3(x, 1f, z));
                     coords.Add(new Vector2((x + halfMapSize) / State.MapSize, (z + halfMapSize) / State.MapSize));
                     normals.Add(new Vector3(0f, 1f, 0f).Normalized());
+                    tangents.Add(MathLarx.CalculateTangent(normals.Last()));
 
                     if (x < halfMapSize && z < halfMapSize)
                     {
                         indices.AddRange(new int[] {
-                            (i), (i + State.MapSize + 1), (i + 1),
-                            (i + 1), (i + State.MapSize + 1), (i + State.MapSize + 2)
+                            i,     i + State.MapSize + 1, i + 1,
+                            i + 1, i + State.MapSize + 1, i + State.MapSize + 2
                         });
                     }
 
@@ -151,6 +163,7 @@ namespace Larx.Terrain
             coordBuffer = GL.GenBuffer();
             indexBuffer = GL.GenBuffer();
             normalBuffer = GL.GenBuffer();
+            tangentBuffer = GL.GenBuffer();
 
             updateBuffers();
 
@@ -206,6 +219,10 @@ namespace Larx.Terrain
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Count * Vector3.SizeInBytes, normals.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, tangentBuffer);
+            GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, tangents.Count * Vector3.SizeInBytes, tangents.ToArray(), BufferUsageHint.StaticDraw);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
         }
 
         public void Update(MousePicker mouse)
@@ -218,6 +235,7 @@ namespace Larx.Terrain
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
 
             GL.UseProgram(shader.Program);
 
@@ -252,6 +270,9 @@ namespace Larx.Terrain
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, tangentBuffer);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);

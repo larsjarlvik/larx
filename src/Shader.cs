@@ -12,6 +12,7 @@ namespace Larx
         public int Program { get; }
         public int ProjectionMatrix { get; private set; }
         public int ViewMatrix { get; private set; }
+        public int CameraPosition { get; private set; }
         public int LightDirection { get; private set; }
         public int LightAmbient { get; private set; }
         public int LightDiffuse { get; private set; }
@@ -45,6 +46,7 @@ namespace Larx
         {
             ProjectionMatrix = GL.GetUniformLocation(Program, "uProjectionMatrix");
             ViewMatrix = GL.GetUniformLocation(Program, "uViewMatrix");
+            CameraPosition = GL.GetUniformLocation(Program, "uCameraPosition");
             LightDirection = GL.GetUniformLocation(Program, "uLightDirection");
             LightAmbient = GL.GetUniformLocation(Program, "uLightAmbient");
             LightDiffuse = GL.GetUniformLocation(Program, "uLightDiffuse");

@@ -1,8 +1,6 @@
 using System;
 using System.Linq;
 using System.IO;
-using System.Reflection;
-using System.Text;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK;
 

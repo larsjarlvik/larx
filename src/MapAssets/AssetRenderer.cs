@@ -19,6 +19,7 @@ namespace Larx.MapAssets
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
 
             GL.UseProgram(shader.Program);
             GL.Uniform3(shader.Position, position);
@@ -49,6 +50,9 @@ namespace Larx.MapAssets
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.NormalBuffer);
                 GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.TangentBuffer);
+                GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, Vector4.SizeInBytes, 0);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
                 GL.DrawElements(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);

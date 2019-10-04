@@ -48,22 +48,26 @@ float gridLine() {
     return (1.0 - min(line, 1.0)) / 3;
 }
 
-vec3 calculateLight(vec3 normalMap, vec3 roughMap) {
-    vec3 n = normalize(normal + (normalMap * 2.0) - 1.0);
-    vec3 diffuse = max(dot(n, lightVector), 0.0) * uLightDiffuse;
-    vec3 halfwayVector = normalize(lightVector + eyeVector);
-    vec3 specular = pow(max(dot(n, halfwayVector), 0.0), (1.0 - roughMap.r) * 10.0) * uLightSpecular;
+vec3 calculateLight(int normalMap, int roughnessMap) {
+    vec3 n = texture(uTexture, getTriPlanarTexture(normalMap)).rgb * 2.0 - 1.0;
+    float r = texture(uTexture, getTriPlanarTexture(roughnessMap)).r;
+
+    vec3 diffuse = max(dot(n, normalize(lightVector)), 0.0) * uLightDiffuse;
+
+    vec3 reflectedLightVector = reflect(-normalize(lightVector), n);
+    float specularFactor = max(dot(reflectedLightVector, normalize(-eyeVector)), 0.0);
+    vec3 specular = pow(specularFactor, r * 5.0) * uLightSpecular;
 
     return uLightAmbient + diffuse + specular;
 }
 
 vec3 finalTexture(int index) {
-    float n1 = (texture(uTextureNoise, texCoord).r * 0.05) + 0.95;
-    float n2 = (texture(uTextureNoise, texCoord / 5).r * 0.1) + 0.90;
+    float n1 = (texture(uTextureNoise, texCoord / 0.3).r * 0.05) + 0.95;
+    float n2 = (texture(uTextureNoise, texCoord / 4.5).r * 0.1) + 0.90;
 
     float noise = (n1 + n2) / 2;
 
-    return (getTriPlanarTexture(index * 3) * noise) * calculateLight(getTriPlanarTexture(index * 3 + 1), getTriPlanarTexture(index * 3 + 2));
+    return getTriPlanarTexture(index * 3) * calculateLight(index * 3 + 1, index * 3 + 2) * noise;
 }
 
 float circle() {

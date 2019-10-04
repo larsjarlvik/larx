@@ -112,6 +112,7 @@ namespace Larx
         {
             GL.UniformMatrix4(shader.ViewMatrix, false, ref ViewMatrix);
             GL.UniformMatrix4(shader.ProjectionMatrix, false, ref ProjectionMatrix);
+            GL.Uniform3(shader.CameraPosition, Position);
         }
     }
 }
