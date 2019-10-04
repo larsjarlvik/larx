@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Larx.Button;
-using Larx.UserInterFace;
+using Larx.Terrain;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
 
 namespace Larx.UserInterFace
 {
@@ -36,19 +36,9 @@ namespace Larx.UserInterFace
             alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.png")));
             alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.png")));
 
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("0", "textures/grass-1-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("1", "textures/grass-2-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("2", "textures/grass-3-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("3", "textures/grass-4-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("4", "textures/bare-1-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("5", "textures/bare-2-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("6", "textures/bare-3-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("7", "textures/sand-1-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("8", "textures/sand-2-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("9", "textures/sand-3-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("10", "textures/sand-4-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("11", "textures/rock-1-albedo.png")));
-            Tools.Add(new ToolbarItem(TopMenu.Paint, AddButton("12", "textures/rock-2-albedo.png")));
+            Tools.AddRange(TerrainRenderer.Textures.Select((t, i) =>
+                new ToolbarItem(TopMenu.Paint, AddButton(i.ToString(), Path.Combine("textures", $"{t}-albedo.png")))
+            ));
 
             State.ActiveTopMenu = TopMenu.Terrain;
             buttons[Keys.ElevationTools].Active = true;
@@ -125,7 +115,8 @@ namespace Larx.UserInterFace
 
         private void updateButtonPositions()
         {
-            var position = new Vector2(10.0f, State.Window.Size.Height - 70.0f);
+            var padding = 55.0f;
+            var position = new Vector2(10.0f, State.Window.Size.Height - padding);
 
             position = setButtonPosition(Keys.ElevationTools, position);
             position = setButtonPosition(Keys.TerrainPaint, position);
@@ -136,7 +127,7 @@ namespace Larx.UserInterFace
                 position = setButtonPosition(key, position);
             }
 
-            position = new Vector2(State.Window.Size.Width - 70.0f, State.Window.Size.Height - 70.0f);
+            position = new Vector2(State.Window.Size.Width - padding, State.Window.Size.Height - padding);
             foreach(var key in alignRight.Select(k => k.Key)) {
                 position = setButtonPosition(key, position, true);
             }

@@ -3,8 +3,6 @@ using System.Linq;
 using Larx.Button;
 using Larx.Text;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 namespace Larx.UserInterFace
 {
@@ -33,7 +31,7 @@ namespace Larx.UserInterFace
 
         public string AddButton(string key, string texturePath)
         {
-            var br = new ButtonRenderer(texturePath, new Vector2(60, 60));
+            var br = new ButtonRenderer(texturePath, new Vector2(45, 45));
             buttons.Add(key, br);
 
             return key;
