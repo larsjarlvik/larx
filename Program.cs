@@ -10,6 +10,7 @@ using GL4 = OpenTK.Graphics.OpenGL4;
 using Larx.Water;
 using Larx.MapAssets;
 using Larx.Sky;
+using Larx.Storage;
 
 namespace Larx
 {
@@ -53,6 +54,7 @@ namespace Larx
 
             GL.BindVertexArray(GL.GenVertexArray());
 
+            Map.New(256);
             ui = new Ui();
             terrain = new TerrainRenderer();
             water = new WaterRenderer();
@@ -179,7 +181,7 @@ namespace Larx
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Assets:
-                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition(mousePicker), terrain);
+                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition(mousePicker).Xz, terrain);
                         break;
                 }
             }
@@ -200,6 +202,12 @@ namespace Larx
 
                 if (e.Control && e.Keyboard[Key.G])
                     State.ShowGridLines = !State.ShowGridLines;
+
+                if (e.Control && e.Keyboard[Key.S])
+                    Map.Save(terrain, assets);
+
+                if (e.Control && e.Keyboard[Key.O])
+                    Map.Load(terrain, assets);
             }
 
             if (!e.Control)

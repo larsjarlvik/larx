@@ -33,7 +33,7 @@ namespace Larx.Terrain
         private bool intersectionInRange(float start, float finish, MousePicker picker)
         {
             var endPoint = picker.GetPointOnRay(finish);
-            var endElev = renderer.GetElevationAtPoint(endPoint);
+            var endElev = renderer.GetElevationAtPoint(endPoint.Xz);
 
             if (endElev == null) return true;
 

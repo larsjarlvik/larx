@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Larx.Storage;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -33,7 +34,7 @@ namespace Larx.Water
 
         private void build()
         {
-            var halfMapSize = State.MapSize / 2;
+            var halfMapSize = Map.MapData.MapSize / 2;
 
             var vertices = new Vector3[] {
                 new Vector3(-halfMapSize, 0.0f, halfMapSize),
