@@ -62,8 +62,8 @@ vec3 calculateLight(int normalMap, int roughnessMap) {
 }
 
 vec3 finalTexture(int index) {
-    float n1 = (texture(uTextureNoise, texCoord).r * 0.05) + 0.95;
-    float n2 = (texture(uTextureNoise, texCoord / 5).r * 0.1) + 0.90;
+    float n1 = (texture(uTextureNoise, texCoord / 0.3).r * 0.05) + 0.95;
+    float n2 = (texture(uTextureNoise, texCoord / 4.5).r * 0.1) + 0.90;
 
     float noise = (n1 + n2) / 2;
 
