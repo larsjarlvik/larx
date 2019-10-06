@@ -33,6 +33,7 @@ namespace Larx.Terrain
         {
             var radius = (int)(State.ToolRadius * State.SplatDetail / Map.MapData.MapSize);
             Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
+            var hasChanged = new bool[TerrainRenderer.Textures.Length];
 
             for (var z1 = (int)(pos.Y - radius); z1 < pos.Y + radius; z1 ++)
                 for (var x1 = (int)(pos.X - radius); x1 < pos.X + radius; x1 ++)
@@ -46,17 +47,21 @@ namespace Larx.Terrain
                     var result = Map.MapData.SplatMap[splatId][z1, x1] + n;
 
                     Map.MapData.SplatMap[splatId][z1, x1] = result > 1.0f ? 1.0f : result;
-                    average(z1, x1);
+                    average(ref hasChanged, z1, x1);
                 }
 
-            for(var i = 0; i < TerrainRenderer.Textures.Length; i++) toTexture(i);
+            for(var i = 0; i < TerrainRenderer.Textures.Length; i++)
+                if (hasChanged[i]) toTexture(i);
         }
 
-        private void average(int z, int x)
+        private void average(ref bool[] hasChanged, int z, int x)
         {
             var split = 1.0f / Map.MapData.SplatMap.Sum(s => s[z, x]);
-            foreach(var splat in Map.MapData.SplatMap) {
-                splat[z, x] *= split;
+
+            for(var i = 0; i < TerrainRenderer.Textures.Length; i++) {
+                Map.MapData.SplatMap[i][z, x] *= split;
+                if ((split > 1.02f || split < 0.98f) && Map.MapData.SplatMap[i][z, x] > 0.0f)
+                    hasChanged[i] = true;
             }
         }
 
