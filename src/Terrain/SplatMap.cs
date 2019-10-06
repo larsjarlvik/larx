@@ -25,8 +25,6 @@ namespace Larx.Terrain
             for (var z = 0; z < State.SplatDetail; z ++)
                 for (var x = 0; x < State.SplatDetail; x ++)
                     Map.MapData.SplatMap[0][z, x] = 1.0f;
-
-            for(var i = 0; i < TerrainRenderer.Textures.Length; i++) toTexture(i);
         }
 
         public void Update(Vector2 pos, byte splatId)
@@ -51,7 +49,7 @@ namespace Larx.Terrain
                 }
 
             for(var i = 0; i < TerrainRenderer.Textures.Length; i++)
-                if (hasChanged[i]) toTexture(i);
+                if (hasChanged[i]) ToTexture(i);
         }
 
         private void average(ref bool[] hasChanged, int z, int x)
@@ -65,7 +63,7 @@ namespace Larx.Terrain
             }
         }
 
-        private void toTexture(int textureId)
+        public void ToTexture(int textureId)
         {
             GL.BindTexture(TextureTarget.Texture2DArray, Texture);
             GL.TexSubImage3D<float>(TextureTarget.Texture2DArray, 0, 0, 0, textureId, State.SplatDetail, State.SplatDetail, 1, PixelFormat.Red, PixelType.Float, Map.MapData.SplatMap[textureId]);

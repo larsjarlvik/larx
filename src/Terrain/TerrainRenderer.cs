@@ -193,6 +193,9 @@ namespace Larx.Terrain
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Count * sizeof(int), indices.ToArray(), BufferUsageHint.StaticDraw);
+
+            for(var n = 0; n < Textures.Length; n ++)
+                splatMap.ToTexture(n);
         }
 
         private int? getTileIndex(Vector2 position)
