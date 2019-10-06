@@ -10,7 +10,7 @@ namespace Larx.Terrain
     {
         public int Texture;
 
-        public SplatMap(int textureCount)
+        public SplatMap()
         {
             Texture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, Texture);

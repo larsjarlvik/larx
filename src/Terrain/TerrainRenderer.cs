@@ -61,7 +61,7 @@ namespace Larx.Terrain
         public TerrainRenderer()
         {
             shader = new TerrainShader();
-            splatMap = new SplatMap(Textures.Length);
+            splatMap = new SplatMap();
             textureNoise = new TextureNoise(12312234);
             Picker = new TerrainPicker(this);
             texture = new Texture();
@@ -161,7 +161,7 @@ namespace Larx.Terrain
                 for (var x = -halfMapSize; x <= halfMapSize; x++)
                 {
                     vertices.Add(new Vector3(x, Map.MapData.TerrainElevations[i], z));
-                    coords.Add(new Vector2((x + halfMapSize) / Map.MapData.MapSize, (z + halfMapSize) / Map.MapData.MapSize));
+                    coords.Add(new Vector2((float)(x + halfMapSize) / Map.MapData.MapSize, (float)(z + halfMapSize) / Map.MapData.MapSize));
                     normals.Add(new Vector3(0f, 1f, 0f).Normalized());
                     tangents.Add(MathLarx.CalculateTangent(normals.Last()));
 
