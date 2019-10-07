@@ -15,11 +15,13 @@ namespace Larx.Storage
     {
         public string Model { get; set; }
         public Vector2 Position { get; set; }
+        public float Rotation { get; set; }
 
-        public PlacedAsset(string model, Vector2 position)
+        public PlacedAsset(string model, Vector2 position, float rotation)
         {
             Model = model;
             Position = position;
+            Rotation = rotation;
         }
     }
 

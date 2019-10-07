@@ -14,7 +14,7 @@ namespace Larx.MapAssets
             shader = new AssetShader();
         }
 
-        public void Render(Camera camera, Light light, Model model, Vector3 position)
+        public void Render(Camera camera, Light light, Model model, Vector3 position, float rotation)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -23,6 +23,7 @@ namespace Larx.MapAssets
 
             GL.UseProgram(shader.Program);
             GL.Uniform3(shader.Position, position);
+            GL.Uniform1(shader.Rotation, rotation);
 
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);
