@@ -61,5 +61,25 @@ namespace Larx.MapAssets
 
             GL.Enable(EnableCap.CullFace);
         }
+
+        public void RenderShadowMap(Matrix4 viewMatrix, Matrix4 projectionMatrix, Model model, Vector3 position, float rotation)
+        {
+            GL.EnableVertexAttribArray(0);
+            GL.UseProgram(shader.Program);
+
+            GL.UniformMatrix4(shader.ViewMatrix, false, ref viewMatrix);
+            GL.UniformMatrix4(shader.ProjectionMatrix, false, ref projectionMatrix);
+            GL.Uniform3(shader.Position, position);
+            GL.Uniform1(shader.Rotation, rotation);
+
+            foreach(var mesh in model.Meshes)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.VertexBuffer);
+                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
+                GL.DrawElements(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);
+            }
+        }
     }
 }

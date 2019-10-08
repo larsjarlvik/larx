@@ -48,5 +48,13 @@ namespace Larx.MapAssets
                 assetRenderer.Render(camera, light, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
             }
         }
+
+        public void RenderShadowMap(Matrix4 viewMatrix, Matrix4 projectionMatrix, TerrainRenderer terrain)
+        {
+            foreach(var asset in Map.MapData.Assets)
+            {
+                assetRenderer.RenderShadowMap(viewMatrix, projectionMatrix, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+            }
+        }
     }
 }

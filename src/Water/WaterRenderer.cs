@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Larx.Buffers;
 using Larx.Storage;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -22,7 +23,7 @@ namespace Larx.Water
         {
             shader = new WaterShader();
             RefractionBuffer = new Framebuffer(0, State.Window.Size);
-            ReflectionBuffer = new Framebuffer(0, State.Window.Size);
+            ReflectionBuffer = new Framebuffer(0, State.Window.Size, true, false);
 
             dudvMap = new Texture();
             normalMap = new Texture();

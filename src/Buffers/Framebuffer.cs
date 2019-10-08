@@ -2,7 +2,7 @@ using System;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx
+namespace Larx.Buffers
 {
     public class Framebuffer
     {
@@ -14,11 +14,13 @@ namespace Larx
         public readonly int ColorTexture;
         public readonly int DepthTexture;
         public Size Size { get; set; }
+        private readonly FramebufferRenderer framebufferRenderer;
 
-        public Framebuffer(int samples, Size size)
+        public Framebuffer(int samples, Size size, bool useColorBuffer = true, bool useDepthBuffer = true)
         {
             this.samples = samples;
             this.Size = size;
+            framebufferRenderer = new FramebufferRenderer();
 
             GL.Enable(EnableCap.Multisample);
 
@@ -28,10 +30,12 @@ namespace Larx
             colorBuffer = GL.GenRenderbuffer();
             depthBuffer = GL.GenRenderbuffer();
 
-            buildBuffers();
+            GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
+            if (useColorBuffer) buildColorBuffer();
+            if (useDepthBuffer) buildDepthBuffer();
         }
 
-        private void buildBuffers()
+        private void buildColorBuffer()
         {
             GL.BindTexture(TextureTarget.Texture2D, ColorTexture);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Size.Width, Size.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
@@ -39,16 +43,17 @@ namespace Larx
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
+            GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, ColorTexture, 0);
+        }
 
+        private void buildDepthBuffer()
+        {
             GL.BindTexture(TextureTarget.Texture2D, DepthTexture);
             GL.TexImage2D(TextureTarget.Texture2D, 0, (PixelInternalFormat)All.DepthComponent32, Size.Width, Size.Height, 0, PixelFormat.DepthComponent, PixelType.UnsignedInt, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToBorder);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToBorder);
-
-            GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
-            GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.ColorAttachment0Ext, TextureTarget.Texture2D, ColorTexture, 0);
             GL.FramebufferTexture2D(FramebufferTarget.FramebufferExt, FramebufferAttachment.DepthAttachmentExt, TextureTarget.Texture2D, DepthTexture, 0);
         }
 
@@ -59,37 +64,25 @@ namespace Larx
 
             GL.BindTexture(TextureTarget.Texture2D, DepthTexture);
             GL.TexImage2D(TextureTarget.Texture2D, 0, (PixelInternalFormat)All.DepthComponent32, Size.Width, Size.Height, 0, PixelFormat.DepthComponent, PixelType.UnsignedInt, IntPtr.Zero);
+
+            framebufferRenderer.UpdateMatrix();
         }
 
         public void Bind()
         {
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+            GL.Viewport(0, 0, Size.Width, Size.Height);
         }
 
-        public void Draw()
+        public void DrawColorBuffer()
         {
-            Draw(new Point(0, 0), Size);
+            framebufferRenderer.Render(ColorTexture);
         }
 
-        public void Draw(Point position, Size size)
+        public void DrawDepthBuffer()
         {
-            GL.Disable(EnableCap.DepthTest);
-            GL.BindTexture(TextureTarget.Texture2D, ColorTexture);
-            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, framebuffer);
-            GL.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
-            GL.BlitFramebuffer(
-                0, 0, Size.Width, Size.Height,
-                position.X, position.Y, position.X + size.Width, position.Y + size.Height,
-                ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest
-            );
-
-            GL.Enable(EnableCap.DepthTest);
-        }
-
-        public void Copy(Size size)
-        {
-            GL.CopyTexImage2D(TextureTarget.Texture2D, 0, InternalFormat.Rgba8, 0, 0, size.Width, size.Height, 0);
+            framebufferRenderer.Render(DepthTexture);
         }
     }
 }
