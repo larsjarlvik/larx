@@ -28,8 +28,8 @@ namespace Larx.Shadows
 
         private Matrix4 calculateCameraRotation(Camera camera)
         {
-            var rX = Matrix4.CreateRotationX(-MathLarx.DegToRad(camera.Rotation.X));
-            var rY = Matrix4.CreateRotationY(-MathLarx.DegToRad(camera.Rotation.Y));
+            var rX = Matrix4.CreateRotationX(-MathLarx.DegToRad(camera.Rotation.Y));
+            var rY = Matrix4.CreateRotationY(-MathLarx.DegToRad(camera.Rotation.X));
             return Matrix4.Mult(rX, rY);
         }
 
@@ -43,12 +43,12 @@ namespace Larx.Shadows
         {
             var upVector = Vector4.Transform(rotation, up).Xyz;
             var rightVector = Vector3.Cross(forwardVector, upVector);
-            var downVector = new Vector3(-upVector.X, -upVector.Y, -upVector.Z);
-            var leftVector = new Vector3(-rightVector.X, -rightVector.Y, -rightVector.Z);
-            var farTop = Vector3.Add(centerFar, new Vector3(upVector.X * farHeight, upVector.Y * farHeight, upVector.Z * farHeight));
-            var farBottom = Vector3.Add(centerFar, new Vector3(downVector.X * farHeight, downVector.Y * farHeight, downVector.Z * farHeight));
-            var nearTop = Vector3.Add(centerNear, new Vector3(upVector.X * nearHeight, upVector.Y * nearHeight, upVector.Z * nearHeight));
-            var nearBottom = Vector3.Add(centerNear, new Vector3(downVector.X * nearHeight, downVector.Y * nearHeight, downVector.Z * nearHeight));
+            var downVector = new Vector3(-upVector);
+            var leftVector = new Vector3(-rightVector);
+            var farTop = Vector3.Add(centerFar, new Vector3(upVector * farHeight));
+            var farBottom = Vector3.Add(centerFar, new Vector3(downVector * farHeight));
+            var nearTop = Vector3.Add(centerNear, new Vector3(upVector * nearHeight));
+            var nearBottom = Vector3.Add(centerNear, new Vector3(downVector * nearHeight));
 
             var points = new Vector4[8];
             points[0] = calculateLightSpaceFrustumCorner(farTop, rightVector, farWidth);
@@ -65,6 +65,7 @@ namespace Larx.Shadows
         public void Update(Camera camera, Light light)
         {
             updateViewMatrix(camera, light);
+            updateProjectionMatrix();
 
             var rotation = calculateCameraRotation(camera);
             var forwardVector = Vector4.Transform(forward, rotation).Xyz;
@@ -100,7 +101,6 @@ namespace Larx.Shadows
             }
 
             max.Z += offset;
-            updateProjectionMatrix();
         }
 
         private void updateProjectionMatrix()
@@ -114,11 +114,16 @@ namespace Larx.Shadows
 
         private void updateViewMatrix(Camera camera, Light light)
         {
-            var rX = Matrix4.CreateRotationX(MathLarx.DegToRad(light.Rotation.Normalized().X));
-            var rY = Matrix4.CreateRotationY(MathLarx.DegToRad(-light.Rotation.Normalized().Y));
-            var t = Matrix4.CreateTranslation(camera.Position.X, camera.Position.Y, camera.Position.Z);
+            var pitch = MathF.Acos(new Vector2(light.Direction[0], light.Direction[2]).Length);
+            var yaw = MathLarx.RadToDeg(MathF.Atan(light.Direction[0] / light.Direction[2]));
 
-            ViewMatrix = Matrix4.Mult(Matrix4.Mult(rX, rY), t);
+            yaw = light.Direction[2] > 0 ? yaw - 180 : yaw;
+
+            var rX = Matrix4.CreateRotationX(pitch);
+            var rY = Matrix4.CreateRotationY(-MathLarx.DegToRad(yaw));
+            var t = Matrix4.CreateTranslation(camera.Position);
+
+            ViewMatrix = Matrix4.Mult(t, Matrix4.Mult(rX, rY));
         }
 
         public void Resize()

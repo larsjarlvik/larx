@@ -14,12 +14,21 @@ uniform mat4 uViewMatrix;
 uniform vec3 uLightDirection;
 uniform int uClipPlane;
 uniform vec3 uCameraPosition;
+uniform mat4 uShadowViewMatrix;
+uniform mat4 uShadowProjectionMatrix;
 
 out vec3 position;
 out vec2 texCoord;
 out vec3 normal;
 out vec3 lightVector;
 out vec3 eyeVector;
+out vec4 shadowCoords;
+
+void setShadowCoords(vec4 position, float distance) {
+    float fade = (distance - (1000 - 400)) / 1000;
+    shadowCoords = uShadowProjectionMatrix * uShadowViewMatrix * position;
+    shadowCoords.w = clamp(1.0 - fade, 0.0, 0.5);
+}
 
 void main()
 {
@@ -44,6 +53,8 @@ void main()
     eyeVector = tangentSpace * -(uCameraPosition - position);
 
     vec4 worldPosition = uViewMatrix * vec4(position, 1.0);
+
+    setShadowCoords(worldPosition, length(gl_Position));
 
     gl_Position = uProjectionMatrix * worldPosition;
 }

@@ -4,12 +4,14 @@ precision highp float;
 uniform sampler2DArray uTexture;
 uniform sampler2DArray uSplatMap;
 uniform sampler2D uTextureNoise;
+uniform sampler2D uShadowMap;
 
 in vec3 position;
 in vec2 texCoord;
 in vec3 normal;
 in vec3 lightVector;
 in vec3 eyeVector;
+in vec4 shadowCoords;
 
 out vec4 outputColor;
 
@@ -23,6 +25,15 @@ uniform int uShowOverlays;
 
 uniform vec3 uMousePosition;
 uniform float uSelectionSize;
+
+float getShadowFactor() {
+    if(shadowCoords.z > 1.0) {
+        return 1.0;
+    }
+
+    return texture(uShadowMap, shadowCoords.xy).r;
+}
+
 
 vec3 getTriPlanarTexture(int textureId) {
     vec3 n = normalize(normal);
@@ -94,5 +105,5 @@ void main() {
     }
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
-    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);
+    outputColor = vec4(getShadowFactor(), 0.0, 0.0, 1.0);
 }

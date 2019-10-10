@@ -18,8 +18,7 @@ out vec3 eyeVector;
 out vec2 texCoord;
 out vec3 normal;
 
-mat3 rotationYMatrix(float a)
-{
+mat3 rotationYMatrix(float a) {
     return mat3(cos(a), 0, sin(a), 0, 1, 0, -sin(a), 0, cos(a));
 }
 

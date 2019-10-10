@@ -15,6 +15,9 @@ namespace Larx.Terrain
         public int SelectionSize { get; private set; }
         public int ClipPlane { get; private set; }
         public int ShowOverlays { get; private set; }
+        public int ShadowMap { get; private set; }
+        public int ShadowViewMatrix { get; private set; }
+        public int ShadowProjectionMatrix { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -30,6 +33,9 @@ namespace Larx.Terrain
             SelectionSize = GL.GetUniformLocation(Program, "uSelectionSize");
             ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
             ShowOverlays = GL.GetUniformLocation(Program, "uShowOverlays");
+            ShadowMap = GL.GetUniformLocation(Program, "uShadowMap");
+            ShadowViewMatrix = GL.GetUniformLocation(Program, "uShadowViewMatrix");
+            ShadowProjectionMatrix = GL.GetUniformLocation(Program, "uShadowProjectionMatrix");
         }
     }
 }

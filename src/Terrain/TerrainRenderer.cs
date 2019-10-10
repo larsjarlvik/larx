@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Larx.Shadows;
 using Larx.Storage;
 using Larx.Utils;
 using OpenTK;
@@ -257,7 +258,7 @@ namespace Larx.Terrain
             MousePosition = Picker.GetPosition(mouse);
         }
 
-        public void Render(Camera camera, Light light, bool showOverlays, ClipPlane clip = ClipPlane.None)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows, bool showOverlays, ClipPlane clip = ClipPlane.None)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -285,6 +286,16 @@ namespace Larx.Terrain
             GL.ActiveTexture(TextureUnit.Texture2);
             GL.BindTexture(TextureTarget.Texture2D, textureNoise.Texture);
             GL.Uniform1(shader.TextureNoise, 2);
+
+            if (shadows != null)
+            {
+                GL.ActiveTexture(TextureUnit.Texture3);
+                GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
+                GL.Uniform1(shader.ShadowMap, 3);
+
+                GL.UniformMatrix4(shader.ShadowViewMatrix, false, ref shadows.ViewMatrix);
+                GL.UniformMatrix4(shader.ShadowProjectionMatrix, false, ref shadows.ProjectionMatrix);
+            }
 
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);

@@ -8,11 +8,11 @@ namespace Larx.Buffers
     {
         private readonly int samples;
         private readonly int framebuffer;
-        private readonly int depthBuffer;
-        private readonly int colorBuffer;
+        private int depthBuffer;
+        private int colorBuffer;
 
-        public readonly int ColorTexture;
-        public readonly int DepthTexture;
+        public int ColorTexture;
+        public int DepthTexture;
         public Size Size { get; set; }
         private readonly FramebufferRenderer framebufferRenderer;
 
@@ -25,10 +25,6 @@ namespace Larx.Buffers
             GL.Enable(EnableCap.Multisample);
 
             framebuffer = GL.GenFramebuffer();
-            ColorTexture = GL.GenTexture();
-            DepthTexture = GL.GenTexture();
-            colorBuffer = GL.GenRenderbuffer();
-            depthBuffer = GL.GenRenderbuffer();
 
             GL.BindFramebuffer(FramebufferTarget.FramebufferExt, framebuffer);
             if (useColorBuffer) buildColorBuffer();
@@ -37,6 +33,8 @@ namespace Larx.Buffers
 
         private void buildColorBuffer()
         {
+            colorBuffer = GL.GenRenderbuffer();
+            ColorTexture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, ColorTexture);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Size.Width, Size.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -48,6 +46,8 @@ namespace Larx.Buffers
 
         private void buildDepthBuffer()
         {
+            depthBuffer = GL.GenRenderbuffer();
+            DepthTexture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, DepthTexture);
             GL.TexImage2D(TextureTarget.Texture2D, 0, (PixelInternalFormat)All.DepthComponent32, Size.Width, Size.Height, 0, PixelFormat.DepthComponent, PixelType.UnsignedInt, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
@@ -59,11 +59,15 @@ namespace Larx.Buffers
 
         public void RefreshBuffers()
         {
-            GL.BindTexture(TextureTarget.Texture2D, ColorTexture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Size.Width, Size.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            if (ColorTexture > 0) {
+                GL.BindTexture(TextureTarget.Texture2D, ColorTexture);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Size.Width, Size.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            }
 
-            GL.BindTexture(TextureTarget.Texture2D, DepthTexture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, (PixelInternalFormat)All.DepthComponent32, Size.Width, Size.Height, 0, PixelFormat.DepthComponent, PixelType.UnsignedInt, IntPtr.Zero);
+            if (DepthTexture > 0) {
+                GL.BindTexture(TextureTarget.Texture2D, DepthTexture);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, (PixelInternalFormat)All.DepthComponent32, Size.Width, Size.Height, 0, PixelFormat.DepthComponent, PixelType.UnsignedInt, IntPtr.Zero);
+            }
 
             framebufferRenderer.UpdateMatrix();
         }
