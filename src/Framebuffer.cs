@@ -65,6 +65,7 @@ namespace Larx
         {
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+            GL.Viewport(0, 0, Size.Width, Size.Height);
         }
 
         public void Draw()

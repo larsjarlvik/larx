@@ -64,6 +64,7 @@ namespace Larx
         public void Bind()
         {
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+            GL.Viewport(0, 0, State.Window.Size.Width, State.Window.Size.Height);
         }
 
         public void Draw()
