@@ -26,13 +26,30 @@ uniform int uShowOverlays;
 uniform vec3 uMousePosition;
 uniform float uSelectionSize;
 
+const float PCF_COUNT = 1.0;
+const float PCF_SAMLE_SIZE = 0.5;
+
 float getShadowFactor() {
-    float objectNearestLight = texture(uShadowMap, shadowCoords.xy).r;
-    float lightFactor = 1.0;
-    if (shadowCoords.z > objectNearestLight) {
-        lightFactor = 0.6;
+    if(shadowCoords.z > 1.0) {
+        return 1.0;
     }
-    return lightFactor;
+
+    float totalTexels = (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE) * (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE);
+    float texelSize = 1.0 / 4095.0;
+    float total = 0.0;
+
+    for(float x = -PCF_COUNT; x <= PCF_COUNT; x += PCF_SAMLE_SIZE) {
+        for(float y = -PCF_COUNT; y <= PCF_COUNT; y += PCF_SAMLE_SIZE) {
+            float nearestLight = texture(uShadowMap, shadowCoords.xy + vec2(x, y) * texelSize).r;
+            if(shadowCoords.z > nearestLight) {
+                total += 0.1;
+            }
+        }
+    }
+
+    total /= totalTexels;
+
+    return 1.0 - (total * shadowCoords.w);
 }
 
 

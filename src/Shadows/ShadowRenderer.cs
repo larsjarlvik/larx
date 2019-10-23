@@ -11,7 +11,7 @@ namespace Larx.Shadows
         private readonly Vector4 forward = new Vector4(0, 0, -1, 0);
         private readonly Vector4 up = new Vector4(0, 1, 0, 0);
         private const float offset = 10.0f;
-        private const float shadowDistance = 100.0f;
+        private const float shadowDistance = 150.0f;
         private Vector3 min;
         private Vector3 max;
         private float farWidth;
@@ -119,9 +119,8 @@ namespace Larx.Shadows
             ViewMatrix =
                 Matrix4.CreateTranslation(-camera.Position) *
                 Matrix4.CreateRotationX(-light.Direction.Y) *
-                Matrix4.CreateRotationY(-light.Direction.X);
+                Matrix4.CreateRotationY(light.Direction.X);
         }
-
 
         public void Resize()
         {
