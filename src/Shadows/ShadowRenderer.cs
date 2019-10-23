@@ -11,26 +11,28 @@ namespace Larx.Shadows
         private readonly Vector4 forward = new Vector4(0, 0, -1, 0);
         private readonly Vector4 up = new Vector4(0, 1, 0, 0);
         private const float offset = 10.0f;
-        private const float shadowDistance = 50.0f;
+        private const float shadowDistance = 100.0f;
         private Vector3 min;
         private Vector3 max;
         private float farWidth;
         private float farHeight;
         private float nearWidth;
         private float nearHeight;
+
         public Matrix4 ProjectionMatrix;
         public Matrix4 ViewMatrix;
+        public Matrix4 ShadowMatrix;
 
         public ShadowRenderer()
         {
-            ShadowBuffer = new Framebuffer(0, new Size(4096, 4096), false, true);
+            ShadowBuffer = new Framebuffer(new Size(4096, 4096), false, true);
         }
 
         private Matrix4 calculateCameraRotation(Camera camera)
         {
-            var rX = Matrix4.CreateRotationX(-MathLarx.DegToRad(camera.Rotation.Y));
-            var rY = Matrix4.CreateRotationY(-MathLarx.DegToRad(camera.Rotation.X));
-            return Matrix4.Mult(rX, rY);
+            var rX = Matrix4.CreateRotationX(MathLarx.DegToRad(camera.Rotation.X));
+            var rY = Matrix4.CreateRotationY(MathLarx.DegToRad(camera.Rotation.Y));
+            return rX * rY;
         }
 
         Vector4 calculateLightSpaceFrustumCorner(Vector3 startPoint, Vector3 direction, float width)
@@ -66,6 +68,10 @@ namespace Larx.Shadows
         {
             updateViewMatrix(camera, light);
             updateProjectionMatrix();
+
+            ShadowMatrix = ViewMatrix * ProjectionMatrix;
+            ShadowMatrix *= Matrix4.CreateScale(new Vector3(0.5f));
+            ShadowMatrix *= Matrix4.CreateTranslation(new Vector3(0.5f));
 
             var rotation = calculateCameraRotation(camera);
             var forwardVector = Vector4.Transform(forward, rotation).Xyz;
@@ -105,26 +111,17 @@ namespace Larx.Shadows
 
         private void updateProjectionMatrix()
         {
-            ProjectionMatrix = new Matrix4();
-            ProjectionMatrix.M11 = 2.0f / (max.X - min.X);
-            ProjectionMatrix.M22 = 2.0f / (max.Y - min.Y);
-            ProjectionMatrix.M33 = -2.0f / (max.Z - min.Z);
-            ProjectionMatrix.M44 = 1.0f;
+            ProjectionMatrix = Matrix4.CreateOrthographic((max.X - min.X), (max.Y - min.Y), min.Z, max.Z);
         }
 
         private void updateViewMatrix(Camera camera, Light light)
         {
-            var pitch = MathF.Acos(new Vector2(light.Direction[0], light.Direction[2]).Length);
-            var yaw = MathLarx.RadToDeg(MathF.Atan(light.Direction[0] / light.Direction[2]));
-
-            yaw = light.Direction[2] > 0 ? yaw - 180 : yaw;
-
-            var rX = Matrix4.CreateRotationX(pitch);
-            var rY = Matrix4.CreateRotationY(-MathLarx.DegToRad(yaw));
-            var t = Matrix4.CreateTranslation(camera.Position);
-
-            ViewMatrix = Matrix4.Mult(t, Matrix4.Mult(rX, rY));
+            ViewMatrix =
+                Matrix4.CreateTranslation(-camera.Position) *
+                Matrix4.CreateRotationX(-light.Direction.Y) *
+                Matrix4.CreateRotationY(-light.Direction.X);
         }
+
 
         public void Resize()
         {

@@ -6,7 +6,6 @@ namespace Larx.Buffers
 {
     public class Framebuffer
     {
-        private readonly int samples;
         private readonly int framebuffer;
         private int depthBuffer;
         private int colorBuffer;
@@ -16,9 +15,8 @@ namespace Larx.Buffers
         public Size Size { get; set; }
         private readonly FramebufferRenderer framebufferRenderer;
 
-        public Framebuffer(int samples, Size size, bool useColorBuffer = true, bool useDepthBuffer = true)
+        public Framebuffer(Size size, bool useColorBuffer = true, bool useDepthBuffer = true)
         {
-            this.samples = samples;
             this.Size = size;
             framebufferRenderer = new FramebufferRenderer();
 

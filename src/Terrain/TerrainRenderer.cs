@@ -293,8 +293,7 @@ namespace Larx.Terrain
                 GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
                 GL.Uniform1(shader.ShadowMap, 3);
 
-                GL.UniformMatrix4(shader.ShadowViewMatrix, false, ref shadows.ViewMatrix);
-                GL.UniformMatrix4(shader.ShadowProjectionMatrix, false, ref shadows.ProjectionMatrix);
+                GL.UniformMatrix4(shader.ShadowMatrix, false, ref shadows.ShadowMatrix);
             }
 
             camera.ApplyCamera(shader);

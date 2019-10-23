@@ -22,8 +22,8 @@ namespace Larx.Water
         public WaterRenderer()
         {
             shader = new WaterShader();
-            RefractionBuffer = new Framebuffer(0, State.Window.Size);
-            ReflectionBuffer = new Framebuffer(0, State.Window.Size, true, false);
+            RefractionBuffer = new Framebuffer(State.Window.Size);
+            ReflectionBuffer = new Framebuffer(State.Window.Size, true, false);
 
             dudvMap = new Texture();
             normalMap = new Texture();

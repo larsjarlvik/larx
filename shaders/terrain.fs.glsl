@@ -27,11 +27,12 @@ uniform vec3 uMousePosition;
 uniform float uSelectionSize;
 
 float getShadowFactor() {
-    if(shadowCoords.z > 1.0) {
-        return 1.0;
+    float objectNearestLight = texture(uShadowMap, shadowCoords.xy).r;
+    float lightFactor = 1.0;
+    if (shadowCoords.z > objectNearestLight) {
+        lightFactor = 0.6;
     }
-
-    return texture(uShadowMap, shadowCoords.xy).r;
+    return lightFactor;
 }
 
 
@@ -104,6 +105,8 @@ void main() {
         return;
     }
 
+    color *= getShadowFactor();
+
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
-    outputColor = vec4(getShadowFactor(), 0.0, 0.0, 1.0);
+    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);
 }
