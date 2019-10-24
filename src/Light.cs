@@ -21,7 +21,7 @@ namespace Larx
             Rotation = new Vector2(MathLarx.DegToRad(0), MathLarx.DegToRad(45));
         }
 
-        public void  ApplyLight(Shader shader)
+        public void ApplyLight(Shader shader)
         {
             Direction = new Vector3(
                 -MathF.Sin(Rotation.X) * MathF.Cos(Rotation.Y),

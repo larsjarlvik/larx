@@ -17,7 +17,6 @@ mat3 rotationYMatrix(float a) {
 void main(void) {
     mat3 rotation = rotationYMatrix(uRotation);
     vec4 position = vec4(vPosition * rotation + uPosition, 1.0);
-
     vec4 worldPosition = uViewMatrix * position;
 
     texCoord = vTexCoord;

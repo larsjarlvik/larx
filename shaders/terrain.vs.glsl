@@ -23,7 +23,7 @@ out vec3 lightVector;
 out vec3 eyeVector;
 out vec4 shadowCoords;
 
-const float shadowDistance = 130.0;
+const float shadowDistance = 250.0;
 const float transitionDistance = 10.0;
 
 void setShadowCoords(vec4 position, float distance) {
