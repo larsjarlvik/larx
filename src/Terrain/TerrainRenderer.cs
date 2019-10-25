@@ -59,12 +59,12 @@ namespace Larx.Terrain
             };
         }
 
-        public TerrainRenderer()
+        public TerrainRenderer(Camera camera)
         {
             shader = new TerrainShader();
             splatMap = new SplatMap();
             textureNoise = new TextureNoise(12312234);
-            Picker = new TerrainPicker(this);
+            Picker = new TerrainPicker(this, camera);
             texture = new Texture();
 
             loadTextures(Textures);
@@ -82,7 +82,7 @@ namespace Larx.Terrain
             texture.LoadTexture(paths.ToArray(), true);
         }
 
-        public void ChangeElevation(float offset, MousePicker picker)
+        public void ChangeElevation(float offset)
         {
             var toUpdate = getTilesInArea(MousePosition, State.SelectionCircleRadius);
 
@@ -253,9 +253,9 @@ namespace Larx.Terrain
             GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
         }
 
-        public void Update(MousePicker mouse)
+        public void Update()
         {
-            MousePosition = Picker.GetPosition(mouse);
+            MousePosition = Picker.GetPosition();
         }
 
         public void Render(Camera camera, Light light, ShadowRenderer shadows, bool showOverlays, ClipPlane clip = ClipPlane.None)

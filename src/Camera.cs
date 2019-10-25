@@ -114,5 +114,17 @@ namespace Larx
             GL.UniformMatrix4(shader.ProjectionMatrix, false, ref ProjectionMatrix);
             GL.Uniform3(shader.CameraPosition, Position);
         }
+
+        public Vector3 getPoint(Vector3 pos)
+        {
+            var clipCoords = new Vector4(pos.X, pos.Y, -1f, 1f);
+            var eyeCoords = Vector4.Transform(clipCoords, Matrix4.Invert(ProjectionMatrix));
+            var trimmedEyeCoords = new Vector4(eyeCoords.X, eyeCoords.Y, -1, 0);
+
+            var worldCoords = Vector4.Transform(trimmedEyeCoords, Matrix4.Invert(ViewMatrix)).Normalized();
+            var ray = worldCoords.Normalized().Xyz;
+
+            return Vector3.Add(Position, ray * pos.Z);
+        }
     }
 }

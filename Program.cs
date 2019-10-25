@@ -24,7 +24,6 @@ namespace Larx
         private ObjectRenderer debug;
         private TerrainRenderer terrain;
         private WaterRenderer water;
-        private MousePicker mousePicker;
         private SkyRenderer sky;
         private Assets assets;
         private ShadowRenderer shadows;
@@ -59,13 +58,12 @@ namespace Larx
 
             Map.New(256);
             ui = new Ui();
-            terrain = new TerrainRenderer();
-            water = new WaterRenderer();
             debug = new ObjectRenderer();
             camera = new Camera();
+            terrain = new TerrainRenderer(camera);
+            water = new WaterRenderer();
             light = new Light();
             assets = new Assets(ui);
-            mousePicker = new MousePicker(camera);
             sky = new SkyRenderer();
             shadows = new ShadowRenderer();
         }
@@ -94,16 +92,15 @@ namespace Larx
             if (State.Keyboard.Key[Key.Right]) light.Rotation.X -= 0.01f;
 
             camera.Update((float)e.Time);
-            mousePicker.Update();
-            terrain.Update(mousePicker);
+            terrain.Update();
             shadows.Update(camera, light);
 
             if (!uiIntersect) {
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Terrain:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, mousePicker);
-                        if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, mousePicker);
+                        if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f);
+                        if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f);
                         break;
                     case TopMenu.Paint:
                         if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
@@ -194,7 +191,7 @@ namespace Larx
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Assets:
-                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition(mousePicker).Xz, terrain);
+                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition().Xz, terrain);
                         break;
                 }
             }
