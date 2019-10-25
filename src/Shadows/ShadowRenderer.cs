@@ -65,9 +65,16 @@ namespace Larx.Shadows
             return points;
         }
 
+        protected Vector3 getCenter(Vector3 min, Vector3 max) {
+            var cen = new Vector4((min + max) / 2.0f, 1.0f);
+            var invertedLight = ViewMatrix.Inverted();
+
+            return Vector4.Transform(cen, invertedLight).Xyz;
+        }
+
         public void Update(Camera camera, Light light)
         {
-            var nCam = new Vector3(-camera.Position.X, -camera.Position.Y, -camera.Position.Z);
+            var nCam = new Vector3(-camera.Position.X, -camera.Position.Y, camera.Position.Z);
             ViewMatrix = Matrix4.LookAt(nCam, nCam + light.Direction, new Vector3(0.0f, 1.0f, 0.0f));
 
             var rotation = calculateCameraRotation(camera);
@@ -105,10 +112,26 @@ namespace Larx.Shadows
 
             max.Z += offset;
 
+            var center = getCenter(min, max);
+
+            updateLightViewMatrix(light.Direction, center);
             ProjectionMatrix = Matrix4.CreateOrthographic((max.X - min.X), (max.Y - min.Y), min.Z, max.Z);
             ShadowMatrix = ViewMatrix * ProjectionMatrix *
                 Matrix4.CreateScale(new Vector3(0.5f)) *
                 Matrix4.CreateTranslation(new Vector3(0.5f));
+        }
+
+        private void updateLightViewMatrix(Vector3 direction, Vector3 center) {
+            direction.Normalize();
+            center = -center;
+            ViewMatrix = Matrix4.Identity;
+            float pitch = (float) MathF.Acos(new Vector2(direction.X, direction.Z).Length);
+            float yaw = (float) MathLarx.RadToDeg(((float) MathF.Atan(direction.X / direction.Z)));
+            yaw = direction.Z > 0 ? yaw - 180 : yaw;
+
+            ViewMatrix = Matrix4.CreateTranslation(center) *
+                Matrix4.CreateRotationX(pitch) *
+                Matrix4.CreateRotationY(-MathLarx.DegToRad(yaw));
         }
 
         public void Resize()
