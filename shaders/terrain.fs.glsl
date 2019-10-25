@@ -4,7 +4,7 @@ precision highp float;
 uniform sampler2DArray uTexture;
 uniform sampler2DArray uSplatMap;
 uniform sampler2D uTextureNoise;
-uniform sampler2D uShadowMap;
+uniform sampler2DShadow uShadowMap;
 
 in vec3 position;
 in vec2 texCoord;
@@ -26,8 +26,8 @@ uniform int uShowOverlays;
 uniform vec3 uMousePosition;
 uniform float uSelectionSize;
 
-const float PCF_COUNT = 1.0;
-const float PCF_SAMLE_SIZE = 0.5;
+const float PCF_COUNT = 2.0;
+const float PCF_SAMLE_SIZE = 1.0;
 
 float getShadowFactor() {
     if(shadowCoords.z > 1.0) {
@@ -40,18 +40,16 @@ float getShadowFactor() {
 
     for(float x = -PCF_COUNT; x <= PCF_COUNT; x += PCF_SAMLE_SIZE) {
         for(float y = -PCF_COUNT; y <= PCF_COUNT; y += PCF_SAMLE_SIZE) {
-            float nearestLight = texture(uShadowMap, shadowCoords.xy + vec2(x, y) * texelSize).r;
+            float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + vec2(x, y) * texelSize, shadowCoords.z));
             if(shadowCoords.z > nearestLight) {
-                total += 0.1;
+                total += 0.3;
             }
         }
     }
 
     total /= totalTexels;
-
     return 1.0 - (total * shadowCoords.w);
 }
-
 
 vec3 getTriPlanarTexture(int textureId) {
     vec3 n = normalize(normal);
@@ -118,7 +116,7 @@ void main() {
     }
 
     if (uShowOverlays == 0) {
-        outputColor = vec4(color, 0);
+        outputColor = vec4(color, 1.0);
         return;
     }
 

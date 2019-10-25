@@ -24,15 +24,15 @@ namespace Larx.Shadows
         public void Update(Camera camera, Light light)
         {
             var points = new Vector3[8];
-            points[0] = camera.getPoint(new Vector3(0, 0, State.Near));
-            points[1] = camera.getPoint(new Vector3(0, 0, ShadowDistance));
-            points[2] = camera.getPoint(new Vector3(1, 0, State.Near));
-            points[3] = camera.getPoint(new Vector3(1, 0, ShadowDistance));
-            points[4] = camera.getPoint(new Vector3(0, 1, State.Near));
-            points[5] = camera.getPoint(new Vector3(0, 1, ShadowDistance));
-            points[6] = camera.getPoint(new Vector3(1, 1, State.Near));
-            points[7] = camera.getPoint(new Vector3(1, 1, ShadowDistance));
-            var first = false;
+            points[0] = camera.GetPoint(new Vector3(-1.0f, -1.0f, State.Near));
+            points[1] = camera.GetPoint(new Vector3(-1.0f, -1.0f, ShadowDistance));
+            points[2] = camera.GetPoint(new Vector3( 1.0f, -1.0f, State.Near));
+            points[3] = camera.GetPoint(new Vector3( 1.0f, -1.0f, ShadowDistance));
+            points[4] = camera.GetPoint(new Vector3(-1.0f,  1.0f, State.Near));
+            points[5] = camera.GetPoint(new Vector3(-1.0f,  1.0f, ShadowDistance));
+            points[6] = camera.GetPoint(new Vector3( 1.0f,  1.0f, State.Near));
+            points[7] = camera.GetPoint(new Vector3( 1.0f,  1.0f, ShadowDistance));
+            var first = true;
 
             foreach(var point in points)
             {
@@ -54,6 +54,9 @@ namespace Larx.Shadows
                 max.Z = MathF.Max(max.Z, point.Z);
                 min.Z = MathF.Min(min.Z, point.Z);
             }
+
+            max *= 1.25f;
+            min *= 1.25f;
 
             ViewMatrix = Matrix4.LookAt(camera.Look - light.Direction, camera.Look, new Vector3(0.0f, 1.0f, 0.0f));
             ProjectionMatrix = Matrix4.CreateOrthographic((max.X - min.X), (max.Y - min.Y), min.Z, max.Z);

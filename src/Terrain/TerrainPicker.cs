@@ -50,7 +50,7 @@ namespace Larx.Terrain
                 distance
             );
 
-            return camera.getPoint(ray);
+            return camera.GetPoint(ray);
         }
     }
 }

@@ -115,7 +115,7 @@ namespace Larx
             GL.Uniform3(shader.CameraPosition, Position);
         }
 
-        public Vector3 getPoint(Vector3 pos)
+        public Vector3 GetPoint(Vector3 pos)
         {
             var clipCoords = new Vector4(pos.X, pos.Y, -1f, 1f);
             var eyeCoords = Vector4.Transform(clipCoords, Matrix4.Invert(ProjectionMatrix));

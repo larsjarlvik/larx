@@ -119,6 +119,11 @@ namespace Larx
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
+            // Shadow rendering
+            shadows.ShadowBuffer.Bind();
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+            assets.RenderShadowMap(shadows.ProjectionMatrix, shadows.ViewMatrix, terrain);
+
             // Water refraction rendering
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -127,18 +132,12 @@ namespace Larx
             // Water reflection rendering
             camera.InvertY();
             water.ReflectionBuffer.Bind();
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-            terrain.Render(camera, light, null, true, ClipPlane.ClipBottom);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            assets.Render(camera, light, terrain);
+            terrain.Render(camera, light, null, false, ClipPlane.ClipBottom);
             sky.Render(camera, light);
             GL.Disable(EnableCap.ClipDistance0);
-
-            assets.Render(camera, light, terrain);
             camera.Reset();
-
-            // Shadow rendering
-            shadows.ShadowBuffer.Bind();
-            GL.Clear(ClearBufferMask.DepthBufferBit);
-            assets.RenderShadowMap(shadows.ProjectionMatrix, shadows.ViewMatrix, terrain);
 
             // Main rendering
             GL.Disable(EnableCap.ClipDistance0);
@@ -159,7 +158,7 @@ namespace Larx
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
             ui.Render();
-            shadows.ShadowBuffer.DrawDepthBuffer();
+            // water.ReflectionBuffer.DrawColorBuffer();
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -177,7 +176,7 @@ namespace Larx
             water.ReflectionBuffer.Size = State.Window.Size;
             water.ReflectionBuffer.RefreshBuffers();
 
-            shadows.ShadowBuffer.RefreshBuffers();
+            // shadows.ShadowBuffer.RefreshBuffers();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
