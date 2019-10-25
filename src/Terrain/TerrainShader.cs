@@ -17,8 +17,7 @@ namespace Larx.Terrain
         public int ShowOverlays { get; private set; }
         public int ShadowMap { get; private set; }
         public int ShadowMatrix { get; private set; }
-        public int ShadowProjectionMatrix { get; private set; }
-        public int ShadowOffset { get; private set; }
+        public int ShadowDistance { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -36,6 +35,7 @@ namespace Larx.Terrain
             ShowOverlays = GL.GetUniformLocation(Program, "uShowOverlays");
             ShadowMap = GL.GetUniformLocation(Program, "uShadowMap");
             ShadowMatrix = GL.GetUniformLocation(Program, "uShadowMatrix");
+            ShadowDistance = GL.GetUniformLocation(Program, "uShadowDistance");
          }
     }
 }

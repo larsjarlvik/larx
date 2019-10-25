@@ -292,6 +292,7 @@ namespace Larx.Terrain
                 GL.ActiveTexture(TextureUnit.Texture3);
                 GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
                 GL.Uniform1(shader.ShadowMap, 3);
+                GL.Uniform1(shader.ShadowDistance, ShadowRenderer.ShadowDistance);
 
                 GL.UniformMatrix4(shader.ShadowMatrix, false, ref shadows.ShadowMatrix);
             }

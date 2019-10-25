@@ -177,7 +177,6 @@ namespace Larx
             water.ReflectionBuffer.Size = State.Window.Size;
             water.ReflectionBuffer.RefreshBuffers();
 
-            shadows.Resize();
             shadows.ShadowBuffer.RefreshBuffers();
         }
 
