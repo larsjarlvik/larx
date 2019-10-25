@@ -287,8 +287,7 @@ namespace Larx.Terrain
             GL.BindTexture(TextureTarget.Texture2D, textureNoise.Texture);
             GL.Uniform1(shader.TextureNoise, 2);
 
-            if (shadows != null)
-            {
+            if (shadows != null) {
                 GL.ActiveTexture(TextureUnit.Texture3);
                 GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
                 GL.Uniform1(shader.ShadowMap, 3);

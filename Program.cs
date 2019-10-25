@@ -133,7 +133,7 @@ namespace Larx
             camera.InvertY();
             water.ReflectionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            assets.Render(camera, light, terrain);
+            assets.Render(camera, light, null, terrain);
             terrain.Render(camera, light, null, false, ClipPlane.ClipBottom);
             sky.Render(camera, light);
             GL.Disable(EnableCap.ClipDistance0);
@@ -145,8 +145,8 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
-            assets.Render(camera, light, terrain);
-            water.Render(camera, light);
+            assets.Render(camera, light, shadows, terrain);
+            water.Render(camera, light, shadows);
             sky.Render(camera, light);
 
             // Draw to screen

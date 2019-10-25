@@ -11,6 +11,10 @@ namespace Larx.MapAssets
         public int BaseColorTexture { get; private set; }
         public int NormalTexture { get; private set; }
         public int Roughness { get; private set; }
+        public int ShadowMap { get; private set; }
+        public int ShadowMatrix { get; private set; }
+        public int ShadowDistance { get; private set; }
+        public int EnableShadows { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -20,6 +24,10 @@ namespace Larx.MapAssets
             BaseColorTexture = GL.GetUniformLocation(Program, "uBaseColorTexture");
             NormalTexture = GL.GetUniformLocation(Program, "uNormalTexture");
             Roughness = GL.GetUniformLocation(Program, "uRoughness");
+            ShadowMap = GL.GetUniformLocation(Program, "uShadowMap");
+            ShadowMatrix = GL.GetUniformLocation(Program, "uShadowMatrix");
+            ShadowDistance = GL.GetUniformLocation(Program, "uShadowDistance");
+            EnableShadows = GL.GetUniformLocation(Program, "uEnableShadows");
         }
     }
 }

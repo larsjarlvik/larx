@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Larx.GltfModel;
+using Larx.Shadows;
 using Larx.Storage;
 using Larx.Terrain;
 using Larx.UserInterFace;
@@ -41,11 +42,11 @@ namespace Larx.MapAssets
             Map.MapData.Assets.Add(new PlacedAsset(State.ActiveToolBarItem, new Vector2(position.X, position.Y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
         }
 
-        public void Render(Camera camera, Light light, TerrainRenderer terrain)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain)
         {
             foreach(var asset in Map.MapData.Assets)
             {
-                assetRenderer.Render(camera, light, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                assetRenderer.Render(camera, light, shadows, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
             }
         }
 

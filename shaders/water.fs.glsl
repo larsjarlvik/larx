@@ -11,12 +11,14 @@ in vec4 clipSpace;
 in vec2 texCoord;
 in vec3 eyeVector;
 in vec3 position;
+in vec4 shadowCoords;
 
 uniform sampler2D uRefractionColorTexture;
 uniform sampler2D uRefractionDepthTexture;
 uniform sampler2D uReflectionColorTexture;
 uniform sampler2D uDuDvMap;
 uniform sampler2D uNormalMap;
+uniform sampler2DShadow uShadowMap;
 
 uniform vec3 uLightDiffuse;
 uniform vec3 uLightSpecular;
@@ -26,6 +28,31 @@ uniform float uFar;
 uniform float uTimeOffset;
 
 out vec4 outputColor;
+
+const float PCF_COUNT = 2.0;
+const float PCF_SAMLE_SIZE = 1.0;
+
+float getShadowFactor() {
+    if(shadowCoords.z > 1.0) {
+        return 1.0;
+    }
+
+    float totalTexels = (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE) * (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE);
+    float texelSize = 1.0 / 4095.0;
+    float total = 0.0;
+
+    for(float x = -PCF_COUNT; x <= PCF_COUNT; x += PCF_SAMLE_SIZE) {
+        for(float y = -PCF_COUNT; y <= PCF_COUNT; y += PCF_SAMLE_SIZE) {
+            float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + vec2(x, y) * texelSize, shadowCoords.z));
+            if(shadowCoords.z > nearestLight) {
+                total += 0.3;
+            }
+        }
+    }
+
+    total /= totalTexels;
+    return 1.0 - (total * shadowCoords.w);
+}
 
 vec3 calculateLight(float waterDepth) {
     vec3 nm1 = texture(uNormalMap, vec2(texCoord.x + uTimeOffset, texCoord.y) / waveScale).rgb;
@@ -66,6 +93,5 @@ void main() {
     vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb;
     vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 35.0 + 0.3, 0.0, 1.0)) + calculateLight(waterDepth);
 
-    outputColor = vec4(waterColor, clamp(waterDepth, 0.0, 1.0));
-
+    outputColor = vec4(waterColor * getShadowFactor(), clamp(waterDepth, 0.0, 1.0));
 }

@@ -18,6 +18,10 @@ namespace Larx.Water
         public int NormalMap { get; private set; }
         public int DuDvMap { get; private set; }
         public int TimeOffset { get; private set; }
+        public int ShadowMap { get; private set; }
+        public int ShadowMatrix { get; private set; }
+        public int ShadowDistance { get; private set; }
+        public int EnableShadows { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -30,6 +34,10 @@ namespace Larx.Water
             NormalMap = GL.GetUniformLocation(Program, "uNormalMap");
             DuDvMap = GL.GetUniformLocation(Program, "uDuDvMap");
             TimeOffset = GL.GetUniformLocation(Program, "uTimeOffset");
+            ShadowMap = GL.GetUniformLocation(Program, "uShadowMap");
+            ShadowMatrix = GL.GetUniformLocation(Program, "uShadowMatrix");
+            ShadowDistance = GL.GetUniformLocation(Program, "uShadowDistance");
+            EnableShadows = GL.GetUniformLocation(Program, "uEnableShadows");
         }
     }
 }

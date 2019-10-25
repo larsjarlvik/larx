@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Larx.Buffers;
+using Larx.Shadows;
 using Larx.Storage;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -71,7 +72,7 @@ namespace Larx.Water
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
         }
 
-        public void Render(Camera camera, Light light)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -104,6 +105,17 @@ namespace Larx.Water
             GL.ActiveTexture(TextureUnit.Texture4);
             GL.BindTexture(TextureTarget.Texture2D, normalMap.TextureId);
             GL.Uniform1(shader.NormalMap, 4);
+
+            if (shadows != null) {
+                GL.ActiveTexture(TextureUnit.Texture5);
+                GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
+                GL.Uniform1(shader.ShadowMap, 5);
+                GL.Uniform1(shader.ShadowDistance, ShadowRenderer.ShadowDistance);
+                GL.Uniform1(shader.EnableShadows, 1);
+                GL.UniformMatrix4(shader.ShadowMatrix, false, ref shadows.ShadowMatrix);
+            } else {
+                GL.Uniform1(shader.EnableShadows, 0);
+            }
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
