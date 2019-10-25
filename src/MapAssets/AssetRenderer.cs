@@ -30,6 +30,7 @@ namespace Larx.MapAssets
 
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);
+            shader.ApplyShadows(shadows);
 
             foreach(var mesh in model.Meshes)
             {
@@ -45,17 +46,6 @@ namespace Larx.MapAssets
                 GL.ActiveTexture(TextureUnit.Texture1);
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.NormalTexture.TextureId);
                 GL.Uniform1(shader.NormalTexture, 1);
-
-                if (shadows != null) {
-                    GL.ActiveTexture(TextureUnit.Texture2);
-                    GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
-                    GL.Uniform1(shader.ShadowMap, 2);
-                    GL.Uniform1(shader.ShadowDistance, ShadowRenderer.ShadowDistance);
-                    GL.Uniform1(shader.EnableShadows, 1);
-                    GL.UniformMatrix4(shader.ShadowMatrix, false, ref shadows.ShadowMatrix);
-                } else {
-                    GL.Uniform1(shader.EnableShadows, 0);
-                }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.VertexBuffer);
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);

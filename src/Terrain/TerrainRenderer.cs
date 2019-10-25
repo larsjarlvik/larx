@@ -287,19 +287,9 @@ namespace Larx.Terrain
             GL.BindTexture(TextureTarget.Texture2D, textureNoise.Texture);
             GL.Uniform1(shader.TextureNoise, 2);
 
-            if (shadows != null) {
-                GL.ActiveTexture(TextureUnit.Texture3);
-                GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
-                GL.Uniform1(shader.ShadowMap, 3);
-                GL.Uniform1(shader.ShadowDistance, ShadowRenderer.ShadowDistance);
-                GL.Uniform1(shader.EnableShadows, 1);
-                GL.UniformMatrix4(shader.ShadowMatrix, false, ref shadows.ShadowMatrix);
-            } else {
-                GL.Uniform1(shader.EnableShadows, 0);
-            }
-
             camera.ApplyCamera(shader);
             light.ApplyLight(shader);
+            shader.ApplyShadows(shadows);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);

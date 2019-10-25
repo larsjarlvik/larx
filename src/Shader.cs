@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Larx.Shadows;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -9,6 +10,11 @@ namespace Larx
 {
     public class Shader
     {
+        private int shadowMap;
+        private int shadowMatrix;
+        private int shadowDistance;
+        private int enableShadows;
+
         public int Program { get; }
         public int ProjectionMatrix { get; private set; }
         public int ViewMatrix { get; private set; }
@@ -53,6 +59,14 @@ namespace Larx
             LightSpecular = GL.GetUniformLocation(Program, "uLightSpecular");
         }
 
+        protected void SetShadowUniformLocations()
+        {
+            shadowMap = GL.GetUniformLocation(Program, "uShadowMap");
+            shadowMatrix = GL.GetUniformLocation(Program, "uShadowMatrix");
+            shadowDistance = GL.GetUniformLocation(Program, "uShadowDistance");
+            enableShadows = GL.GetUniformLocation(Program, "uEnableShadows");
+        }
+
         private void checkCompileStatus(string shaderName, int shader)
         {
             int compileStatus;
@@ -60,6 +74,20 @@ namespace Larx
             GL.GetShader(shader, ShaderParameter.CompileStatus, out compileStatus);
             if (compileStatus != 1)
                 throw new Exception($"Filed to Compiler {shaderName}: {GL.GetShaderInfoLog(shader)}");
+        }
+
+        public void ApplyShadows(ShadowRenderer shadows)
+        {
+            if (shadows != null) {
+                GL.ActiveTexture(TextureUnit.Texture9);
+                GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
+                GL.Uniform1(shadowMap, 9);
+                GL.Uniform1(shadowDistance, ShadowRenderer.ShadowDistance);
+                GL.Uniform1(enableShadows, 1);
+                GL.UniformMatrix4(shadowMatrix, false, ref shadows.ShadowMatrix);
+            } else {
+                GL.Uniform1(enableShadows, 0);
+            }
         }
     }
 }
