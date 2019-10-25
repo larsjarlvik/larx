@@ -11,7 +11,7 @@ namespace Larx
         public const float RotationDeceleration = 0.1f;
         public const float DistanceDeceleration = 4.0f;
 
-        private float cameraDistance = 40.0f;
+        public float Distance = 40.0f;
         private float cameraDistanceSpeed = 0.0f;
         public Vector3 Look;
         public Vector2 Rotation;
@@ -21,8 +21,6 @@ namespace Larx
 
         public Matrix4 ProjectionMatrix;
         public Matrix4 ViewMatrix;
-
-
 
         public Camera()
         {
@@ -74,7 +72,7 @@ namespace Larx
 
         private void zoom(float frameTime)
         {
-            cameraDistance += cameraDistanceSpeed;
+            Distance += cameraDistanceSpeed;
             cameraDistanceSpeed /= (frameTime * DistanceDeceleration) + 1.0f;
         }
 
@@ -99,9 +97,9 @@ namespace Larx
             var ry = MathLarx.DegToRad(Rotation.Y);
 
             Position = new Vector3(
-                Look.X - (MathF.Sin(rx) * MathF.Cos(ry) * cameraDistance),
-                cameraDistance * MathF.Sin(ry),
-                Look.Z - (MathF.Cos(rx) * MathF.Cos(ry) * cameraDistance)
+                Look.X - (MathF.Sin(rx) * MathF.Cos(ry) * Distance),
+                Distance * MathF.Sin(ry),
+                Look.Z - (MathF.Cos(rx) * MathF.Cos(ry) * Distance)
             );
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, State.Near, State.Far);

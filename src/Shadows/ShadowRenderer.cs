@@ -8,7 +8,7 @@ namespace Larx.Shadows
     public class ShadowRenderer
     {
         public readonly Framebuffer ShadowBuffer;
-        public const float ShadowDistance = 250.0f;
+        public float ShadowDistance = 250.0f;
         private Vector3 min;
         private Vector3 max;
 
@@ -18,11 +18,12 @@ namespace Larx.Shadows
 
         public ShadowRenderer()
         {
-            ShadowBuffer = new Framebuffer(new Size(4096, 4096), false, true);
+            ShadowBuffer = new Framebuffer(new Size(State.ShadowMapResolution, State.ShadowMapResolution), false, true);
         }
 
         public void Update(Camera camera, Light light)
         {
+            ShadowDistance = camera.Distance * 3.0f + 20.0f;
             var points = new Vector3[8];
             points[0] = camera.GetPoint(new Vector3(-1.0f, -1.0f, State.Near));
             points[1] = camera.GetPoint(new Vector3(-1.0f, -1.0f, ShadowDistance));

@@ -78,8 +78,15 @@ namespace Larx.MapAssets
 
             foreach(var mesh in model.Meshes)
             {
+                GL.ActiveTexture(TextureUnit.Texture0);
+                GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
+                GL.Uniform1(shadowShader.BaseColorTexture, 0);
+
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.VertexBuffer);
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.TexCoordBuffer);
+                GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
                 GL.DrawElements(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);

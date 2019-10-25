@@ -98,7 +98,7 @@ namespace Larx
                 GL.ActiveTexture(TextureUnit.Texture9);
                 GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
                 GL.Uniform1(shadowMap, 9);
-                GL.Uniform1(shadowDistance, ShadowRenderer.ShadowDistance);
+                GL.Uniform1(shadowDistance, shadows.ShadowDistance);
                 GL.Uniform1(enableShadows, 1);
                 GL.UniformMatrix4(shadowMatrix, false, ref shadows.ShadowMatrix);
             } else {
