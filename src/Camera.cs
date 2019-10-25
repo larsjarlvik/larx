@@ -108,13 +108,6 @@ namespace Larx
             ViewMatrix = Matrix4.LookAt(Position, Look, new Vector3(0, 1, 0));
         }
 
-        public void ApplyCamera(Shader shader)
-        {
-            GL.UniformMatrix4(shader.ViewMatrix, false, ref ViewMatrix);
-            GL.UniformMatrix4(shader.ProjectionMatrix, false, ref ProjectionMatrix);
-            GL.Uniform3(shader.CameraPosition, Position);
-        }
-
         public Vector3 GetPoint(Vector3 pos)
         {
             var clipCoords = new Vector4(pos.X, pos.Y, -1f, 1f);

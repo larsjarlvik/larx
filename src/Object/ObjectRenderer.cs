@@ -61,7 +61,7 @@ namespace Larx.Object
 
             GL.Uniform3(shader.Position, position.X, position.Y, position.Z);
 
-            camera.ApplyCamera(shader);
+            shader.ApplyCamera(camera);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);

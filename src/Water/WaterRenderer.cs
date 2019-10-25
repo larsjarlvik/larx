@@ -79,8 +79,8 @@ namespace Larx.Water
 
             GL.UseProgram(shader.Program);
 
-            camera.ApplyCamera(shader);
-            light.ApplyLight(shader);
+            shader.ApplyCamera(camera);
+            shader.ApplyLight(light);
             shader.ApplyShadows(shadows);
 
             GL.Uniform1(shader.Near, State.Near);

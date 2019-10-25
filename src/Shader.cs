@@ -76,6 +76,22 @@ namespace Larx
                 throw new Exception($"Filed to Compiler {shaderName}: {GL.GetShaderInfoLog(shader)}");
         }
 
+        public void ApplyCamera(Camera camera)
+        {
+            GL.UniformMatrix4(ViewMatrix, false, ref camera.ViewMatrix);
+            GL.UniformMatrix4(ProjectionMatrix, false, ref camera.ProjectionMatrix);
+            GL.Uniform3(CameraPosition, camera.Position);
+        }
+
+
+        public void ApplyLight(Light light)
+        {
+            GL.Uniform3(LightDirection, light.Direction);
+            GL.Uniform3(LightAmbient, light.Ambient);
+            GL.Uniform3(LightDiffuse, light.Diffuse);
+            GL.Uniform3(LightSpecular, light.Specular);
+        }
+
         public void ApplyShadows(ShadowRenderer shadows)
         {
             if (shadows != null) {

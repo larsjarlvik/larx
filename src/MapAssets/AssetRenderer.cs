@@ -28,8 +28,8 @@ namespace Larx.MapAssets
             GL.Uniform3(shader.Position, position);
             GL.Uniform1(shader.Rotation, rotation);
 
-            camera.ApplyCamera(shader);
-            light.ApplyLight(shader);
+            shader.ApplyCamera(camera);
+            shader.ApplyLight(light);
             shader.ApplyShadows(shadows);
 
             foreach(var mesh in model.Meshes)

@@ -287,8 +287,8 @@ namespace Larx.Terrain
             GL.BindTexture(TextureTarget.Texture2D, textureNoise.Texture);
             GL.Uniform1(shader.TextureNoise, 2);
 
-            camera.ApplyCamera(shader);
-            light.ApplyLight(shader);
+            shader.ApplyCamera(camera);
+            shader.ApplyLight(light);
             shader.ApplyShadows(shadows);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);

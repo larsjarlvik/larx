@@ -92,6 +92,7 @@ namespace Larx
             if (State.Keyboard.Key[Key.Right]) light.Rotation.X -= 0.01f;
 
             camera.Update((float)e.Time);
+            light.Update();
             terrain.Update();
             shadows.Update(camera, light);
 
