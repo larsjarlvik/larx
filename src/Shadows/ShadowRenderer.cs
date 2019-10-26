@@ -56,11 +56,16 @@ namespace Larx.Shadows
                 min.Z = MathF.Min(min.Z, point.Z);
             }
 
-            max *= 1.25f;
-            min *= 1.25f;
+            min = Vector3.Subtract(min, new Vector3(20.0f));
+            max = Vector3.Add(max, new Vector3(20.0f));
 
             ViewMatrix = Matrix4.LookAt(camera.Look - light.Direction, camera.Look, new Vector3(0.0f, 1.0f, 0.0f));
-            ProjectionMatrix = Matrix4.CreateOrthographic((max.X - min.X), (max.Y - min.Y), min.Z, max.Z);
+            ProjectionMatrix = Matrix4.Identity;
+            ProjectionMatrix.M11 = 2.0f / (max.X - min.X);
+            ProjectionMatrix.M22 = 2.0f / (max.Y - min.Y);
+            ProjectionMatrix.M33 = -2.0f / (max.Z - min.Z);
+            ProjectionMatrix.M44 = 1.0f;
+
             ShadowMatrix = ViewMatrix * ProjectionMatrix *
                 Matrix4.CreateScale(new Vector3(0.5f)) *
                 Matrix4.CreateTranslation(new Vector3(0.5f));

@@ -21,10 +21,9 @@ out vec2 texCoord;
 out vec3 normal;
 out vec4 shadowCoords;
 
-void setShadowCoords(vec4 position, float distance) {
+void setShadowCoords(vec4 position) {
     if (uEnableShadows == 1) {
-        float fade = distance - (uShadowDistance - 10.0);
-        fade = fade / 10.0;
+        float fade = (length(gl_Position) - uShadowDistance - 10.0) / 10.0;
         shadowCoords = uShadowMatrix * position;
         shadowCoords.w = clamp(1.0 - fade, 0.0, 1.0);
     }
@@ -53,6 +52,6 @@ void main() {
     lightVector = tangentSpace * -uLightDirection;
     eyeVector = tangentSpace * -(uCameraPosition - position.xyz);
 
-    setShadowCoords(position, length(gl_Position));
+    setShadowCoords(position);
     gl_Position = uProjectionMatrix * worldPosition;
 }

@@ -4,14 +4,12 @@ precision highp float;
 uniform sampler2DArray uTexture;
 uniform sampler2DArray uSplatMap;
 uniform sampler2D uTextureNoise;
-uniform sampler2DShadow uShadowMap;
 
 in vec3 position;
 in vec2 texCoord;
 in vec3 normal;
 in vec3 lightVector;
 in vec3 eyeVector;
-in vec4 shadowCoords;
 
 out vec4 outputColor;
 
@@ -26,30 +24,7 @@ uniform int uShowOverlays;
 uniform vec3 uMousePosition;
 uniform float uSelectionSize;
 
-const float PCF_COUNT = 2.0;
-const float PCF_SAMLE_SIZE = 1.0;
-
-float getShadowFactor() {
-    if(shadowCoords.z > 1.0) {
-        return 1.0;
-    }
-
-    float totalTexels = (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE) * (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE);
-    float texelSize = 1.0 / 4095.0;
-    float total = 0.0;
-
-    for(float x = -PCF_COUNT; x <= PCF_COUNT; x += PCF_SAMLE_SIZE) {
-        for(float y = -PCF_COUNT; y <= PCF_COUNT; y += PCF_SAMLE_SIZE) {
-            float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + vec2(x, y) * texelSize, shadowCoords.z));
-            if(shadowCoords.z > nearestLight) {
-                total += 0.3;
-            }
-        }
-    }
-
-    total /= totalTexels;
-    return 1.0 - (total * shadowCoords.w);
-}
+#include shadow-factor
 
 vec3 getTriPlanarTexture(int textureId) {
     vec3 n = normalize(normal);

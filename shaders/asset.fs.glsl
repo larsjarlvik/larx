@@ -4,6 +4,7 @@ uniform vec3 uLightAmbient;
 uniform vec3 uLightDiffuse;
 uniform vec3 uLightSpecular;
 uniform float uRoughness;
+uniform int uEnableShadows;
 
 uniform sampler2D uBaseColorTexture;
 uniform sampler2D uNormalTexture;
@@ -19,20 +20,19 @@ out vec4 outputColor;
 
 const float PCF_COUNT = 2.0;
 const float PCF_SAMLE_SIZE = 1.0;
-
 float getShadowFactor() {
-    if(shadowCoords.z > 1.0) {
+    if(shadowCoords.z > 1.0 || uEnableShadows != 1.0) {
         return 1.0;
     }
 
     float totalTexels = (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE) * (PCF_COUNT * 2.0 + PCF_SAMLE_SIZE);
-    float texelSize = 1.0 / 4095.0;
+    float texelSize = 1.0 / 4096.0;
     float total = 0.0;
 
     for(float x = -PCF_COUNT; x <= PCF_COUNT; x += PCF_SAMLE_SIZE) {
         for(float y = -PCF_COUNT; y <= PCF_COUNT; y += PCF_SAMLE_SIZE) {
             float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + vec2(x, y) * texelSize, shadowCoords.z));
-            if(shadowCoords.z > nearestLight) {
+            if(shadowCoords.z - 0.001 > nearestLight) {
                 total += 0.3;
             }
         }

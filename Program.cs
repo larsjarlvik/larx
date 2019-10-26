@@ -159,7 +159,7 @@ namespace Larx
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
             ui.Render();
-            // water.ReflectionBuffer.DrawColorBuffer();
+            shadows.ShadowBuffer.DrawDepthBuffer();
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -177,7 +177,7 @@ namespace Larx
             water.ReflectionBuffer.Size = State.Window.Size;
             water.ReflectionBuffer.RefreshBuffers();
 
-            // shadows.ShadowBuffer.RefreshBuffers();
+            shadows.ShadowBuffer.RefreshBuffers();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
