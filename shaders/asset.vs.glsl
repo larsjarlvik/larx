@@ -9,25 +9,12 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 uniform vec3 uPosition;
 uniform float uRotation;
-uniform vec3 uCameraPosition;
-uniform vec3 uLightDirection;
-uniform mat4 uShadowMatrix;
-uniform float uShadowDistance;
-uniform int uEnableShadows;
 
-out vec3 lightVector;
-out vec3 eyeVector;
 out vec2 texCoord;
 out vec3 normal;
-out vec4 shadowCoords;
 
-void setShadowCoords(vec4 position) {
-    if (uEnableShadows == 1) {
-        float fade = (length(gl_Position) - uShadowDistance - 10.0) / 10.0;
-        shadowCoords = uShadowMatrix * position;
-        shadowCoords.w = clamp(1.0 - fade, 0.0, 1.0);
-    }
-}
+#include shadow-coords
+#include calculate-light-vectors
 
 mat3 rotationYMatrix(float a) {
     return mat3(cos(a), 0, sin(a), 0, 1, 0, -sin(a), 0, cos(a));
@@ -36,22 +23,13 @@ mat3 rotationYMatrix(float a) {
 void main() {
     mat3 rotation = rotationYMatrix(uRotation);
     vec4 position = vec4(vPosition * rotation + uPosition, 1.0);
-
     vec4 worldPosition = uViewMatrix * position;
 
     normal = vNormal;
     texCoord = vTexCoord;
 
-    vec3 tangent = vTangent.xyz;
-    vec3 biTangent = normalize(cross(normal, tangent));
-    mat3 tangentSpace = mat3(
-        tangent.x, biTangent.x, normal.x,
-        tangent.y, biTangent.y, normal.y,
-        tangent.z, biTangent.z, normal.z
-    ) * rotation;
-    lightVector = tangentSpace * -uLightDirection;
-    eyeVector = tangentSpace * -(uCameraPosition - position.xyz);
-
+    calculateLightVectors(normal, vTangent.xyz, position.xyz, rotation);
     setShadowCoords(position);
+
     gl_Position = uProjectionMatrix * worldPosition;
 }

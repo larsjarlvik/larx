@@ -1,10 +1,8 @@
 using System;
 using System.IO;
+using System.Text;
 using Larx.Shadows;
-using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 namespace Larx
 {
@@ -24,16 +22,36 @@ namespace Larx
         public int LightDiffuse { get; private set; }
         public int LightSpecular { get; private set; }
 
+        private string prepareShader(string name)
+        {
+            var contents = File.ReadLines(Path.Combine("shaders", name));
+            var finalShader = new StringBuilder();
+
+            foreach(var line in contents)
+            {
+                if (line.StartsWith("#include")) {
+                    var includeName = line.Split(' ')[1];
+                    var include = File.ReadAllText(Path.Combine("shaders", "includes", $"{includeName}.glsl"));
+                    finalShader.AppendLine(include);
+                    continue;
+                }
+
+                finalShader.AppendLine(line);
+            }
+
+            return finalShader.ToString();
+        }
+
         public Shader(string name)
         {
             var vertexShader = GL.CreateShader(ShaderType.VertexShader);
             var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
 
-            GL.ShaderSource(vertexShader, System.IO.File.ReadAllText(Path.Combine("shaders", $"{name}.vs.glsl")));
+            GL.ShaderSource(vertexShader, prepareShader($"{name}.vs.glsl"));
             GL.CompileShader(vertexShader);
             checkCompileStatus($"Vertex Shader: {name}", vertexShader);
 
-            GL.ShaderSource(fragmentShader, System.IO.File.ReadAllText(Path.Combine("shaders", $"{name}.fs.glsl")));
+            GL.ShaderSource(fragmentShader, prepareShader($"{name}.fs.glsl"));
             GL.CompileShader(fragmentShader);
             checkCompileStatus($"Fragment Shader: {name}", fragmentShader);
 

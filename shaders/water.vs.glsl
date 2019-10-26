@@ -5,26 +5,13 @@ layout(location = 1) in vec2 vTexCoord;
 
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
-uniform vec3 uCameraPosition;
-uniform vec3 uLightDirection;
-uniform mat4 uShadowMatrix;
-uniform float uShadowDistance;
-uniform int uEnableShadows;
 
 out vec4 clipSpace;
-out vec3 lightVector;
-out vec3 eyeVector;
 out vec2 texCoord;
 out vec3 position;
-out vec4 shadowCoords;
 
-void setShadowCoords(vec4 position) {
-    if (uEnableShadows == 1) {
-        float fade = (length(gl_Position) - uShadowDistance - 10.0) / 10.0;
-        shadowCoords = uShadowMatrix * position;
-        shadowCoords.w = clamp(1.0 - fade, 0.0, 1.0);
-    }
-}
+#include shadow-coords
+#include calculate-light-vectors
 
 void main() {
     vec4 worldPosition = uViewMatrix * vec4(vPosition, 1.0);
@@ -35,16 +22,9 @@ void main() {
 
     vec3 normal = normalize(vec3(0, 1, 0));
     vec3 tangent = normalize((uViewMatrix * vec4(1, 0, 0, 0)).xyz);
-    vec3 biTangent = normalize(cross(normal, tangent));
-    mat3 toTangentSpace = mat3(
-        tangent.x, biTangent.x, normal.x,
-        tangent.y, biTangent.y, normal.y,
-        tangent.z, biTangent.z, normal.z
-    );
 
-    lightVector = toTangentSpace * -uLightDirection;
-    eyeVector = toTangentSpace * -(uCameraPosition - position);
-
+    calculateLightVectors(normal, tangent, position.xyz);
     setShadowCoords(vec4(position, 1.0));
+
     gl_Position = clipSpace;
 }
