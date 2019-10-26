@@ -10,7 +10,6 @@ namespace Larx
     {
         private int shadowMap;
         private int shadowMatrix;
-        private int shadowDistance;
         private int enableShadows;
 
         public int Program { get; }
@@ -81,7 +80,6 @@ namespace Larx
         {
             shadowMap = GL.GetUniformLocation(Program, "uShadowMap");
             shadowMatrix = GL.GetUniformLocation(Program, "uShadowMatrix");
-            shadowDistance = GL.GetUniformLocation(Program, "uShadowDistance");
             enableShadows = GL.GetUniformLocation(Program, "uEnableShadows");
         }
 
@@ -116,7 +114,6 @@ namespace Larx
                 GL.ActiveTexture(TextureUnit.Texture9);
                 GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
                 GL.Uniform1(shadowMap, 9);
-                GL.Uniform1(shadowDistance, shadows.ShadowDistance);
                 GL.Uniform1(enableShadows, 1);
                 GL.UniformMatrix4(shadowMatrix, false, ref shadows.ShadowMatrix);
             } else {
