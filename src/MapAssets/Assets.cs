@@ -7,22 +7,21 @@ using Larx.Terrain;
 using Larx.UserInterFace;
 using Larx.Utils;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace Larx.MapAssets
 {
-    public class Assets
+    public class Assets : AssetRenderer
     {
         private readonly string[] assets = new string[] {
             "tree",
         };
-        private readonly AssetRenderer assetRenderer;
         private readonly Dictionary<string, Model> models;
         private readonly Random random;
 
 
         public Assets(Ui ui)
         {
-            assetRenderer = new AssetRenderer();
             models = new Dictionary<string, Model>();
             random = new Random();
 
@@ -44,17 +43,34 @@ namespace Larx.MapAssets
 
         public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain)
         {
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
+
+            GL.UseProgram(shader.Program);
+
+            shader.ApplyCamera(camera);
+            shader.ApplyLight(light);
+            shader.ApplyShadows(shadows);
+
             foreach(var asset in Map.MapData.Assets)
             {
-                assetRenderer.Render(camera, light, shadows, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                Render(camera, light, shadows, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
             }
         }
 
         public void RenderShadowMap(Matrix4 projectionMatrix, Matrix4 viewMatrix, TerrainRenderer terrain)
         {
+            GL.EnableVertexAttribArray(0);
+            GL.UseProgram(shadowShader.Program);
+
+            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref viewMatrix);
+            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref projectionMatrix);
+
             foreach(var asset in Map.MapData.Assets)
             {
-                assetRenderer.RenderShadowMap(projectionMatrix, viewMatrix, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                RenderShadowMap(projectionMatrix, viewMatrix, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
             }
         }
     }

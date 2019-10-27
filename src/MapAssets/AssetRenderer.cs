@@ -6,46 +6,36 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Larx.MapAssets
 {
-    public class AssetRenderer
+    public partial class AssetRenderer
     {
-        private readonly AssetShader shader;
-        private readonly ShadowShader shadowShader;
+        protected readonly AssetShader Shader;
+        protected readonly ShadowShader ShadowShader;
 
         public AssetRenderer()
         {
-            shader = new AssetShader();
-            shadowShader = new ShadowShader();
+            Shader = new AssetShader();
+            ShadowShader = new ShadowShader();
         }
 
         public void Render(Camera camera, Light light, ShadowRenderer shadows, Model model, Vector3 position, float rotation)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.EnableVertexAttribArray(2);
-            GL.EnableVertexAttribArray(3);
-
-            GL.UseProgram(shader.Program);
-            GL.Uniform3(shader.Position, position);
-            GL.Uniform1(shader.Rotation, rotation);
-
-            shader.ApplyCamera(camera);
-            shader.ApplyLight(light);
-            shader.ApplyShadows(shadows);
+            GL.Uniform3(Shader.Position, position);
+            GL.Uniform1(Shader.Rotation, rotation);
 
             foreach(var mesh in model.Meshes)
             {
                 if (mesh.Material.DoubleSided) GL.Disable(EnableCap.CullFace);
                 else GL.Enable(EnableCap.CullFace);
 
-                GL.Uniform1(shader.Roughness, mesh.Material.Roughness);
+                GL.Uniform1(Shader.Roughness, mesh.Material.Roughness);
 
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
-                GL.Uniform1(shader.BaseColorTexture, 0);
+                GL.Uniform1(Shader.BaseColorTexture, 0);
 
                 GL.ActiveTexture(TextureUnit.Texture1);
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.NormalTexture.TextureId);
-                GL.Uniform1(shader.NormalTexture, 1);
+                GL.Uniform1(Shader.NormalTexture, 1);
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.VertexBuffer);
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
@@ -68,19 +58,14 @@ namespace Larx.MapAssets
 
         public void RenderShadowMap(Matrix4 projectionMatrix, Matrix4 viewMatrix, Model model, Vector3 position, float rotation)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.UseProgram(shadowShader.Program);
-
-            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref viewMatrix);
-            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref projectionMatrix);
-            GL.Uniform3(shadowShader.Position, position);
-            GL.Uniform1(shadowShader.Rotation, rotation);
+            GL.Uniform3(ShadowShader.Position, position);
+            GL.Uniform1(ShadowShader.Rotation, rotation);
 
             foreach(var mesh in model.Meshes)
             {
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
-                GL.Uniform1(shadowShader.BaseColorTexture, 0);
+                GL.Uniform1(ShadowShader.BaseColorTexture, 0);
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.VertexBuffer);
                 GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
