@@ -11,7 +11,7 @@ namespace Larx
         public const float RotationDeceleration = 0.1f;
         public const float DistanceDeceleration = 4.0f;
 
-        private float cameraDistance = 40.0f;
+        public float Distance = 40.0f;
         private float cameraDistanceSpeed = 0.0f;
         public Vector3 Look;
         public Vector2 Rotation;
@@ -21,8 +21,6 @@ namespace Larx
 
         public Matrix4 ProjectionMatrix;
         public Matrix4 ViewMatrix;
-
-
 
         public Camera()
         {
@@ -74,7 +72,7 @@ namespace Larx
 
         private void zoom(float frameTime)
         {
-            cameraDistance += cameraDistanceSpeed;
+            Distance += cameraDistanceSpeed;
             cameraDistanceSpeed /= (frameTime * DistanceDeceleration) + 1.0f;
         }
 
@@ -99,20 +97,25 @@ namespace Larx
             var ry = MathLarx.DegToRad(Rotation.Y);
 
             Position = new Vector3(
-                Look.X - (MathF.Sin(rx) * MathF.Cos(ry) * cameraDistance),
-                cameraDistance * MathF.Sin(ry),
-                Look.Z - (MathF.Cos(rx) * MathF.Cos(ry) * cameraDistance)
+                Look.X - (MathF.Sin(rx) * MathF.Cos(ry) * Distance),
+                Distance * MathF.Sin(ry),
+                Look.Z - (MathF.Cos(rx) * MathF.Cos(ry) * Distance)
             );
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, State.Near, State.Far);
             ViewMatrix = Matrix4.LookAt(Position, Look, new Vector3(0, 1, 0));
         }
 
-        public void ApplyCamera(Shader shader)
+        public Vector3 GetPoint(Vector3 pos)
         {
-            GL.UniformMatrix4(shader.ViewMatrix, false, ref ViewMatrix);
-            GL.UniformMatrix4(shader.ProjectionMatrix, false, ref ProjectionMatrix);
-            GL.Uniform3(shader.CameraPosition, Position);
+            var clipCoords = new Vector4(pos.X, pos.Y, -1f, 1f);
+            var eyeCoords = Vector4.Transform(clipCoords, Matrix4.Invert(ProjectionMatrix));
+            var trimmedEyeCoords = new Vector4(eyeCoords.X, eyeCoords.Y, -1, 0);
+
+            var worldCoords = Vector4.Transform(trimmedEyeCoords, Matrix4.Invert(ViewMatrix)).Normalized();
+            var ray = worldCoords.Normalized().Xyz;
+
+            return Vector3.Add(Position, ray * pos.Z);
         }
     }
 }

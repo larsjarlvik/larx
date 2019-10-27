@@ -19,6 +19,7 @@ namespace Larx.Terrain
         protected override void SetUniformsLocations()
         {
             base.SetUniformsLocations();
+            base.SetShadowUniformLocations();
 
             Texture = GL.GetUniformLocation(Program, "uTexture");
             GridLines = GL.GetUniformLocation(Program, "uGridLines");
@@ -30,6 +31,6 @@ namespace Larx.Terrain
             SelectionSize = GL.GetUniformLocation(Program, "uSelectionSize");
             ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
             ShowOverlays = GL.GetUniformLocation(Program, "uShowOverlays");
-        }
+         }
     }
 }

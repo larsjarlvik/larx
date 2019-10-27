@@ -11,6 +11,8 @@ using Larx.Water;
 using Larx.MapAssets;
 using Larx.Sky;
 using Larx.Storage;
+using Larx.Shadows;
+using Larx.Buffers;
 
 namespace Larx
 {
@@ -22,9 +24,9 @@ namespace Larx
         private ObjectRenderer debug;
         private TerrainRenderer terrain;
         private WaterRenderer water;
-        private MousePicker mousePicker;
         private SkyRenderer sky;
         private Assets assets;
+        private ShadowRenderer shadows;
         private Ui ui;
 
         public Program() : base(
@@ -56,14 +58,14 @@ namespace Larx
 
             Map.New(256);
             ui = new Ui();
-            terrain = new TerrainRenderer();
-            water = new WaterRenderer();
             debug = new ObjectRenderer();
             camera = new Camera();
+            terrain = new TerrainRenderer(camera);
+            water = new WaterRenderer();
             light = new Light();
             assets = new Assets(ui);
-            mousePicker = new MousePicker(camera);
             sky = new SkyRenderer();
+            shadows = new ShadowRenderer();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -90,15 +92,16 @@ namespace Larx
             if (State.Keyboard.Key[Key.Right]) light.Rotation.X -= 0.01f;
 
             camera.Update((float)e.Time);
-            mousePicker.Update();
-            terrain.Update(mousePicker);
+            light.Update();
+            terrain.Update();
+            shadows.Update(camera, light);
 
             if (!uiIntersect) {
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Terrain:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f, mousePicker);
-                        if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f, mousePicker);
+                        if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f);
+                        if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f);
                         break;
                     case TopMenu.Paint:
                         if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
@@ -117,20 +120,25 @@ namespace Larx
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
+            // Shadow rendering
+            shadows.ShadowBuffer.Bind();
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+            assets.RenderShadowMap(shadows, terrain);
+            terrain.RenderShadowMap(shadows);
+
             // Water refraction rendering
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Render(camera, light, true, ClipPlane.ClipTop);
+            terrain.Render(camera, light, null, true, ClipPlane.ClipTop);
 
             // Water reflection rendering
             camera.InvertY();
             water.ReflectionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Render(camera, light, true, ClipPlane.ClipBottom);
+            assets.Render(camera, light, null, terrain);
+            terrain.Render(camera, light, null, false, ClipPlane.ClipBottom);
             sky.Render(camera, light);
             GL.Disable(EnableCap.ClipDistance0);
-
-            assets.Render(camera, light, terrain);
             camera.Reset();
 
             // Main rendering
@@ -138,9 +146,9 @@ namespace Larx
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            terrain.Render(camera, light, true, ClipPlane.ClipBottom);
-            assets.Render(camera, light, terrain);
-            water.Render(camera, light);
+            terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
+            assets.Render(camera, light, shadows, terrain);
+            water.Render(camera, light, shadows);
             sky.Render(camera, light);
 
             // Draw to screen
@@ -152,7 +160,7 @@ namespace Larx
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
             ui.Render();
-            // water.ReflectionBuffer.Draw(new Point(State.Window.Size.Width - 330, State.Window.Size.Height - 190), new Size(320, 180));
+            // shadows.ShadowBuffer.DrawDepthBuffer();
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -169,6 +177,8 @@ namespace Larx
 
             water.ReflectionBuffer.Size = State.Window.Size;
             water.ReflectionBuffer.RefreshBuffers();
+
+            shadows.ShadowBuffer.RefreshBuffers();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -181,7 +191,7 @@ namespace Larx
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Assets:
-                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition(mousePicker).Xz, terrain);
+                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition().Xz, terrain);
                         break;
                 }
             }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Larx.Shadows;
 using Larx.Storage;
 using Larx.Utils;
 using OpenTK;
@@ -34,6 +35,7 @@ namespace Larx.Terrain
         private readonly SplatMap splatMap;
         private readonly TextureNoise textureNoise;
         private readonly TerrainShader shader;
+        private readonly ShadowShader shadowShader;
         private readonly Texture texture;
         public readonly TerrainPicker Picker;
 
@@ -58,12 +60,13 @@ namespace Larx.Terrain
             };
         }
 
-        public TerrainRenderer()
+        public TerrainRenderer(Camera camera)
         {
             shader = new TerrainShader();
+            shadowShader = new ShadowShader();
             splatMap = new SplatMap();
             textureNoise = new TextureNoise(12312234);
-            Picker = new TerrainPicker(this);
+            Picker = new TerrainPicker(this, camera);
             texture = new Texture();
 
             loadTextures(Textures);
@@ -81,7 +84,7 @@ namespace Larx.Terrain
             texture.LoadTexture(paths.ToArray(), true);
         }
 
-        public void ChangeElevation(float offset, MousePicker picker)
+        public void ChangeElevation(float offset)
         {
             var toUpdate = getTilesInArea(MousePosition, State.SelectionCircleRadius);
 
@@ -252,12 +255,12 @@ namespace Larx.Terrain
             GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
         }
 
-        public void Update(MousePicker mouse)
+        public void Update()
         {
-            MousePosition = Picker.GetPosition(mouse);
+            MousePosition = Picker.GetPosition();
         }
 
-        public void Render(Camera camera, Light light, bool showOverlays, ClipPlane clip = ClipPlane.None)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows, bool showOverlays, ClipPlane clip = ClipPlane.None)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -286,8 +289,9 @@ namespace Larx.Terrain
             GL.BindTexture(TextureTarget.Texture2D, textureNoise.Texture);
             GL.Uniform1(shader.TextureNoise, 2);
 
-            camera.ApplyCamera(shader);
-            light.ApplyLight(shader);
+            shader.ApplyCamera(camera);
+            shader.ApplyLight(light);
+            shader.ApplyShadows(shadows);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
@@ -305,6 +309,21 @@ namespace Larx.Terrain
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             GL.ActiveTexture(TextureUnit.Texture0);
+        }
+
+        public void RenderShadowMap(ShadowRenderer shadows)
+        {
+            GL.EnableVertexAttribArray(0);
+            GL.UseProgram(shadowShader.Program);
+
+            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
+            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
+            GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
     }
 }

@@ -23,8 +23,8 @@ namespace Larx.Sky
 
             GL.UseProgram(shader.Program);
 
-            camera.ApplyCamera(shader);
-            light.ApplyLight(shader);
+            shader.ApplyCamera(camera);
+            shader.ApplyLight(light);
 
             GL.Uniform1(shader.FarPlane, State.Far);
             GL.Uniform4(shader.ClearColor, State.ClearColor);

@@ -14,7 +14,7 @@ const int state_hover = 1;
 const int state_pressed = 2;
 
 void main() {
-    vec3 texColor = texture(uTexture, texCoord * 1.0).rgb;
+    vec3 texColor = texture(uTexture, texCoord).rgb;
     vec3 gradient = vec3(0.0);
 
     float maxX = 1.0 - border_width;

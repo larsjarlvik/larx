@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using Larx.Buffers;
+using Larx.Shadows;
 using Larx.Storage;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -21,8 +23,8 @@ namespace Larx.Water
         public WaterRenderer()
         {
             shader = new WaterShader();
-            RefractionBuffer = new Framebuffer(0, State.Window.Size);
-            ReflectionBuffer = new Framebuffer(0, State.Window.Size);
+            RefractionBuffer = new Framebuffer(State.Window.Size);
+            ReflectionBuffer = new Framebuffer(State.Window.Size);
 
             dudvMap = new Texture();
             normalMap = new Texture();
@@ -70,15 +72,16 @@ namespace Larx.Water
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
         }
 
-        public void Render(Camera camera, Light light)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
 
             GL.UseProgram(shader.Program);
 
-            camera.ApplyCamera(shader);
-            light.ApplyLight(shader);
+            shader.ApplyCamera(camera);
+            shader.ApplyLight(light);
+            shader.ApplyShadows(shadows);
 
             GL.Uniform1(shader.Near, State.Near);
             GL.Uniform1(shader.Far, State.Far);
