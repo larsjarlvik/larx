@@ -3,7 +3,10 @@ uniform int uEnableShadows;
 
 in vec4 shadowCoords;
 
-vec2 poissonDisk[16] = vec2[](
+#define TEXTURE_SAMPLES 16
+#define BIAS 0.002
+
+vec2 poissonDisk[TEXTURE_SAMPLES] = vec2[](
    vec2(-0.94201624,-0.39906216),
    vec2( 0.94558609,-0.76890725),
    vec2(-0.09418410,-0.92938870),
@@ -29,10 +32,10 @@ float getShadowFactor(float strength) {
 
     float total = 0.0;
 
-    for (int i = 0; i < 16; i++){
-        float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + poissonDisk[i] / 3000.0, (shadowCoords.z - 0.001) / shadowCoords.w));
-        if(shadowCoords.z - 0.001 > nearestLight) {
-            total += strength / 16.0;
+    for (int i = 0; i < TEXTURE_SAMPLES; i++){
+        float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + poissonDisk[i] / 1000.0, (shadowCoords.z - BIAS) / shadowCoords.w));
+        if(shadowCoords.z - BIAS > nearestLight) {
+            total += strength / TEXTURE_SAMPLES;
         }
     }
 

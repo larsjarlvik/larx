@@ -35,6 +35,7 @@ namespace Larx.Terrain
         private readonly SplatMap splatMap;
         private readonly TextureNoise textureNoise;
         private readonly TerrainShader shader;
+        private readonly ShadowShader shadowShader;
         private readonly Texture texture;
         public readonly TerrainPicker Picker;
 
@@ -62,6 +63,7 @@ namespace Larx.Terrain
         public TerrainRenderer(Camera camera)
         {
             shader = new TerrainShader();
+            shadowShader = new ShadowShader();
             splatMap = new SplatMap();
             textureNoise = new TextureNoise(12312234);
             Picker = new TerrainPicker(this, camera);
@@ -307,6 +309,21 @@ namespace Larx.Terrain
             GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             GL.ActiveTexture(TextureUnit.Texture0);
+        }
+
+        public void RenderShadowMap(ShadowRenderer shadows)
+        {
+            GL.EnableVertexAttribArray(0);
+            GL.UseProgram(shadowShader.Program);
+
+            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
+            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
+            GL.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
     }
 }

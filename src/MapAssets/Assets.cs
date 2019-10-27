@@ -19,7 +19,6 @@ namespace Larx.MapAssets
         private readonly Dictionary<string, Model> models;
         private readonly Random random;
 
-
         public Assets(Ui ui)
         {
             models = new Dictionary<string, Model>();
@@ -48,11 +47,11 @@ namespace Larx.MapAssets
             GL.EnableVertexAttribArray(2);
             GL.EnableVertexAttribArray(3);
 
-            GL.UseProgram(shader.Program);
+            GL.UseProgram(Shader.Program);
 
-            shader.ApplyCamera(camera);
-            shader.ApplyLight(light);
-            shader.ApplyShadows(shadows);
+            Shader.ApplyCamera(camera);
+            Shader.ApplyLight(light);
+            Shader.ApplyShadows(shadows);
 
             foreach(var asset in Map.MapData.Assets)
             {
@@ -60,17 +59,17 @@ namespace Larx.MapAssets
             }
         }
 
-        public void RenderShadowMap(Matrix4 projectionMatrix, Matrix4 viewMatrix, TerrainRenderer terrain)
+        public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain)
         {
             GL.EnableVertexAttribArray(0);
-            GL.UseProgram(shadowShader.Program);
+            GL.UseProgram(ShadowShader.Program);
 
-            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref viewMatrix);
-            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref projectionMatrix);
+            GL.UniformMatrix4(ShadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
+            GL.UniformMatrix4(ShadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
 
             foreach(var asset in Map.MapData.Assets)
             {
-                RenderShadowMap(projectionMatrix, viewMatrix, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                RenderShadowMap(models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
             }
         }
     }

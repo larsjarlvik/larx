@@ -56,7 +56,7 @@ namespace Larx.MapAssets
             GL.Enable(EnableCap.CullFace);
         }
 
-        public void RenderShadowMap(Matrix4 projectionMatrix, Matrix4 viewMatrix, Model model, Vector3 position, float rotation)
+        public void RenderShadowMap(Model model, Vector3 position, float rotation)
         {
             GL.Uniform3(ShadowShader.Position, position);
             GL.Uniform1(ShadowShader.Rotation, rotation);
