@@ -34,7 +34,7 @@ void main()
         gl_ClipDistance[0] = -position.y + 0.05;
     }
 
-    calculateLightVectors(normal, vTangent.xyz, position.xyz);
+    calculateLightVectors(normal, vTangent.xyz, position.xyz, mat3(1.0));
     setShadowCoords(vec4(position, 1.0));
 
     gl_Position = uProjectionMatrix * worldPosition;

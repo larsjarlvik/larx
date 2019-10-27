@@ -4,7 +4,7 @@ uniform vec3 uCameraPosition;
 out vec3 lightVector;
 out vec3 eyeVector;
 
-void calculateLightVectors(vec3 normal, vec3 tangent, vec3 position, mat3 transform = mat3(1.0)) {
+void calculateLightVectors(vec3 normal, vec3 tangent, vec3 position, mat3 transform) {
     vec3 biTangent = normalize(cross(normal, tangent));
     mat3 tangentSpace = mat3(
         tangent.x, biTangent.x, normal.x,

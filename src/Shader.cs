@@ -99,7 +99,6 @@ namespace Larx
             GL.Uniform3(CameraPosition, camera.Position);
         }
 
-
         public void ApplyLight(Light light)
         {
             GL.Uniform3(LightDirection, light.Direction);

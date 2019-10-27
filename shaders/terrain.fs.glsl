@@ -53,7 +53,7 @@ vec3 finalTexture(int index) {
 
     vec3 n = texture(uTexture, getTriPlanarTexture(index * 3 + 1)).rgb * 2.0 - 1.0;
     float r = texture(uTexture, getTriPlanarTexture(index * 3 + 2)).r;
-    return getTriPlanarTexture(index * 3) * calculateLight(n, r * 5.0) * noise;
+    return getTriPlanarTexture(index * 3) * calculateLight(n, r * 5.0, 1.0) * noise;
 }
 
 float circle() {

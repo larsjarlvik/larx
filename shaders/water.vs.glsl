@@ -23,7 +23,7 @@ void main() {
     vec3 normal = normalize(vec3(0, 1, 0));
     vec3 tangent = normalize((uViewMatrix * vec4(1, 0, 0, 0)).xyz);
 
-    calculateLightVectors(normal, tangent, position.xyz);
+    calculateLightVectors(normal, tangent, position.xyz, mat3(1.0));
     setShadowCoords(vec4(position, 1.0));
 
     gl_Position = clipSpace;

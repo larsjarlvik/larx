@@ -20,5 +20,5 @@ void main() {
     vec3 normalMap = texture(uNormalTexture, texCoord).rgb * 2.0 - 1.0;
     vec3 n = normalize(normalMap);
 
-    outputColor = tex * vec4(calculateLight(n, uRoughness) * getShadowFactor(0.3), 1.0);
+    outputColor = tex * vec4(calculateLight(n, uRoughness, 1.0) * getShadowFactor(0.3), 1.0);
 }
