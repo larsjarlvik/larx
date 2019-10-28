@@ -77,6 +77,7 @@ namespace Larx.Storage
             }
 
             terrain.Build();
+            assets.Refresh(terrain);
         }
     }
 }

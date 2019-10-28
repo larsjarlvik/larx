@@ -100,8 +100,14 @@ namespace Larx
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Terrain:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f);
-                        if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f);
+                        if (mouse.LeftButton == ButtonState.Pressed) {
+                            terrain.ChangeElevation(0.1f);
+                            assets.Refresh(terrain);
+                        }
+                        if (mouse.RightButton == ButtonState.Pressed) {
+                            terrain.ChangeElevation(-0.1f);
+                            assets.Refresh(terrain);
+                        }
                         break;
                     case TopMenu.Paint:
                         if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();

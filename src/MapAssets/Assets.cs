@@ -38,6 +38,7 @@ namespace Larx.MapAssets
             if (elev == null) return;
 
             Map.MapData.Assets.Add(new PlacedAsset(State.ActiveToolBarItem, new Vector2(position.X, position.Y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
+            Refresh(terrain);
         }
 
         public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain)
@@ -46,6 +47,8 @@ namespace Larx.MapAssets
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
             GL.EnableVertexAttribArray(3);
+            GL.EnableVertexAttribArray(4);
+            GL.EnableVertexAttribArray(5);
 
             GL.UseProgram(Shader.Program);
 
@@ -53,23 +56,27 @@ namespace Larx.MapAssets
             Shader.ApplyLight(light);
             Shader.ApplyShadows(shadows);
 
-            foreach(var asset in Map.MapData.Assets)
+            foreach(var asset in models.Keys)
             {
-                Render(camera, light, shadows, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                Render(models[asset], Map.MapData.Assets.Count);
             }
         }
 
         public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain)
         {
             GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(4);
+            GL.EnableVertexAttribArray(5);
+
             GL.UseProgram(ShadowShader.Program);
 
             GL.UniformMatrix4(ShadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
             GL.UniformMatrix4(ShadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
 
-            foreach(var asset in Map.MapData.Assets)
+            foreach(var asset in models.Keys)
             {
-                RenderShadowMap(models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                RenderShadowMap(models[asset], Map.MapData.Assets.Count);
             }
         }
     }
