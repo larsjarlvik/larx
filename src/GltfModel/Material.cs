@@ -8,6 +8,7 @@ namespace Larx.GltfModel
     {
         public readonly Texture NormalTexture;
         public readonly Texture BaseColorTexture;
+        public readonly Texture RoughnessTexture;
         public readonly bool DoubleSided;
         public readonly float Roughness;
 
@@ -25,12 +26,18 @@ namespace Larx.GltfModel
             BaseColorTexture = new Texture();
             BaseColorTexture.LoadTexture(Path.Combine(rootPath, baseColorTextureName), true);
 
-            if (material.NormalTexture != null)
-            {
+            if (material.NormalTexture != null) {
                 var normalTextureIndex = material.NormalTexture.Index;
                 var normalTextureName = model.Images[(int)model.Textures[normalTextureIndex].Source].Uri;
                 NormalTexture = new Texture();
                 NormalTexture.LoadTexture(Path.Combine(rootPath, normalTextureName), true);
+            }
+
+            if (material.PbrMetallicRoughness.MetallicRoughnessTexture != null) {
+                var roughnessTextureIndex = material.NormalTexture.Index;
+                var roughnessTextureName = model.Images[(int)model.Textures[roughnessTextureIndex].Source].Uri;
+                RoughnessTexture = new Texture();
+                RoughnessTexture.LoadTexture(Path.Combine(rootPath, roughnessTextureName), true);
             }
 
             DoubleSided = material.DoubleSided;

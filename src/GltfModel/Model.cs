@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using OpenTK;
-using OpenTK.Graphics.OpenGL;
-using Gltf = glTFLoader.Schema;
 
 namespace Larx.GltfModel
 {

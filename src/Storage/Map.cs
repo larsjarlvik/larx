@@ -13,13 +13,11 @@ namespace Larx.Storage
     [Serializable]
     public class PlacedAsset
     {
-        public string Model { get; set; }
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
 
-        public PlacedAsset(string model, Vector2 position, float rotation)
+        public PlacedAsset(Vector2 position, float rotation)
         {
-            Model = model;
             Position = position;
             Rotation = rotation;
         }
@@ -31,7 +29,7 @@ namespace Larx.Storage
         public int MapSize { get; set; }
         public float[] TerrainElevations { get; set; }
         public float[][,] SplatMap { get; set; }
-        public List<PlacedAsset> Assets { get; set; }
+        public Dictionary<string, List<PlacedAsset>> Assets { get; set; }
     }
 
     public static class Map
@@ -42,7 +40,7 @@ namespace Larx.Storage
         public static void New(int mapSize)
         {
             MapData.MapSize = mapSize;
-            MapData.Assets = new List<PlacedAsset>();
+            MapData.Assets = new Dictionary<string, List<PlacedAsset>>();
 
             var paddedMapSize = MapData.MapSize + 1;
             MapData.TerrainElevations = Enumerable.Repeat(1.0f, (int)Math.Pow(paddedMapSize, 2)).ToArray();
