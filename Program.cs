@@ -136,6 +136,7 @@ namespace Larx
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, null, true, ClipPlane.ClipTop);
+            assets.Render(camera, light, null, terrain, ClipPlane.ClipTop);
 
             // Water reflection rendering
             camera.InvertY();
@@ -153,7 +154,7 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
-            assets.Render(camera, light, shadows, terrain);
+            assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
             water.Render(camera, light, shadows);
             sky.Render(camera, light);
 

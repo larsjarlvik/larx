@@ -15,6 +15,7 @@ out vec3 normal;
 
 #include shadow-coords
 #include calculate-light-vectors
+#include clip
 
 mat3 rotationYMatrix(float a) {
     return mat3(cos(a), 0, sin(a), 0, 1, 0, -sin(a), 0, cos(a));
@@ -28,6 +29,7 @@ void main() {
     normal = vNormal;
     texCoord = vTexCoord;
 
+    clip(position.xyz);
     calculateLightVectors(normal, vTangent.xyz, position.xyz, rotation);
     setShadowCoords(position);
 

@@ -43,7 +43,7 @@ namespace Larx.MapAssets
             Refresh(terrain);
         }
 
-        public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -58,6 +58,8 @@ namespace Larx.MapAssets
             Shader.ApplyLight(light);
             Shader.ApplyShadows(shadows);
 
+            GL.Uniform1(Shader.ClipPlane, (int)clip);
+
             foreach(var key in models.Keys)
             {
                 if (Map.MapData.Assets[key].Count == 0) continue;
@@ -68,7 +70,7 @@ namespace Larx.MapAssets
             GL.DisableVertexAttribArray(5);
         }
 
-        public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain)
+        public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
@@ -79,6 +81,8 @@ namespace Larx.MapAssets
 
             GL.UniformMatrix4(ShadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
             GL.UniformMatrix4(ShadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
+
+            GL.Uniform1(ShadowShader.ClipPlane, (int)clip);
 
             foreach(var key in models.Keys)
             {

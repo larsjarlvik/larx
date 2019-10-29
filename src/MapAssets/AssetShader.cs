@@ -12,6 +12,7 @@ namespace Larx.MapAssets
         public int NormalTexture { get; private set; }
         public int Roughness { get; private set; }
         public int RoughnessTexture { get; private set; }
+        public int ClipPlane { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -24,6 +25,7 @@ namespace Larx.MapAssets
             NormalTexture = GL.GetUniformLocation(Program, "uNormalTexture");
             Roughness = GL.GetUniformLocation(Program, "uRoughness");
             RoughnessTexture = GL.GetUniformLocation(Program, "uRoughnessTexture");
+            ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
         }
     }
 }
