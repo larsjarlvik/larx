@@ -77,19 +77,22 @@ namespace Larx
 
             var uiIntersect = ui.Update();
 
-            if (State.Mouse.ScrollDelta > 0) camera.Zoom(-0.2f);
-            if (State.Mouse.ScrollDelta < 0) camera.Zoom( 0.2f);
-            if (mouse.MiddleButton == ButtonState.Pressed || State.Keyboard.Key[Key.ShiftLeft]) camera.Rotate(State.Mouse.Delta);
+            if (Focused)
+            {
+                if (State.Mouse.ScrollDelta > 0) camera.Zoom(-0.2f);
+                if (State.Mouse.ScrollDelta < 0) camera.Zoom( 0.2f);
+                if (mouse.MiddleButton == ButtonState.Pressed || State.Keyboard.Key[Key.ShiftLeft]) camera.Rotate(State.Mouse.Delta);
 
-            if (State.Keyboard.Key[Key.W]) camera.Move(new Vector3( 0.0f, 0.0f, 1.0f));
-            if (State.Keyboard.Key[Key.S]) camera.Move(new Vector3( 0.0f, 0.0f,-1.0f));
-            if (State.Keyboard.Key[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
-            if (State.Keyboard.Key[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
+                if (State.Keyboard.Key[Key.W]) camera.Move(new Vector3( 0.0f, 0.0f, 1.0f));
+                if (State.Keyboard.Key[Key.S]) camera.Move(new Vector3( 0.0f, 0.0f,-1.0f));
+                if (State.Keyboard.Key[Key.A]) camera.Move(new Vector3( 1.0f, 0.0f, 0.0f));
+                if (State.Keyboard.Key[Key.D]) camera.Move(new Vector3(-1.0f, 0.0f, 0.0f));
 
-            if (State.Keyboard.Key[Key.Up]) light.Rotation.Y += 0.01f;
-            if (State.Keyboard.Key[Key.Down]) light.Rotation.Y -= 0.01f;
-            if (State.Keyboard.Key[Key.Left]) light.Rotation.X += 0.01f;
-            if (State.Keyboard.Key[Key.Right]) light.Rotation.X -= 0.01f;
+                if (State.Keyboard.Key[Key.Up]) light.Rotation.Y += 0.01f;
+                if (State.Keyboard.Key[Key.Down]) light.Rotation.Y -= 0.01f;
+                if (State.Keyboard.Key[Key.Left]) light.Rotation.X += 0.01f;
+                if (State.Keyboard.Key[Key.Right]) light.Rotation.X -= 0.01f;
+            }
 
             camera.Update((float)e.Time);
             light.Update();
