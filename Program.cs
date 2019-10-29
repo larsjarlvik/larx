@@ -126,17 +126,20 @@ namespace Larx
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
-            // Shadow rendering
+            // Asset shadow rendering
             shadows.ShadowBuffer.Bind();
             GL.Clear(ClearBufferMask.DepthBufferBit);
             assets.RenderShadowMap(shadows, terrain);
-            terrain.RenderShadowMap(shadows);
 
             // Water refraction rendering
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, shadows, true, ClipPlane.ClipTop);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipTop);
+
+            // Terrain shadow rendering
+            shadows.ShadowBuffer.Bind();
+            terrain.RenderShadowMap(shadows);
 
             // Water reflection rendering
             camera.InvertY();
@@ -167,7 +170,7 @@ namespace Larx
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
             ui.Render();
-            shadows.ShadowBuffer.DrawDepthBuffer();
+            // shadows.ShadowBuffer.DrawDepthBuffer();
 
             SwapBuffers();
             State.Time.CountFPS();

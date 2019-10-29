@@ -46,7 +46,7 @@ void main() {
     float waterDepth = calculateDepth(ndc);
 
     vec2 totalDistortion = getDistortion(waterDepth);
-    vec3 refractionTexture = texture(uRefractionColorTexture, clamp(ndc + totalDistortion, 0.001, 0.999)).rgb * getShadowFactor(0.02);
+    vec3 refractionTexture = texture(uRefractionColorTexture, clamp(ndc + totalDistortion, 0.001, 0.999)).rgb;
 
     vec3 nm1 = texture(uNormalMap, vec2(texCoord.x + uTimeOffset, texCoord.y) / waveScale).rgb;
     vec3 nm2 = texture(uNormalMap, vec2(-texCoord.x + uTimeOffset, texCoord.y + uTimeOffset) / waveScale).rgb;
