@@ -130,16 +130,13 @@ namespace Larx
             shadows.ShadowBuffer.Bind();
             GL.Clear(ClearBufferMask.DepthBufferBit);
             assets.RenderShadowMap(shadows, terrain);
+            terrain.RenderShadowMap(shadows);
 
             // Water refraction rendering
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Render(camera, light, shadows, true, ClipPlane.ClipTop);
-            assets.Render(camera, light, shadows, terrain, ClipPlane.ClipTop);
-
-            // Terrain shadow rendering
-            shadows.ShadowBuffer.Bind();
-            terrain.RenderShadowMap(shadows);
+            terrain.Render(camera, light, null, true, ClipPlane.ClipTop);
+            assets.Render(camera, light, null, terrain, ClipPlane.ClipTop);
 
             // Water reflection rendering
             camera.InvertY();
