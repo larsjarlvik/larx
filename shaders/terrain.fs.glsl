@@ -28,9 +28,9 @@ vec3 getTriPlanarTexture(int textureId) {
     float b = (blending.x + blending.y + blending.z);
     blending /= vec3(b, b, b);
 
-    vec3 xaxis = texture(uTexture, vec3(position.yz, textureId)).rgb;
-    vec3 yaxis = texture(uTexture, vec3(position.xz, textureId)).rgb;
-    vec3 zaxis = texture(uTexture, vec3(position.xy, textureId)).rgb;
+    vec3 xaxis = texture(uTexture, vec3(position.yz * 0.5, textureId)).rgb;
+    vec3 yaxis = texture(uTexture, vec3(position.xz * 0.5, textureId)).rgb;
+    vec3 zaxis = texture(uTexture, vec3(position.xy * 0.5, textureId)).rgb;
 
     return xaxis * blending.x + yaxis * blending.y + zaxis * blending.z;
 }

@@ -3,7 +3,8 @@ using OpenTK;
 
 namespace Larx.Terrain
 {
-    public class TerrainPicker {
+    public class TerrainPicker
+    {
         private const float RayRange = 1000;
         private const int MaxRecursions = 300;
         private readonly TerrainRenderer renderer;
@@ -21,32 +22,27 @@ namespace Larx.Terrain
         }
 
         private Vector3 findPosition(int count, float start, float finish) {
-            float half = start + ((finish - start) / 2f);
+            var half = start + ((finish - start) / 2.0f);
 
             if (count >= MaxRecursions) {
                 return getPointOnRay(half);
             }
 
-            return intersectionInRange(start, half)
+            return elevationAtPoint(half) > getPointOnRay(half).Y
                 ? findPosition(count + 1, start, half)
                 : findPosition(count + 1, half, finish);
         }
 
-        private bool intersectionInRange(float start, float finish)
+        private float elevationAtPoint(float point)
         {
-            var endPoint = getPointOnRay(finish);
-            var endElev = renderer.GetElevationAtPoint(endPoint.Xz);
-
-            if (endElev == null) return true;
-
-            return endPoint.Y < (float)endElev;
+            return renderer.GetElevationAtPoint(getPointOnRay(point).Xz) ?? 1.0f;
         }
 
         private Vector3 getPointOnRay(float distance)
         {
             var ray = new Vector3(
-                (2f * State.Mouse.Position.X) / State.Window.Size.Width - 1f,
-                -((2f * State.Mouse.Position.Y) / State.Window.Size.Height - 1f),
+                (2f * State.Mouse.Position.X) / State.Window.Size.Width - 1.0f,
+                -((2f * State.Mouse.Position.Y) / State.Window.Size.Height - 1.0f),
                 distance
             );
 

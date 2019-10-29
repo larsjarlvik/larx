@@ -56,7 +56,7 @@ namespace Larx
 
             GL.BindVertexArray(GL.GenVertexArray());
 
-            Map.New(256);
+            Map.New(400);
             ui = new Ui();
             debug = new ObjectRenderer();
             camera = new Camera();
@@ -124,7 +124,6 @@ namespace Larx
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            GL.PolygonMode(MaterialFace.Front, State.PolygonMode);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
@@ -155,6 +154,7 @@ namespace Larx
             GL.Disable(EnableCap.ClipDistance0);
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
 
             terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
