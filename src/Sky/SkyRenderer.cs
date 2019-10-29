@@ -20,6 +20,7 @@ namespace Larx.Sky
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
 
             GL.UseProgram(shader.Program);
 

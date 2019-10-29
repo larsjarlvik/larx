@@ -9,6 +9,7 @@ namespace Larx.MapAssets
         public int Position { get; private set; }
         public int Rotation { get; private set; }
         public int BaseColorTexture { get; private set; }
+        public int ClipPlane { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -17,6 +18,7 @@ namespace Larx.MapAssets
             Position = GL.GetUniformLocation(Program, "uPosition");
             Rotation = GL.GetUniformLocation(Program, "uRotation");
             BaseColorTexture = GL.GetUniformLocation(Program, "uBaseColorTexture");
+            ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
         }
     }
 }

@@ -53,8 +53,8 @@ void main() {
     vec3 n = normalize(nm1 + nm2 - 1.0);
     vec3 light = calculateLight(n, uShininess, 0.0) * clamp(waterDepth / 5.0, 0, 1);
 
-    vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb;
+    vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb * getShadowFactor(0.2);
     vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 35.0 + 0.3, 0.0, 1.0)) + light;
 
-    outputColor = vec4(waterColor * getShadowFactor(0.15), clamp(waterDepth, 0.0, 1.0));
+    outputColor = vec4(waterColor, clamp(waterDepth, 0.0, 1.0));
 }

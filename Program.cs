@@ -100,8 +100,14 @@ namespace Larx
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Terrain:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.ChangeElevation(0.1f);
-                        if (mouse.RightButton == ButtonState.Pressed) terrain.ChangeElevation(-0.1f);
+                        if (mouse.LeftButton == ButtonState.Pressed) {
+                            terrain.ChangeElevation(0.1f);
+                            assets.Refresh(terrain);
+                        }
+                        if (mouse.RightButton == ButtonState.Pressed) {
+                            terrain.ChangeElevation(-0.1f);
+                            assets.Refresh(terrain);
+                        }
                         break;
                     case TopMenu.Paint:
                         if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
@@ -120,7 +126,7 @@ namespace Larx
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
-            // Shadow rendering
+            // Asset shadow rendering
             shadows.ShadowBuffer.Bind();
             GL.Clear(ClearBufferMask.DepthBufferBit);
             assets.RenderShadowMap(shadows, terrain);
@@ -130,12 +136,13 @@ namespace Larx
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, null, true, ClipPlane.ClipTop);
+            assets.Render(camera, light, null, terrain, ClipPlane.ClipTop);
 
             // Water reflection rendering
             camera.InvertY();
             water.ReflectionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            assets.Render(camera, light, null, terrain);
+            assets.Render(camera, light, null, terrain, ClipPlane.ClipBottom);
             terrain.Render(camera, light, null, false, ClipPlane.ClipBottom);
             sky.Render(camera, light);
             GL.Disable(EnableCap.ClipDistance0);
@@ -147,7 +154,7 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
-            assets.Render(camera, light, shadows, terrain);
+            assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
             water.Render(camera, light, shadows);
             sky.Render(camera, light);
 

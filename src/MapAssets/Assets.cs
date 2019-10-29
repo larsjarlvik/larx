@@ -15,6 +15,7 @@ namespace Larx.MapAssets
     {
         private readonly string[] assets = new string[] {
             "tree",
+            "rock",
         };
         private readonly Dictionary<string, Model> models;
         private readonly Random random;
@@ -25,8 +26,9 @@ namespace Larx.MapAssets
             random = new Random();
 
             foreach(var asset in assets) {
-                ui.Tools.Add(new ToolbarItem(TopMenu.Assets, ui.AddButton($"asset_{asset}", $"ui/assets/{asset}.png")));
-                models.Add($"asset_{asset}", Model.Load(asset));
+                ui.Tools.Add(new ToolbarItem(TopMenu.Assets, ui.AddButton(asset, $"ui/assets/{asset}.png")));
+                models.Add(asset, Model.Load(asset));
+                Map.MapData.Assets.Add(asset, new List<PlacedAsset>());
             }
         }
 
@@ -37,15 +39,18 @@ namespace Larx.MapAssets
             var elev = terrain.GetElevationAtPoint(position);
             if (elev == null) return;
 
-            Map.MapData.Assets.Add(new PlacedAsset(State.ActiveToolBarItem, new Vector2(position.X, position.Y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
+            Map.MapData.Assets[State.ActiveToolBarItem].Add(new PlacedAsset(new Vector2(position.X, position.Y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
+            Refresh(terrain);
         }
 
-        public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.EnableVertexAttribArray(0);
             GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
             GL.EnableVertexAttribArray(3);
+            GL.EnableVertexAttribArray(4);
+            GL.EnableVertexAttribArray(5);
 
             GL.UseProgram(Shader.Program);
 
@@ -53,24 +58,40 @@ namespace Larx.MapAssets
             Shader.ApplyLight(light);
             Shader.ApplyShadows(shadows);
 
-            foreach(var asset in Map.MapData.Assets)
+            GL.Uniform1(Shader.ClipPlane, (int)clip);
+
+            foreach(var key in models.Keys)
             {
-                Render(camera, light, shadows, models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                if (Map.MapData.Assets[key].Count == 0) continue;
+                Render(models[key], key);
             }
+
+            GL.DisableVertexAttribArray(4);
+            GL.DisableVertexAttribArray(5);
         }
 
-        public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain)
+        public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(4);
+            GL.EnableVertexAttribArray(5);
+
             GL.UseProgram(ShadowShader.Program);
 
             GL.UniformMatrix4(ShadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
             GL.UniformMatrix4(ShadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
 
-            foreach(var asset in Map.MapData.Assets)
+            GL.Uniform1(ShadowShader.ClipPlane, (int)clip);
+
+            foreach(var key in models.Keys)
             {
-                RenderShadowMap(models[asset.Model], new Vector3(asset.Position.X, (float)terrain.GetElevationAtPoint(asset.Position), asset.Position.Y), asset.Rotation);
+                if (Map.MapData.Assets[key].Count == 0) continue;
+                RenderShadowMap(models[key], key);
             }
+
+            GL.DisableVertexAttribArray(4);
+            GL.DisableVertexAttribArray(5);
         }
     }
 }
