@@ -40,7 +40,7 @@ namespace Larx.MapAssets
             var elev = terrain.GetElevationAtPoint(position);
             if (elev == null) return;
 
-            var count = (State.ToolHardness - 1) * (State.ToolHardness * 20) + 1;
+            var count = (State.ToolHardness - 1) * State.ToolHardness + 1;
 
             for(var i = 0; i < count; i ++) {
                 var r = (float)(random.NextDouble() * (State.ToolRadius - 1.0f));
