@@ -20,16 +20,15 @@ namespace Larx.Terrain
     {
         public static readonly string[] Textures;
 
-        private int indexCount = 0;
         private int vertexBuffer;
         private int coordBuffer;
         private int indexBuffer;
         private int normalBuffer;
         private int tangentBuffer;
-        private Vector3[] vertices;
-        private Vector2[] coords;
-        private Vector3[] normals;
-        private Vector3[] tangents;
+        private Vector3[,] vertices;
+        private Vector2[,] coords;
+        private Vector3[,] normals;
+        private Vector3[,] tangents;
         private List<int> indices = new List<int>();
 
         private readonly SplatMap splatMap;
@@ -40,6 +39,7 @@ namespace Larx.Terrain
         public readonly TerrainPicker Picker;
 
         public Vector3 MousePosition;
+        private float halfMapSize;
 
         static TerrainRenderer()
         {
@@ -90,29 +90,34 @@ namespace Larx.Terrain
 
             foreach (var i in toUpdate)
             {
-                if (i >= indices.Count) continue;
-
-                var vertex = vertices[indices[i]];
+                var vertex = vertices[i.X, i.Y];
 
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
                 var amount = Vector3.Distance(MousePosition, vertex);
                 var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / State.ToolRadius > State.ToolHardness ? amount : 0.0f) / State.ToolRadius))) * offset;
 
-                vertices[indices[i]] = new Vector3(vertex.X, elev, vertex.Z);
-                updateNormals(i);
+                vertices[i.X, i.Y] = new Vector3(vertex.X, elev, vertex.Z);
+                updateNormals(i.X, i.Y);
             }
 
             updateBuffers();
         }
 
-        private void updateNormals(int i)
+        private void updateNormals(int x, int z)
         {
-            var v1 = vertices[indices[i]];
-            var v2 = vertices[indices[i + 1]];
-            var v3 = vertices[indices[i + 2]];
-            normals[indices[i]] = Vector3.Cross(v2 - v1, v3 - v1);
-            tangents[indices[i]] = MathLarx.CalculateTangent(normals[indices[i]]);
+            var offX = x > halfMapSize ? -1 : 1;
+            var offZ = z > halfMapSize ? -1 : 1;
+
+            var v1 = vertices[x, z];
+            var v2 = vertices[x + offX, z];
+            var v3 = vertices[x, z + offZ];
+
+            normals[x, z] = Vector3.Cross(
+                offX == -1 ? v2 - v1 : v1 - v2,
+                offZ == -1 ? v3 - v1 : v1 - v3
+            );
+            tangents[x, z] = MathLarx.CalculateTangent(normals[x, z]);
         }
 
         public void Paint()
@@ -126,22 +131,26 @@ namespace Larx.Terrain
             splatMap.Update(position, byte.Parse(State.ActiveToolBarItem));
         }
 
-        public float[] GetTerrainElevations()
+        public float[,] GetTerrainElevations()
         {
-            return vertices.Select(v => v.Y).ToArray();
+            var result = new float[Map.MapData.MapSize + 1, Map.MapData.MapSize + 1];
+            for (var z = 0; z <= Map.MapData.MapSize; z++)
+                for (var x = 0; x <= Map.MapData.MapSize; x++)
+                    result[x, z] = vertices[x, z].Y;
+
+            return result;
         }
 
-        private List<int> getTilesInArea(Vector3 center, float radius)
+        private List<Point> getTilesInArea(Vector3 center, float radius)
         {
-            var included = new List<int>();
+            var included = new List<Point>();
             var r = radius + 2;
 
-            for (var z = center.Z - r; z <= center.Z + r; z++)
-                for (var x = center.X - r; x <= center.X + r; x++)
+            for (var z = center.Z - r + halfMapSize; z <= center.Z + r + halfMapSize; z++)
+                for (var x = center.X - r + halfMapSize; x <= center.X + r + halfMapSize; x++)
                 {
-                    var index = getTileIndex(new Vector2(x, z));
-                    if (index == null) continue;
-                    included.Add((int)index);
+                    if (x > 0 && z > 0 && x <= Map.MapData.MapSize + 1 && z <= Map.MapData.MapSize + 1)
+                        included.Add(new Point((int)x, (int)z));
                 }
 
             return included;
@@ -149,41 +158,38 @@ namespace Larx.Terrain
 
         public void Build()
         {
-            var halfMapSize = Map.MapData.MapSize / 2.0f;
+            halfMapSize = Map.MapData.MapSize / 2.0f;
             var rnd = new Random();
             var i = 0;
-            var size = (Map.MapData.MapSize + 1) * (Map.MapData.MapSize + 1);
+            var size = Map.MapData.MapSize + 1;
 
-            vertices = new Vector3[size];
-            coords = new Vector2[size];
-            normals = new Vector3[size];
-            tangents = new Vector3[size];
+            vertices = new Vector3[size, size];
+            coords = new Vector2[size, size];
+            normals = new Vector3[size, size];
+            tangents = new Vector3[size, size];
             indices.Clear();
 
-            for (var z = 0.0f; z <= Map.MapData.MapSize ; z++)
-            {
-                for (var x = 0.0f; x <= Map.MapData.MapSize ; x++)
+            for (var z = 0; z <= Map.MapData.MapSize; z++)
+                for (var x = 0; x <= Map.MapData.MapSize; x++)
                 {
-                    vertices[i] = new Vector3(x - halfMapSize, Map.MapData.TerrainElevations[i], z - halfMapSize);
-                    coords[i] = new Vector2(x / Map.MapData.MapSize, z / Map.MapData.MapSize);
-                    normals[i] = new Vector3(0f, 1f, 0f);
-                    tangents[i] = new Vector3(1f, 0f, 0f);
+                    vertices[x, z] = new Vector3(x - halfMapSize, Map.MapData.TerrainElevations[x, z], z - halfMapSize);
+                    coords[x, z] = new Vector2((float)x / Map.MapData.MapSize, (float)z / Map.MapData.MapSize);
+                    normals[x, z] = new Vector3(0f, 1f, 0f);
+                    tangents[x, z] = new Vector3(1f, 0f, 0f);
 
-                    if (x < Map.MapData.MapSize && z < Map.MapData.MapSize)
+                    if (x > 0.0f && z > 0.0f)
                         indices.AddRange(new int[] {
-                            i,     i + Map.MapData.MapSize + 1, i + 1,
-                            i + 1, i + Map.MapData.MapSize + 1, i + Map.MapData.MapSize + 2
+                            i - Map.MapData.MapSize - 1, i, i - 1,
+                            i - Map.MapData.MapSize - 1, i - 1, i - Map.MapData.MapSize - 2
                         });
 
                     i++;
                 }
-            }
 
-            for(var n = 0; n < indices.Count; n += 3) {
-                updateNormals(n);
-            }
 
-            indexCount = indices.Count;
+            for (var z = 0; z <= Map.MapData.MapSize; z++)
+                for (var x = 0; x <= Map.MapData.MapSize; x++)
+                    updateNormals(x, z);
 
             vertexBuffer = GL.GenBuffer();
             coordBuffer = GL.GenBuffer();
@@ -200,39 +206,30 @@ namespace Larx.Terrain
                 splatMap.ToTexture(n);
         }
 
-        private int? getTileIndex(Vector2 position)
-        {
-            var x = (int)MathF.Round(position.X + (Map.MapData.MapSize / 2));
-            if (x < 0 || x > Map.MapData.MapSize) return null;
-
-            var z = (int)MathF.Round(position.Y + (Map.MapData.MapSize / 2));
-            if (z < 0 || z > Map.MapData.MapSize) return null;
-
-            var index = ((z * Map.MapData.MapSize) + x) * 6;
-            if (index >= indices.Count) return null;
-
-            return index;
-        }
-
         public float? GetElevationAtPoint(Vector2 position)
         {
-            int? index0;
-            int? index1;
-            int? index2;
+            Vector3 index0;
+            Vector3 index1;
+            Vector3 index2;
+
+            var x = (int)(position.X + halfMapSize);
+            var z = (int)(position.Y + halfMapSize);
+
+            if (x < 0 || x >= Map.MapData.MapSize ||
+                z < 0 || z >= Map.MapData.MapSize)
+                return 1.0f;
 
             if ((position.X % 1) + (position.Y % 1) > 1.0f) {
-                index0 = getTileIndex(new Vector2(MathF.Floor(position.X), MathF.Floor(position.Y)));
-                index1 = getTileIndex(new Vector2(MathF.Floor(position.X) + 1, MathF.Floor(position.Y)));
-                index2 = getTileIndex(new Vector2(MathF.Floor(position.X), MathF.Floor(position.Y) + 1));
+                index0 = vertices[x, z];
+                index1 = vertices[x + 1, z];
+                index2 = vertices[x, z + 1];
             } else {
-                index0 = getTileIndex(new Vector2(MathF.Floor(position.X) + 1, MathF.Floor(position.Y)));
-                index1 = getTileIndex(new Vector2(MathF.Floor(position.X), MathF.Floor(position.Y) + 1));
-                index2 = getTileIndex(new Vector2(MathF.Floor(position.X) + 1, MathF.Floor(position.Y) + 1));
+                index0 = vertices[x + 1, z];
+                index1 = vertices[x, z + 1];
+                index2 = vertices[x + 1, z + 1];;
             }
 
-            if (index0 == null || index1 == null || index2 == null) return null;
-
-            return MathLarx.BaryCentric(vertices[indices[(int)index0]], vertices[indices[(int)index1]], vertices[indices[(int)index2]], new Vector2(position.X, position.Y));
+            return MathLarx.BaryCentric(index0, index1, index2, new Vector2(position.X, position.Y));
         }
 
         private void updateBuffers()
