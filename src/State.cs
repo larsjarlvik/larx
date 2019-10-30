@@ -16,16 +16,6 @@ namespace Larx
         public static bool ShowGridLines;
         public static PolygonMode PolygonMode;
         public static float ToolRadius;
-        public static float SelectionCircleRadius
-        {
-            get
-            {
-                if (State.ActiveTopMenu == TopMenu.Assets)
-                    return 1.0f;
-
-                return ToolRadius;
-            }
-        }
 
         public static float ToolHardness;
         public static TopMenu ActiveTopMenu;

@@ -41,7 +41,7 @@ namespace Larx.Terrain
                     var distance = Vector2.Distance(pos, new Vector2(x1, z1));
                     if (distance > radius) continue;
 
-                    var n = calcP(MathF.Min(1.0f, MathF.Sqrt((distance / radius > State.ToolHardness ? distance : 0.0f) / radius)));
+                    var n = calcP(MathF.Min(1.0f, MathF.Sqrt((distance / radius > (State.ToolHardness * 0.1f) ? distance : 0.0f) / radius)));
                     var result = Map.MapData.SplatMap[splatId][z1, x1] + n;
 
                     Map.MapData.SplatMap[splatId][z1, x1] = result > 1.0f ? 1.0f : result;

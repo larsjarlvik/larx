@@ -66,9 +66,11 @@ namespace Larx.MapAssets
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
                 GL.Uniform1(Shader.BaseColorTexture, 0);
 
-                GL.ActiveTexture(TextureUnit.Texture1);
-                GL.BindTexture(TextureTarget.Texture2D, mesh.Material.NormalTexture.TextureId);
-                GL.Uniform1(Shader.NormalTexture, 1);
+                if (mesh.Material.NormalTexture != null) {
+                    GL.ActiveTexture(TextureUnit.Texture1);
+                    GL.BindTexture(TextureTarget.Texture2D, mesh.Material.NormalTexture.TextureId);
+                    GL.Uniform1(Shader.NormalTexture, 1);
+                }
 
                 if (mesh.Material.RoughnessTexture != null) {
                     GL.ActiveTexture(TextureUnit.Texture2);

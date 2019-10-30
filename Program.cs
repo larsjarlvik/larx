@@ -37,7 +37,7 @@ namespace Larx
         {
             State.PolygonMode = PolygonMode.Fill;
             State.ToolRadius = 3f;
-            State.ToolHardness = 0.5f;
+            State.ToolHardness = 5f;
         }
 
         protected override void OnLoad(EventArgs e)

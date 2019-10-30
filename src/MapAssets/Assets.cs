@@ -16,6 +16,7 @@ namespace Larx.MapAssets
         private readonly string[] assets = new string[] {
             "tree",
             "rock",
+            "grass"
         };
         private readonly Dictionary<string, Model> models;
         private readonly Random random;
@@ -39,7 +40,17 @@ namespace Larx.MapAssets
             var elev = terrain.GetElevationAtPoint(position);
             if (elev == null) return;
 
-            Map.MapData.Assets[State.ActiveToolBarItem].Add(new PlacedAsset(new Vector2(position.X, position.Y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
+            var count = (State.ToolHardness - 1) * (State.ToolHardness * 20) + 1;
+
+            for(var i = 0; i < count; i ++) {
+                var r = (float)(random.NextDouble() * (State.ToolRadius - 1.0f));
+                var angle = (float)(random.NextDouble() * 2 * MathF.PI);
+                var x = position.X + r * MathF.Cos(angle);
+                var y = position.Y + r * MathF.Sin(angle);
+
+                Map.MapData.Assets[State.ActiveToolBarItem].Add(new PlacedAsset(new Vector2(x, y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
+            }
+
             Refresh(terrain);
         }
 

@@ -86,7 +86,7 @@ namespace Larx.Terrain
 
         public void ChangeElevation(float offset)
         {
-            var toUpdate = getTilesInArea(MousePosition, State.SelectionCircleRadius);
+            var toUpdate = getTilesInArea(MousePosition, State.ToolRadius);
 
             foreach (var i in toUpdate)
             {
@@ -95,7 +95,7 @@ namespace Larx.Terrain
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
                 var amount = Vector3.Distance(MousePosition, vertex);
-                var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / State.ToolRadius > State.ToolHardness ? amount : 0.0f) / State.ToolRadius))) * offset;
+                var elev = vertex.Y + calcP(MathF.Min(1f, MathF.Sqrt((amount / State.ToolRadius > (State.ToolHardness * 0.1f) ? amount : 0.0f) / State.ToolRadius))) * offset;
 
                 vertices[i.X, i.Y] = new Vector3(vertex.X, elev, vertex.Z);
                 updateNormals(i.X, i.Y);
@@ -266,7 +266,7 @@ namespace Larx.Terrain
             GL.UseProgram(shader.Program);
 
             GL.Uniform3(shader.MousePosition, MousePosition);
-            GL.Uniform1(shader.SelectionSize, State.SelectionCircleRadius);
+            GL.Uniform1(shader.SelectionSize, State.ToolRadius);
             GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
             GL.Uniform1(shader.ShowOverlays, showOverlays ? 1 : 0);
 

@@ -26,5 +26,5 @@ void main() {
         roughness = texture(uRoughnessTexture, texCoord).r;
     }
 
-    outputColor = tex * vec4(calculateLight(n, roughness, 1.0) * getShadowFactor(0.3), 1.0);
+    outputColor = tex * vec4(calculateLight(n, roughness, 1.0) * getShadowFactor(0.3), tex.a);
 }

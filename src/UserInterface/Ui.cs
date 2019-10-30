@@ -68,18 +68,24 @@ namespace Larx.UserInterFace
 
             switch(uiIntersect) {
                 case Keys.ElevationTools:
+                    State.ToolRadius = 3f;
+                    State.ToolHardness = 5f;
                     State.ActiveTopMenu = TopMenu.Terrain;
                     buttons[Keys.ElevationTools].Active = true;
                     buttons[Keys.TerrainPaint].Active = false;
                     buttons[Keys.AddAssets].Active = false;
                     break;
                 case Keys.TerrainPaint:
+                    State.ToolRadius = 3f;
+                    State.ToolHardness = 5f;
                     State.ActiveTopMenu = TopMenu.Paint;
                     buttons[Keys.ElevationTools].Active = false;
                     buttons[Keys.TerrainPaint].Active = true;
                     buttons[Keys.AddAssets].Active = false;
                     break;
                 case Keys.AddAssets:
+                    State.ToolRadius = 1f;
+                    State.ToolHardness = 1;
                     State.ActiveTopMenu = TopMenu.Assets;
                     buttons[Keys.ElevationTools].Active = false;
                     buttons[Keys.TerrainPaint].Active = false;
@@ -87,19 +93,19 @@ namespace Larx.UserInterFace
                     break;
                 case Keys.Terrain.SizeIncrease:
                     State.ToolRadius ++;
-                    if (State.ToolRadius > 12.0f) State.ToolRadius = 12.0f;
+                    if (State.ToolRadius > 12f) State.ToolRadius = 12f;
                     break;
                 case Keys.Terrain.SizeDecrease:
                     State.ToolRadius --;
-                    if (State.ToolRadius < 0.0f) State.ToolRadius = 0.0f;
+                    if (State.ToolRadius < 0f) State.ToolRadius = 0f;
                     break;
                 case Keys.Terrain.HardnessIncrease:
-                    State.ToolHardness += 0.1f;
-                    if (State.ToolHardness > 1.0f) State.ToolHardness = 1.0f;
+                    State.ToolHardness += 1f;
+                    if (State.ToolHardness > 10f) State.ToolHardness = 10f;
                     break;
                 case Keys.Terrain.HardnessDecrease:
-                    State.ToolHardness -= 0.1f;
-                    if (State.ToolHardness < 0.0f) State.ToolHardness = 0.0f;
+                    State.ToolHardness -= 1f;
+                    if (State.ToolHardness < 0f) State.ToolHardness = 0f;
                     break;
                 default:
                     if (Tools.Any(t => t.Key == uiIntersect)) {
@@ -156,9 +162,7 @@ namespace Larx.UserInterFace
         {
             var visble = new List<string> { Keys.ElevationTools, Keys.TerrainPaint, Keys.AddAssets };
             visble.AddRange(Tools.Where(t => t.TopMenu == State.ActiveTopMenu).Select(t => t.Key));
-
-            if (State.ActiveTopMenu != TopMenu.Assets)
-                visble.AddRange(alignRight.Select(t => t.Key));
+            visble.AddRange(alignRight.Select(t => t.Key));
 
             return visble;
         }
