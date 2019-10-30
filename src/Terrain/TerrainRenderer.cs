@@ -149,7 +149,7 @@ namespace Larx.Terrain
 
         public void Build()
         {
-            var halfMapSize = Map.MapData.MapSize / 2;
+            var halfMapSize = Map.MapData.MapSize / 2.0f;
             var rnd = new Random();
             var i = 0;
             var size = (Map.MapData.MapSize + 1) * (Map.MapData.MapSize + 1);
@@ -160,22 +160,20 @@ namespace Larx.Terrain
             tangents = new Vector3[size];
             indices.Clear();
 
-            for (var z = -halfMapSize; z <= halfMapSize; z++)
+            for (var z = 0.0f; z <= Map.MapData.MapSize ; z++)
             {
-                for (var x = -halfMapSize; x <= halfMapSize; x++)
+                for (var x = 0.0f; x <= Map.MapData.MapSize ; x++)
                 {
-                    vertices[i] = new Vector3(x, Map.MapData.TerrainElevations[i], z);
-                    coords[i] = new Vector2((float)(x + halfMapSize) / Map.MapData.MapSize, (float)(z + halfMapSize) / Map.MapData.MapSize);
-                    normals[i] = new Vector3(0f, 1f, 0f).Normalized();
-                    tangents[i] = MathLarx.CalculateTangent(normals.Last());
+                    vertices[i] = new Vector3(x - halfMapSize, Map.MapData.TerrainElevations[i], z - halfMapSize);
+                    coords[i] = new Vector2(x / Map.MapData.MapSize, z / Map.MapData.MapSize);
+                    normals[i] = new Vector3(0f, 1f, 0f);
+                    tangents[i] = new Vector3(1f, 0f, 0f);
 
-                    if (x < halfMapSize && z < halfMapSize)
-                    {
+                    if (x < Map.MapData.MapSize && z < Map.MapData.MapSize)
                         indices.AddRange(new int[] {
                             i,     i + Map.MapData.MapSize + 1, i + 1,
                             i + 1, i + Map.MapData.MapSize + 1, i + Map.MapData.MapSize + 2
                         });
-                    }
 
                     i++;
                 }
