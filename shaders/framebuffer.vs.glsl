@@ -7,9 +7,9 @@ uniform mat4 uMatrix;
 uniform vec2 uSize;
 uniform vec2 uPosition;
 
-out vec2 texCoord;
+out vec2 vert_texCoord;
 
 void main() {
-    texCoord = vTexCoord;
+    vert_texCoord = vTexCoord;
     gl_Position = uMatrix * vec4(vPosition * uSize + uPosition, 0.0, 1.0);
 }

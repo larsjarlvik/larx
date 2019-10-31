@@ -1,4 +1,7 @@
 #version 330
+#include shadow-coords
+#include calculate-light-vectors
+#include clip
 
 layout(location = 0) in vec3 vPosition;
 layout(location = 1) in vec2 vTexCoord;
@@ -10,12 +13,10 @@ layout(location = 5) in float iRotation;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 
-out vec2 texCoord;
-out vec3 normal;
-
-#include shadow-coords
-#include calculate-light-vectors
-#include clip
+out vec2 vert_texCoord;
+out vec3 vert_normal;
+out LightVectors vert_lightVectors;
+out vec4 vert_shadowCoords;
 
 mat3 rotationYMatrix(float a) {
     return mat3(cos(a), 0, sin(a), 0, 1, 0, -sin(a), 0, cos(a));
@@ -26,12 +27,11 @@ void main() {
     vec4 position = vec4(vPosition * rotation + iPosition, 1.0);
     vec4 worldPosition = uViewMatrix * position;
 
-    normal = vNormal;
-    texCoord = vTexCoord;
+    vert_normal = vNormal;
+    vert_texCoord = vTexCoord;
+    vert_lightVectors = calculateLightVectors(vert_normal, vTangent.xyz, position.xyz, rotation);
+    vert_shadowCoords = getShadowCoords(position);
 
-    clip(position.xyz);
-    calculateLightVectors(normal, vTangent.xyz, position.xyz, rotation);
-    setShadowCoords(position);
-
+    gl_ClipDistance[0] = clip(position.xyz);
     gl_Position = uProjectionMatrix * worldPosition;
 }

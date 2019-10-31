@@ -1,8 +1,6 @@
 uniform sampler2DShadow uShadowMap;
 uniform int uEnableShadows;
 
-in vec4 shadowCoords;
-
 #define TEXTURE_SAMPLES 16
 #define BIAS 0.002
 
@@ -25,7 +23,7 @@ vec2 poissonDisk[TEXTURE_SAMPLES] = vec2[](
    vec2( 0.14383161,-0.14100790)
 );
 
-float getShadowFactor(float strength) {
+float getShadowFactor(vec4 shadowCoords, float strength) {
     if(shadowCoords.z > 1.0 || uEnableShadows != 1.0) {
         return 1.0;
     }

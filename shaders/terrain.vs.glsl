@@ -1,4 +1,8 @@
 #version 330
+#include shadow-coords
+#include calculate-light-vectors
+#include clip
+
 precision highp float;
 
 layout(location = 0) in vec3 vPosition;
@@ -9,25 +13,22 @@ layout(location = 3) in vec3 vTangent;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 
-out vec3 position;
-out vec2 texCoord;
-out vec3 normal;
-
-#include shadow-coords
-#include calculate-light-vectors
-#include clip
+out vec3 vert_position;
+out vec2 vert_texCoord;
+out vec3 vert_normal;
+out LightVectors vert_lightVectors;
+out vec4 vert_shadowCoords;
 
 void main()
 {
     vec4 worldPosition = uViewMatrix * vec4(vPosition, 1.0);
 
-    position = vPosition;
-    texCoord = vTexCoord;
-    normal = vNormal;
+    vert_position = vPosition;
+    vert_texCoord = vTexCoord;
+    vert_normal = vNormal;
+    vert_lightVectors = calculateLightVectors(vert_normal, vTangent.xyz, vert_position.xyz, mat3(1.0));
+    vert_shadowCoords = getShadowCoords(vec4(vert_position, 1.0));
 
-    clip(position);
-    calculateLightVectors(normal, vTangent.xyz, position.xyz, mat3(1.0));
-    setShadowCoords(vec4(position, 1.0));
-
+    gl_ClipDistance[0] = clip(vert_position.xyz);
     gl_Position = uProjectionMatrix * worldPosition;
 }
