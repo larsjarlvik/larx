@@ -93,7 +93,7 @@ namespace Larx.UserInterFace
                     break;
                 case Keys.Terrain.SizeIncrease:
                     State.ToolRadius ++;
-                    if (State.ToolRadius > 12f) State.ToolRadius = 12f;
+                    if (State.ToolRadius > 40f) State.ToolRadius = 40f;
                     break;
                 case Keys.Terrain.SizeDecrease:
                     State.ToolRadius --;
@@ -101,7 +101,7 @@ namespace Larx.UserInterFace
                     break;
                 case Keys.Terrain.HardnessIncrease:
                     State.ToolHardness += 1f;
-                    if (State.ToolHardness > 10f) State.ToolHardness = 10f;
+                    if (State.ToolHardness > 20f) State.ToolHardness = 20f;
                     break;
                 case Keys.Terrain.HardnessDecrease:
                     State.ToolHardness -= 1f;

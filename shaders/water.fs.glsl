@@ -10,7 +10,8 @@ const float reflectivity = 1.0;
 
 in vec4 vert_position;
 in vec2 vert_texCoord;
-in LightVectors vert_lightVectors;
+in vec3 vert_lightVector;
+in vec3 vert_eyeVector;
 in vec4 vert_shadowCoords;
 
 uniform sampler2D uRefractionColorTexture;
@@ -51,7 +52,7 @@ void main() {
     vec3 nm1 = texture(uNormalMap, vec2(vert_texCoord.x + uTimeOffset, vert_texCoord.y) / waveScale).rgb;
     vec3 nm2 = texture(uNormalMap, vec2(-vert_texCoord.x + uTimeOffset, vert_texCoord.y + uTimeOffset) / waveScale).rgb;
     vec3 n = normalize(nm1 + nm2 - 1.0);
-    vec3 light = calculateLight(vert_lightVectors, n, uShininess, 0.0) * clamp(waterDepth / 5.0, 0, 1);
+    vec3 light = calculateLight(vert_lightVector, vert_eyeVector, n, uShininess, 0.0) * clamp(waterDepth / 5.0, 0, 1);
 
     vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb * getShadowFactor(vert_shadowCoords, 0.2);
     vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 35.0 + 0.3, 0.0, 1.0)) + light;

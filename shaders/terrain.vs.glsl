@@ -16,17 +16,20 @@ uniform mat4 uViewMatrix;
 out vec3 vert_position;
 out vec2 vert_texCoord;
 out vec3 vert_normal;
-out LightVectors vert_lightVectors;
+out vec3 vert_lightVector;
+out vec3 vert_eyeVector;
 out vec4 vert_shadowCoords;
 
 void main()
 {
     vec4 worldPosition = uViewMatrix * vec4(vPosition, 1.0);
+    vec3[] vectors = calculateLightVectors(vNormal, vTangent, vPosition, mat3(1.0));
 
     vert_position = vPosition;
     vert_texCoord = vTexCoord;
     vert_normal = vNormal;
-    vert_lightVectors = calculateLightVectors(vert_normal, vTangent.xyz, vert_position.xyz, mat3(1.0));
+    vert_lightVector = vectors[0];
+    vert_eyeVector = vectors[1];
     vert_shadowCoords = getShadowCoords(vec4(vert_position, 1.0));
 
     gl_ClipDistance[0] = clip(vert_position.xyz);

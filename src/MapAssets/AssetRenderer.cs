@@ -15,6 +15,7 @@ namespace Larx.MapAssets
         protected readonly ShadowShader ShadowShader;
         private Dictionary<string, int> positionBuffers;
         private Dictionary<string, int> rotationBuffers;
+        private Dictionary<string, int> variationBuffers;
 
 
         protected AssetRenderer()
@@ -23,23 +24,26 @@ namespace Larx.MapAssets
             ShadowShader = new ShadowShader();
             positionBuffers = new Dictionary<string, int>();
             rotationBuffers = new Dictionary<string, int>();
+            variationBuffers = new Dictionary<string, int>();
         }
 
         public void Refresh(TerrainRenderer terrain)
         {
-
             foreach(var key in Map.MapData.Assets.Keys)
             {
                 var positions = new Vector3[Map.MapData.Assets[key].Count];
                 var rotations = new float[Map.MapData.Assets[key].Count];
+                var variations = new float[Map.MapData.Assets[key].Count];
 
                 if (!positionBuffers.ContainsKey(key)) positionBuffers.Add(key, GL.GenBuffer());
                 if (!rotationBuffers.ContainsKey(key)) rotationBuffers.Add(key, GL.GenBuffer());
+                if (!variationBuffers.ContainsKey(key)) variationBuffers.Add(key, GL.GenBuffer());
 
                 for(var i = 0; i < Map.MapData.Assets[key].Count; i++)
                 {
                     positions[i] = new Vector3(Map.MapData.Assets[key][i].Position.X, (float)terrain.GetElevationAtPoint(Map.MapData.Assets[key][i].Position), Map.MapData.Assets[key][i].Position.Y);
                     rotations[i] = Map.MapData.Assets[key][i].Rotation;
+                    variations[i] = Map.MapData.Assets[key][i].Variation;
                 }
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, positionBuffers[key]);
@@ -51,6 +55,11 @@ namespace Larx.MapAssets
                 GL.BufferData<float>(BufferTarget.ArrayBuffer, rotations.Length * sizeof(float), rotations, BufferUsageHint.StaticDraw);
                 GL.VertexAttribPointer(5, 1, VertexAttribPointerType.Float, false, 0, 0);
                 GL.VertexAttribDivisor(5, 1);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, variationBuffers[key]);
+                GL.BufferData<float>(BufferTarget.ArrayBuffer, variations.Length * sizeof(float), variations, BufferUsageHint.StaticDraw);
+                GL.VertexAttribPointer(6, 1, VertexAttribPointerType.Float, false, 0, 0);
+                GL.VertexAttribDivisor(6, 1);
             }
         }
 
@@ -60,7 +69,6 @@ namespace Larx.MapAssets
             {
                 if (mesh.Material.DoubleSided) GL.Disable(EnableCap.CullFace);
                 else GL.Enable(EnableCap.CullFace);
-
 
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
@@ -99,6 +107,9 @@ namespace Larx.MapAssets
                 GL.BindBuffer(BufferTarget.ArrayBuffer, rotationBuffers[key]);
                 GL.VertexAttribPointer(5, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
 
+                GL.BindBuffer(BufferTarget.ArrayBuffer, variationBuffers[key]);
+                GL.VertexAttribPointer(6, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
+
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
                 GL.DrawElementsInstanced(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero, Map.MapData.Assets[key].Count);
             }
@@ -110,6 +121,9 @@ namespace Larx.MapAssets
         {
             foreach(var mesh in model.Meshes)
             {
+                if (mesh.Material.DoubleSided) GL.Disable(EnableCap.CullFace);
+                else GL.Enable(EnableCap.CullFace);
+
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
                 GL.Uniform1(ShadowShader.BaseColorTexture, 0);
@@ -125,6 +139,9 @@ namespace Larx.MapAssets
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, rotationBuffers[key]);
                 GL.VertexAttribPointer(5, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, variationBuffers[key]);
+                GL.VertexAttribPointer(6, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
                 GL.DrawElementsInstanced(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero, Map.MapData.Assets[key].Count);

@@ -9,7 +9,8 @@ uniform sampler2D uTextureNoise;
 in vec3 vert_position;
 in vec2 vert_texCoord;
 in vec3 vert_normal;
-in LightVectors vert_lightVectors;
+in vec3 vert_lightVector;
+in vec3 vert_eyeVector;
 in vec4 vert_shadowCoords;
 
 out vec4 outputColor;
@@ -54,7 +55,7 @@ vec3 finalTexture(int index) {
 
     vec3 n = texture(uTexture, getTriPlanarTexture(index * 3 + 1)).rgb * 2.0 - 1.0;
     float r = texture(uTexture, getTriPlanarTexture(index * 3 + 2)).r;
-    return getTriPlanarTexture(index * 3) * calculateLight(vert_lightVectors, n, r * 5.0, 1.0) * noise;
+    return getTriPlanarTexture(index * 3) * calculateLight(vert_lightVector, vert_eyeVector, n, r * 5.0, 1.0) * noise;
 }
 
 float circle() {

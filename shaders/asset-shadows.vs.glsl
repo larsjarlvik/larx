@@ -4,11 +4,13 @@ layout(location = 0) in vec3 vPosition;
 layout(location = 1) in vec2 vTexCoord;
 layout(location = 4) in vec3 iPosition;
 layout(location = 5) in float iRotation;
+layout(location = 6) in float iVariation;
 
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 
 out vec2 vert_texCoord;
+out float vert_variation;
 
 mat3 rotationYMatrix(float a) {
     return mat3(cos(a), 0, sin(a), 0, 1, 0, -sin(a), 0, cos(a));
@@ -20,6 +22,7 @@ void main(void) {
     vec4 worldPosition = uViewMatrix * position;
 
     vert_texCoord = vTexCoord;
+    vert_variation = iVariation;
 
     gl_Position = uProjectionMatrix * worldPosition;
 }

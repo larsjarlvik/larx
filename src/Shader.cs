@@ -11,6 +11,9 @@ namespace Larx
         private int shadowMap;
         private int shadowMatrix;
         private int enableShadows;
+        private int vertexShader;
+        private int fragmentShader;
+        private int geometryShader;
 
         public int Program { get; }
         public int ProjectionMatrix { get; private set; }
@@ -43,25 +46,37 @@ namespace Larx
 
         public Shader(string name)
         {
-            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+            vertexShader = GL.CreateShader(ShaderType.VertexShader);
+            fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+            Program = GL.CreateProgram();
 
             GL.ShaderSource(vertexShader, prepareShader($"{name}.vs.glsl"));
             GL.CompileShader(vertexShader);
             checkCompileStatus($"Vertex Shader: {name}", vertexShader);
+            GL.AttachShader(Program, fragmentShader);
 
             GL.ShaderSource(fragmentShader, prepareShader($"{name}.fs.glsl"));
             GL.CompileShader(fragmentShader);
             checkCompileStatus($"Fragment Shader: {name}", fragmentShader);
-
-            Program = GL.CreateProgram();
-            GL.AttachShader(Program, fragmentShader);
             GL.AttachShader(Program, vertexShader);
+
+            if (File.Exists(Path.Combine("shaders", $"{name}.gs.glsl"))) {
+                geometryShader = GL.CreateShader(ShaderType.GeometryShaderExt);
+                GL.ShaderSource(geometryShader, prepareShader($"{name}.gs.glsl"));
+                GL.CompileShader(geometryShader);
+                checkCompileStatus($"Geometry Shader: {name}", geometryShader);
+                GL.AttachShader(Program, geometryShader);
+            }
+
+
             GL.LinkProgram(Program);
+            var log = GL.GetProgramInfoLog(Program);
+            if (!string.IsNullOrEmpty(log)) {
+                throw new Exception($"Filed to link program {name}: {log}");
+            }
+
             GL.UseProgram(Program);
-
             GL.ValidateProgram(Program);
-
             SetUniformsLocations();
         }
 
@@ -89,7 +104,7 @@ namespace Larx
 
             GL.GetShader(shader, ShaderParameter.CompileStatus, out compileStatus);
             if (compileStatus != 1)
-                throw new Exception($"Filed to Compiler {shaderName}: {GL.GetShaderInfoLog(shader)}");
+                throw new Exception($"Failed to Compile {shaderName}: {GL.GetShaderInfoLog(shader)}");
         }
 
         public void ApplyCamera(Camera camera)

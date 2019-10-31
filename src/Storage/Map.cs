@@ -14,11 +14,13 @@ namespace Larx.Storage
     {
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
+        public float Variation { get; set; }
 
-        public PlacedAsset(Vector2 position, float rotation)
+        public PlacedAsset(Vector2 position, float rotation, float variation)
         {
             Position = position;
             Rotation = rotation;
+            Variation = variation;
         }
     }
 

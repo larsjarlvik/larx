@@ -157,9 +157,9 @@ namespace Larx
             GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
 
             terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
+            sky.Render(camera, light);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
             water.Render(camera, light, shadows);
-            sky.Render(camera, light);
 
             // Draw to screen
             multisampling.Draw();

@@ -1,12 +1,7 @@
 uniform vec3 uLightDirection;
 uniform vec3 uCameraPosition;
 
-struct LightVectors {
-    vec3 lightVector;
-    vec3 eyeVector;
-};
-
-LightVectors calculateLightVectors(vec3 normal, vec3 tangent, vec3 position, mat3 transform) {
+vec3[2] calculateLightVectors(vec3 normal, vec3 tangent, vec3 position, mat3 transform) {
     vec3 biTangent = normalize(cross(normal, tangent));
     mat3 tangentSpace = mat3(
         tangent.x, biTangent.x, normal.x,
@@ -14,7 +9,7 @@ LightVectors calculateLightVectors(vec3 normal, vec3 tangent, vec3 position, mat
         tangent.z, biTangent.z, normal.z
     ) * transform;
 
-    return LightVectors(
+    return vec3[2](
         tangentSpace * -uLightDirection,
         tangentSpace * -(uCameraPosition - position)
     );
