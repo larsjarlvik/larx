@@ -13,6 +13,7 @@ using Larx.Sky;
 using Larx.Storage;
 using Larx.Shadows;
 using Larx.Buffers;
+using Larx.Utils;
 
 namespace Larx
 {
@@ -239,6 +240,8 @@ namespace Larx
 
         public static void Main(string[] args)
         {
+            Nvidia.InitializeDedicatedGraphics();
+
             using (var program = new Program())
             {
                 program.VSync = VSyncMode.Off;
