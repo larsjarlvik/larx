@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
@@ -14,6 +13,7 @@ namespace Larx.Text
         private FontData fontData;
         private int vertexBuffer;
         private int textureBuffer;
+        private int vaoId;
         private int numItems;
         private float size;
 
@@ -26,15 +26,13 @@ namespace Larx.Text
             texture.LoadTexture(Path.Combine("resources", "OpenSans-Regular.png"));
             fontData = JsonConvert.DeserializeObject<FontData>(File.ReadAllText(Path.Combine("resources", "OpenSans-Regular.json")));
 
+            vaoId = GL.GenVertexArray();
             vertexBuffer = GL.GenBuffer();
             textureBuffer = GL.GenBuffer();
         }
 
         public void Render(Matrix4 pMatrix, Vector2 position, float buffer, float gamma)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-
             GL.DepthMask(false);
             GL.UseProgram(Shader.Program);
 
@@ -49,11 +47,9 @@ namespace Larx.Text
             GL.Uniform4(Shader.Color, new Color4(0.2f, 0.2f, 0.2f, 1f));
             GL.Uniform1(Shader.Buffer, buffer);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, textureBuffer);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, numItems);
 
@@ -63,6 +59,7 @@ namespace Larx.Text
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, numItems);
             GL.DepthMask(true);
+            GL.BindVertexArray(0);
         }
 
         private Vector2 drawGlyph(char chr, Vector2 pen, float size, List<Vector2> vertexElements, List<Vector2> textureElements) {
@@ -123,13 +120,15 @@ namespace Larx.Text
 
             numItems = vertexElements.Count;
 
+            GL.BindVertexArray(vaoId);
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * numItems, vertexElements.ToArray(), BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, textureBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * numItems, textureElements.ToArray(), BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Double, false, Vector2.SizeInBytes, 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+            GL.BindVertexArray(0);
         }
     }
 }

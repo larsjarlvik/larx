@@ -28,7 +28,7 @@ namespace Larx.GltfModel
                 }
             }
 
-            return new Model("sky", meshes);
+            return new Model(name, meshes);
         }
     }
 }

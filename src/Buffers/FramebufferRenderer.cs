@@ -9,6 +9,7 @@ namespace Larx.Buffers
         private Matrix4 pMatrix;
         private int vertexBuffer;
         private int textureBuffer;
+        private int vaoId;
         private Vector2 size;
         private Vector2 position;
 
@@ -20,6 +21,7 @@ namespace Larx.Buffers
 
         private void build()
         {
+            vaoId = GL.GenVertexArray();
             vertexBuffer = GL.GenBuffer();
             textureBuffer = GL.GenBuffer();
 
@@ -41,13 +43,17 @@ namespace Larx.Buffers
                 new Vector2(0.0f, 1.0f),
             };
 
+            GL.BindVertexArray(vaoId);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * vertices.Length, vertices, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, textureBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * textures.Length, vertices, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Double, false, Vector2.SizeInBytes, 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+
+            GL.BindVertexArray(0);
         }
 
         public void UpdateMatrix()
@@ -59,9 +65,6 @@ namespace Larx.Buffers
 
         public void Render(int textureId)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-
             GL.UseProgram(shader.Program);
 
             GL.UniformMatrix4(shader.Matrix, false, ref pMatrix);
@@ -72,13 +75,13 @@ namespace Larx.Buffers
             GL.BindTexture(TextureTarget.Texture2D, textureId);
             GL.Uniform1(shader.Texture, 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+            GL.BindVertexArray(vaoId);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, textureBuffer);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+            GL.BindVertexArray(0);
         }
     }
 }

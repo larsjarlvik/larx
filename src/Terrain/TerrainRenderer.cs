@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Larx.Shadows;
 using Larx.Storage;
 using Larx.Utils;
@@ -25,6 +24,7 @@ namespace Larx.Terrain
         private int indexBuffer;
         private int normalBuffer;
         private int tangentBuffer;
+        private int vaoId;
         private Vector3[,] vertices;
         private Vector2[,] coords;
         private Vector3[,] normals;
@@ -191,6 +191,7 @@ namespace Larx.Terrain
                 for (var x = 0; x <= Map.MapData.MapSize; x++)
                     updateNormals(x, z);
 
+            vaoId = GL.GenVertexArray();
             vertexBuffer = GL.GenBuffer();
             coordBuffer = GL.GenBuffer();
             indexBuffer = GL.GenBuffer();
@@ -234,21 +235,25 @@ namespace Larx.Terrain
 
         private void updateBuffers()
         {
+            GL.BindVertexArray(vaoId);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, coords.Length * Vector2.SizeInBytes, coords, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, normals.Length * Vector3.SizeInBytes, normals, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, tangentBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, tangents.Length * Vector3.SizeInBytes, tangents, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+
+            GL.BindVertexArray(0);
         }
 
         public void Update()
@@ -258,11 +263,6 @@ namespace Larx.Terrain
 
         public void Render(Camera camera, Light light, ShadowRenderer shadows, bool showOverlays, ClipPlane clip = ClipPlane.None)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.EnableVertexAttribArray(2);
-            GL.EnableVertexAttribArray(3);
-
             GL.UseProgram(shader.Program);
 
             GL.Uniform3(shader.MousePosition, MousePosition);
@@ -289,22 +289,18 @@ namespace Larx.Terrain
             shader.ApplyLight(light);
             shader.ApplyShadows(shadows);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+            GL.BindVertexArray(vaoId);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, normalBuffer);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, tangentBuffer);
-            GL.VertexAttribPointer(3, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, IntPtr.Zero);
 
             GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindVertexArray(0);
         }
 
         public void RenderShadowMap(ShadowRenderer shadows)
@@ -315,8 +311,8 @@ namespace Larx.Terrain
             GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
             GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, IntPtr.Zero);

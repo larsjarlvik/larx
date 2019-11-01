@@ -27,9 +27,19 @@ namespace Larx.MapAssets
             random = new Random();
 
             foreach(var asset in assets) {
+                var model = Model.Load(asset);
+                AppendBuffers(model);
+
                 ui.Tools.Add(new ToolbarItem(TopMenu.Assets, ui.AddButton(asset, $"ui/assets/{asset}.png")));
-                models.Add(asset, Model.Load(asset));
+                models.Add(asset, model);
                 Map.MapData.Assets.Add(asset, new List<PlacedAsset>());
+            }
+        }
+
+        public void Refresh(TerrainRenderer terrain)
+        {
+            foreach(var model in models.Values) {
+                Refresh(model, terrain);
             }
         }
 
@@ -51,18 +61,11 @@ namespace Larx.MapAssets
                 Map.MapData.Assets[State.ActiveToolBarItem].Add(new PlacedAsset(new Vector2(x, y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
             }
 
-            Refresh(terrain);
+            Refresh(models[State.ActiveToolBarItem], terrain);
         }
 
         public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.EnableVertexAttribArray(2);
-            GL.EnableVertexAttribArray(3);
-            GL.EnableVertexAttribArray(4);
-            GL.EnableVertexAttribArray(5);
-
             GL.UseProgram(Shader.Program);
 
             Shader.ApplyCamera(camera);
@@ -83,11 +86,6 @@ namespace Larx.MapAssets
 
         public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-            GL.EnableVertexAttribArray(4);
-            GL.EnableVertexAttribArray(5);
-
             GL.UseProgram(ShadowShader.Program);
 
             GL.UniformMatrix4(ShadowShader.ViewMatrix, false, ref shadows.ViewMatrix);

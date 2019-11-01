@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -12,6 +9,7 @@ namespace Larx.Object
         private readonly ObjectShader shader;
         private int vertexBuffer;
         private int indexBuffer;
+        private int vaoId;
 
         public ObjectRenderer()
         {
@@ -43,31 +41,37 @@ namespace Larx.Object
                 3, 2, 6, 6, 7, 3, // top
             };
 
+            vaoId = GL.GenVertexArray();
             vertexBuffer = GL.GenBuffer();
             indexBuffer = GL.GenBuffer();
 
+            GL.BindVertexArray(vaoId);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
+
+            GL.BindVertexArray(0);
         }
 
         public void Render(Camera camera, Vector3 position)
         {
-            GL.EnableVertexAttribArray(0);
             GL.UseProgram(shader.Program);
 
             GL.Uniform3(shader.Position, position.X, position.Y, position.Z);
 
             shader.ApplyCamera(camera);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, 36, DrawElementsType.UnsignedInt, IntPtr.Zero);
+
+            GL.BindVertexArray(0);
         }
     }
 }

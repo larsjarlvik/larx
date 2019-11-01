@@ -32,8 +32,8 @@ namespace Larx
         public Program() : base(
             1280, 720,
             new GraphicsMode(32, 24, 0, 0), "Larx", 0,
-            DisplayDevice.Default, 4, 0,
-            GraphicsContextFlags.Debug)
+            DisplayDevice.Default, 0, 0,
+            GraphicsContextFlags.ForwardCompatible)
         {
             State.PolygonMode = PolygonMode.Fill;
             State.ToolRadius = 3f;
@@ -53,8 +53,6 @@ namespace Larx
 
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
-
-            GL.BindVertexArray(GL.GenVertexArray());
 
             Map.New(400);
             ui = new Ui();

@@ -14,6 +14,7 @@ namespace Larx.Water
         private int vertexBuffer;
         private int coordBuffer;
         private int indexBuffer;
+        private int vaoId;
         private Texture dudvMap;
         private Texture normalMap;
 
@@ -56,27 +57,29 @@ namespace Larx.Water
                 0, 1, 2, 2, 3, 0,
             };
 
+            vaoId = GL.GenVertexArray();
             vertexBuffer = GL.GenBuffer();
             coordBuffer = GL.GenBuffer();
             indexBuffer = GL.GenBuffer();
 
+            GL.BindVertexArray(vaoId);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector3>(BufferTarget.ArrayBuffer, vertices.Length * Vector3.SizeInBytes, vertices, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, coords.Length * Vector2.SizeInBytes, coords, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(int), indices, BufferUsageHint.StaticDraw);
+
+            GL.BindVertexArray(0);
         }
 
         public void Render(Camera camera, Light light, ShadowRenderer shadows)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-
             GL.UseProgram(shader.Program);
 
             shader.ApplyCamera(camera);
@@ -107,14 +110,14 @@ namespace Larx.Water
             GL.BindTexture(TextureTarget.Texture2D, normalMap.TextureId);
             GL.Uniform1(shader.NormalMap, 4);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, coordBuffer);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
 
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, indexBuffer);
             GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
+
+            GL.BindVertexArray(0);
         }
     }
 }

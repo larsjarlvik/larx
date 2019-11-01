@@ -1,8 +1,6 @@
-using System;
 using System.IO;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
-using OpenTK.Input;
 
 namespace Larx.Button
 {
@@ -23,6 +21,7 @@ namespace Larx.Button
 
         private int vertexBuffer;
         private int textureBuffer;
+        private int vaoId;
         private Texture texture;
 
         public ButtonRenderer(string texturePath, Vector2 size)
@@ -38,6 +37,7 @@ namespace Larx.Button
 
         private void build()
         {
+            vaoId = GL.GenVertexArray();
             vertexBuffer = GL.GenBuffer();
             textureBuffer = GL.GenBuffer();
 
@@ -59,20 +59,21 @@ namespace Larx.Button
                 new Vector2(0.0f, 1.0f),
             };
 
+            GL.BindVertexArray(vaoId);
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * vertices.Length, vertices, BufferUsageHint.StaticDraw);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, textureBuffer);
             GL.BufferData<Vector2>(BufferTarget.ArrayBuffer, Vector2.SizeInBytes * textures.Length, vertices, BufferUsageHint.StaticDraw);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Double, false, Vector2.SizeInBytes, 0);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+
+            GL.BindVertexArray(0);
         }
 
         public void Render(Matrix4 pMatrix)
         {
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
-
             GL.UseProgram(Shader.Program);
 
             GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
@@ -84,13 +85,13 @@ namespace Larx.Button
             GL.Uniform1(Shader.State, (int)State);
             GL.Uniform1(Shader.Active, Active ? 1 : 0);
 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBuffer);
-            GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, textureBuffer);
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
 
             GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+
+            GL.BindVertexArray(0);
         }
 
         public bool Intersect(Vector2 position)

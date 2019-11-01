@@ -37,18 +37,16 @@ namespace Larx.Sky
                 GL.BindTexture(TextureTarget.Texture2D, mesh.Material.BaseColorTexture.TextureId);
                 GL.Uniform1(shader.BaseColorTexture, 0);
 
-                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.VertexBuffer);
-                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
-
-                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.TexCoordBuffer);
-                GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
-
-                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.NormalBuffer);
-                GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, Vector3.SizeInBytes, 0);
+                GL.BindVertexArray(mesh.VaoId);
+                GL.EnableVertexAttribArray(0);
+                GL.EnableVertexAttribArray(1);
+                GL.EnableVertexAttribArray(2);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
                 GL.DrawElements(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero);
             }
+
+            GL.BindVertexArray(0);
         }
     }
 }
