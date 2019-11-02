@@ -1,5 +1,4 @@
 ﻿using System;
-using Larx.Terrain;
 using Larx.Object;
 using Larx.UserInterFace;
 using OpenTK;
@@ -14,6 +13,8 @@ using Larx.Storage;
 using Larx.Shadows;
 using Larx.Buffers;
 using Larx.Utils;
+using v3 = Larx.TerrainV3;
+using Larx.Terrain;
 
 namespace Larx
 {
@@ -24,6 +25,9 @@ namespace Larx
         private Light light;
         private ObjectRenderer debug;
         private TerrainRenderer terrain;
+
+        public v3.TerrainRenderer terrainV3 { get; private set; }
+
         private WaterRenderer water;
         private SkyRenderer sky;
         private Assets assets;
@@ -33,7 +37,7 @@ namespace Larx
         public Program() : base(
             1280, 720,
             new GraphicsMode(32, 24, 0, 0), "Larx", 0,
-            DisplayDevice.Default, 0, 0,
+            DisplayDevice.Default, 4, 3,
             GraphicsContextFlags.ForwardCompatible)
         {
             State.PolygonMode = PolygonMode.Fill;
@@ -55,11 +59,12 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
-            Map.New(400);
+            Map.New(1024);
             ui = new Ui();
             debug = new ObjectRenderer();
             camera = new Camera();
             terrain = new TerrainRenderer(camera);
+            terrainV3 = new v3.TerrainRenderer(camera);
             water = new WaterRenderer();
             light = new Light();
             assets = new Assets(ui);
@@ -97,6 +102,7 @@ namespace Larx
             light.Update();
             terrain.Update();
             shadows.Update(camera, light);
+            terrainV3.Update(camera);
 
             if (!uiIntersect) {
                 switch (State.ActiveTopMenu)
@@ -123,31 +129,34 @@ namespace Larx
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.Enable(EnableCap.ClipDistance0);
-            GL.Enable(EnableCap.DepthTest);
+            // GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            // GL.Enable(EnableCap.ClipDistance0);
+            // GL.Enable(EnableCap.DepthTest);
 
-            // Asset shadow rendering
-            shadows.ShadowBuffer.Bind();
-            GL.Clear(ClearBufferMask.DepthBufferBit);
-            assets.RenderShadowMap(shadows, terrain);
-            terrain.RenderShadowMap(shadows);
+            // // Asset shadow rendering
+            // shadows.ShadowBuffer.Bind();
+            // GL.Clear(ClearBufferMask.DepthBufferBit);
+            // assets.RenderShadowMap(shadows, terrain);
+            // terrain.RenderShadowMap(shadows);
 
-            // Water refraction rendering
-            water.RefractionBuffer.Bind();
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Render(camera, light, null, true, ClipPlane.ClipTop);
-            assets.Render(camera, light, null, terrain, ClipPlane.ClipTop);
+            // // Water refraction rendering
+            // water.RefractionBuffer.Bind();
+            // GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            // terrain.Render(camera, light, null, true, ClipPlane.ClipTop);
+            // assets.Render(camera, light, null, terrain, ClipPlane.ClipTop);
 
-            // Water reflection rendering
-            camera.InvertY();
-            water.ReflectionBuffer.Bind();
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            assets.Render(camera, light, null, terrain, ClipPlane.ClipBottom);
-            terrain.Render(camera, light, null, false, ClipPlane.ClipBottom);
-            sky.Render(camera, light);
-            GL.Disable(EnableCap.ClipDistance0);
-            camera.Reset();
+            // // Water reflection rendering
+            // camera.InvertY();
+            // water.ReflectionBuffer.Bind();
+            // GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            // assets.Render(camera, light, null, terrain, ClipPlane.ClipBottom);
+
+            // terrainV2.UpdateQuadTree(camera);
+            // terrainV2.Render();
+            // terrain.Render(camera, light, null, false, ClipPlane.ClipBottom);
+            // sky.Render(camera, light);
+            // GL.Disable(EnableCap.ClipDistance0);
+            // camera.Reset();
 
             // Main rendering
             GL.Disable(EnableCap.ClipDistance0);
@@ -155,9 +164,10 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
 
-            terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
+            terrainV3.Render(camera);
+            // terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
-            water.Render(camera, light, shadows);
+            // water.Render(camera, light, shadows);
             sky.Render(camera, light);
 
             // Draw to screen

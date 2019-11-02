@@ -43,23 +43,49 @@ namespace Larx
 
         public Shader(string name)
         {
-            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+            Program = GL.CreateProgram();
 
+            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
             GL.ShaderSource(vertexShader, prepareShader($"{name}.vs.glsl"));
             GL.CompileShader(vertexShader);
             checkCompileStatus($"Vertex Shader: {name}", vertexShader);
+            GL.AttachShader(Program, vertexShader);
 
+            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
             GL.ShaderSource(fragmentShader, prepareShader($"{name}.fs.glsl"));
             GL.CompileShader(fragmentShader);
             checkCompileStatus($"Fragment Shader: {name}", fragmentShader);
-
-            Program = GL.CreateProgram();
             GL.AttachShader(Program, fragmentShader);
-            GL.AttachShader(Program, vertexShader);
+
+            // if (File.Exists(Path.Combine("shaders", $"{name}.gs.glsl")))
+            // {
+            //     var geometryShader = GL.CreateShader(ShaderType.GeometryShader);
+            //     GL.ShaderSource(geometryShader, prepareShader($"{name}.gs.glsl"));
+            //     GL.CompileShader(geometryShader);
+            //     checkCompileStatus($"Geometry Shader: {name}", geometryShader);
+            //     GL.AttachShader(Program, geometryShader);
+            // }
+
+            if (File.Exists(Path.Combine("shaders", $"{name}.tc.glsl")))
+            {
+                var tessControlShader = GL.CreateShader(ShaderType.TessControlShader);
+                GL.ShaderSource(tessControlShader, prepareShader($"{name}.tc.glsl"));
+                GL.CompileShader(tessControlShader);
+                checkCompileStatus($"Tesselation Control Shader: {name}", tessControlShader);
+                GL.AttachShader(Program, tessControlShader);
+            }
+
+            if (File.Exists(Path.Combine("shaders", $"{name}.te.glsl")))
+            {
+                var tessEvaluationShader = GL.CreateShader(ShaderType.TessEvaluationShader);
+                GL.ShaderSource(tessEvaluationShader, prepareShader($"{name}.te.glsl"));
+                GL.CompileShader(tessEvaluationShader);
+                checkCompileStatus($"Tesselation Evalutation Shader: {name}", tessEvaluationShader);
+                GL.AttachShader(Program, tessEvaluationShader);
+            }
+
             GL.LinkProgram(Program);
             GL.UseProgram(Program);
-
             GL.ValidateProgram(Program);
 
             SetUniformsLocations();
