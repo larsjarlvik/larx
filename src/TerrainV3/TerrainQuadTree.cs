@@ -13,7 +13,7 @@ namespace Larx.TerrainV3
 
             for (var x = 0.0f; x < TerrainConfig.RootNodes; x ++)
                 for (var z = 0.0f; z < TerrainConfig.RootNodes; z ++)
-                    Nodes.Add(new TerrainNode(new Vector3((x / TerrainConfig.RootNodes) - 0.5f, 0.0f, (z / TerrainConfig.RootNodes) - 0.5f), 0));
+                    Nodes.Add(new TerrainNode(new Vector2(x / TerrainConfig.RootNodes, z / TerrainConfig.RootNodes), 0));
         }
 
         public void UpdateQuadTree(Camera camera)

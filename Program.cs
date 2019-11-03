@@ -24,7 +24,7 @@ namespace Larx
         private Camera camera;
         private Light light;
         private ObjectRenderer debug;
-        private TerrainRenderer terrain;
+        // private TerrainRenderer terrain;
 
         public v3.TerrainRenderer terrainV3 { get; private set; }
 
@@ -59,11 +59,11 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
-            Map.New(1024);
+            Map.New(6000);
             ui = new Ui();
             debug = new ObjectRenderer();
             camera = new Camera();
-            terrain = new TerrainRenderer(camera);
+            // terrain = new TerrainRenderer(camera);
             terrainV3 = new v3.TerrainRenderer(camera);
             water = new WaterRenderer();
             light = new Light();
@@ -100,30 +100,30 @@ namespace Larx
 
             camera.Update((float)e.Time);
             light.Update();
-            terrain.Update();
+            // terrain.Update();
             shadows.Update(camera, light);
             terrainV3.Update(camera);
 
-            if (!uiIntersect) {
-                switch (State.ActiveTopMenu)
-                {
-                    case TopMenu.Terrain:
-                        if (mouse.LeftButton == ButtonState.Pressed) {
-                            terrain.ChangeElevation(0.1f);
-                            assets.Refresh(terrain);
-                        }
-                        if (mouse.RightButton == ButtonState.Pressed) {
-                            terrain.ChangeElevation(-0.1f);
-                            assets.Refresh(terrain);
-                        }
-                        break;
-                    case TopMenu.Paint:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
-                        break;
-                }
-            }
+            // if (!uiIntersect) {
+            //     switch (State.ActiveTopMenu)
+            //     {
+            //         case TopMenu.Terrain:
+            //             if (mouse.LeftButton == ButtonState.Pressed) {
+            //                 terrain.ChangeElevation(0.1f);
+            //                 assets.Refresh(terrain);
+            //             }
+            //             if (mouse.RightButton == ButtonState.Pressed) {
+            //                 terrain.ChangeElevation(-0.1f);
+            //                 assets.Refresh(terrain);
+            //             }
+            //             break;
+            //         case TopMenu.Paint:
+            //             if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
+            //             break;
+            //     }
+            // }
 
-            ui.UpdateText("position", $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
+            // ui.UpdateText("position", $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
             Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
 
@@ -166,7 +166,7 @@ namespace Larx
 
             terrainV3.Render(camera);
             // terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
-            assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
+            // assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
             // water.Render(camera, light, shadows);
             sky.Render(camera, light);
 
@@ -207,12 +207,12 @@ namespace Larx
             var intersection = ui.Click();
 
             if (intersection == null) {
-                switch (State.ActiveTopMenu)
-                {
-                    case TopMenu.Assets:
-                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition().Xz, terrain);
-                        break;
-                }
+                // switch (State.ActiveTopMenu)
+                // {
+                //     case TopMenu.Assets:
+                //         if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition().Xz, terrain);
+                //         break;
+                // }
             }
         }
 
@@ -232,11 +232,11 @@ namespace Larx
                 if (e.Control && e.Keyboard[Key.G])
                     State.ShowGridLines = !State.ShowGridLines;
 
-                if (e.Control && e.Keyboard[Key.S])
-                    Map.Save(terrain, assets);
+                // if (e.Control && e.Keyboard[Key.S])
+                //     Map.Save(terrain, assets);
 
-                if (e.Control && e.Keyboard[Key.O])
-                    Map.Load(terrain, assets);
+                // if (e.Control && e.Keyboard[Key.O])
+                //     Map.Load(terrain, assets);
             }
 
             if (!e.Control)
