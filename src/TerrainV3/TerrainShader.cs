@@ -8,20 +8,27 @@ namespace Larx.TerrainV3
 
         public int Position { get; private set; }
         public int Size { get; private set; }
-        public int Scale { get; private set; }
         public int Depth { get; private set; }
         public int LocalMatrix { get; private set; }
         public int WorldMatrix { get; private set; }
+        public int Lod { get; private set; }
+        public int Index { get; private set; }
+        public int[] LodMorphAreas { get; private set; }
 
         protected override void SetUniformsLocations()
         {
             base.SetUniformsLocations();
             Position = GL.GetUniformLocation(Program, "uPosition");
             Size = GL.GetUniformLocation(Program, "uSize");
-            Scale = GL.GetUniformLocation(Program, "uScale");
             Depth = GL.GetUniformLocation(Program, "uDepth");
             LocalMatrix = GL.GetUniformLocation(Program, "uLocalMatrix");
             WorldMatrix = GL.GetUniformLocation(Program, "uWorldMatrix");
+            Lod = GL.GetUniformLocation(Program, "uLod");
+            Index = GL.GetUniformLocation(Program, "uIndex");
+
+            LodMorphAreas = new int[8];
+            for (var i = 0; i < 8; i ++)
+                LodMorphAreas[i] = GL.GetUniformLocation(Program, $"uLodMorphAreas[{i}]");
         }
     }
 }

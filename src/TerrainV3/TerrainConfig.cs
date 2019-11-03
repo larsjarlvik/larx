@@ -2,12 +2,12 @@ namespace Larx.TerrainV3
 {
     public static class TerrainConfig
     {
-        public const float ScaleY = 0.0f;
-        public const float ScaleXZ = 1000.0f;
         public const int RootNodes = 8;
 
-        public static readonly float[] LodRange = new float [8] {
-            2000.0f, 1000.0f, 500.0f, 200.0f, 100.0f, 0.0f, 0.0f, 0.0f
+        public static readonly int[] LodRange = new int[8] {
+            1750, 874, 386, 192, 100, 50, 0, 0
         };
+
+        public static int[] LodMorphAreas = new int[8];
     }
 }

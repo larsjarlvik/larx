@@ -1,3 +1,4 @@
+using Larx.Storage;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -8,12 +9,14 @@ namespace Larx.TerrainV3
         private int vaoId;
         private TerrainShader shader;
         private TerrainQuadTree quadTree;
+        private Matrix4 worldTransform;
         private Vector3 lastCameraPosition;
 
-        public TerrainRenderer(Camera camera)
+        public TerrainRenderer()
         {
             shader = new TerrainShader();
             quadTree = new TerrainQuadTree();
+            worldTransform = Matrix4.CreateScale(Map.MapData.MapSize) * Matrix4.CreateTranslation(-Map.MapData.MapSize / 2.0f, 0.0f, -Map.MapData.MapSize / 2.0f);
 
             build();
         }
@@ -66,12 +69,16 @@ namespace Larx.TerrainV3
         public void Render(Camera camera)
         {
             GL.UseProgram(shader.Program);
+
             shader.ApplyCamera(camera);
+
+            GL.UniformMatrix4(shader.WorldMatrix, false, ref worldTransform);
+            for (int i = 0; i < 8; i++){
+                GL.Uniform1(shader.LodMorphAreas[i], TerrainConfig.LodMorphAreas[i]);
+            }
 
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
-
-            GL.Uniform1(shader.Scale, TerrainConfig.ScaleXZ);
             quadTree.Render(shader);
 
             GL.BindVertexArray(0);

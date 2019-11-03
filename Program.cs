@@ -64,7 +64,7 @@ namespace Larx
             debug = new ObjectRenderer();
             camera = new Camera();
             // terrain = new TerrainRenderer(camera);
-            terrainV3 = new v3.TerrainRenderer(camera);
+            terrainV3 = new v3.TerrainRenderer();
             water = new WaterRenderer();
             light = new Light();
             assets = new Assets(ui);
