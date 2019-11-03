@@ -15,6 +15,8 @@ uniform mat4 uProjectionMatrix;
 uniform mat4 uLocalMatrix;
 uniform mat4 uWorldMatrix;
 
+out vec2 vs_texCoord;
+
 float morphLatitude(vec2 position) {
     if (uIndex == vec2(0, 0)) {
         float morph = position.x - position.y;
@@ -86,5 +88,8 @@ void main() {
     vec2 position = (uLocalMatrix * vec4(vPosition.x, 0, vPosition.y, 1)).xz;
     if (uLod > 0) position += morph();
 
-    gl_Position = uProjectionMatrix * uViewMatrix * uWorldMatrix * vec4(position.x, 0.0, position.y, 1.0);
+    vec4 worldPosition = uWorldMatrix * vec4(position.x, 0.0, position.y, 1.0);
+
+    vs_texCoord = position;
+    gl_Position = worldPosition;
 }

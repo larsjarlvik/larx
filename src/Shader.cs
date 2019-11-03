@@ -57,14 +57,14 @@ namespace Larx
             checkCompileStatus($"Fragment Shader: {name}", fragmentShader);
             GL.AttachShader(Program, fragmentShader);
 
-            // if (File.Exists(Path.Combine("shaders", $"{name}.gs.glsl")))
-            // {
-            //     var geometryShader = GL.CreateShader(ShaderType.GeometryShader);
-            //     GL.ShaderSource(geometryShader, prepareShader($"{name}.gs.glsl"));
-            //     GL.CompileShader(geometryShader);
-            //     checkCompileStatus($"Geometry Shader: {name}", geometryShader);
-            //     GL.AttachShader(Program, geometryShader);
-            // }
+            if (File.Exists(Path.Combine("shaders", $"{name}.gs.glsl")))
+            {
+                var geometryShader = GL.CreateShader(ShaderType.GeometryShader);
+                GL.ShaderSource(geometryShader, prepareShader($"{name}.gs.glsl"));
+                GL.CompileShader(geometryShader);
+                checkCompileStatus($"Geometry Shader: {name}", geometryShader);
+                GL.AttachShader(Program, geometryShader);
+            }
 
             if (File.Exists(Path.Combine("shaders", $"{name}.tc.glsl")))
             {

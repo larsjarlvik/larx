@@ -59,7 +59,7 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
-            Map.New(6000);
+            Map.New(4096);
             ui = new Ui();
             debug = new ObjectRenderer();
             camera = new Camera();
@@ -123,7 +123,7 @@ namespace Larx
             //     }
             // }
 
-            // ui.UpdateText("position", $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
+            ui.UpdateText("position", $"Position: {terrainV3.MousePosition.X:0.##} {terrainV3.MousePosition.Z:0.##}");
             Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
 
@@ -131,7 +131,7 @@ namespace Larx
         {
             // GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             // GL.Enable(EnableCap.ClipDistance0);
-            // GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.DepthTest);
 
             // // Asset shadow rendering
             // shadows.ShadowBuffer.Bind();

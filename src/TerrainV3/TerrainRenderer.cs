@@ -11,18 +11,26 @@ namespace Larx.TerrainV3
         private TerrainQuadTree quadTree;
         private Matrix4 worldTransform;
         private Vector3 lastCameraPosition;
+        private TerrainPicker picker;
+        public HeightMap HeightMap;
+        public Vector3 MousePosition { get; private set; }
 
         public TerrainRenderer()
         {
             shader = new TerrainShader();
             quadTree = new TerrainQuadTree();
             worldTransform = Matrix4.CreateScale(Map.MapData.MapSize) * Matrix4.CreateTranslation(-Map.MapData.MapSize / 2.0f, 0.0f, -Map.MapData.MapSize / 2.0f);
+            picker = new TerrainPicker();
+            HeightMap = new HeightMap();
+            MousePosition = new Vector3();
 
             build();
         }
 
         public void Update(Camera camera)
         {
+            MousePosition = picker.GetPosition(camera);
+
             if (camera.Position == lastCameraPosition)
                 return;
 
@@ -73,6 +81,14 @@ namespace Larx.TerrainV3
             shader.ApplyCamera(camera);
 
             GL.UniformMatrix4(shader.WorldMatrix, false, ref worldTransform);
+            GL.Uniform1(shader.TessFactor, TerrainConfig.TessFactor);
+            GL.Uniform1(shader.TessSlope, TerrainConfig.TessSlope);
+            GL.Uniform1(shader.TessShift, TerrainConfig.TessShift);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, HeightMap.Texture);
+            GL.Uniform1(shader.HeightMap, 0);
+
             for (int i = 0; i < 8; i++){
                 GL.Uniform1(shader.LodMorphAreas[i], TerrainConfig.LodMorphAreas[i]);
             }
