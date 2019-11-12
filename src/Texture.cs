@@ -49,6 +49,19 @@ namespace Larx
             }
         }
 
+        public void CreateTexture(Point size)
+        {
+            Size = size;
+            TextureId = GL.GenTexture();
+
+            GL.BindTexture(TextureTarget.Texture2D, TextureId);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexStorage2D(TextureTarget2d.Texture2D, (int)(Math.Log(Size.X) / Math.Log(Size.Y)), SizedInternalFormat.Rgba32f, Size.X, Size.Y);
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+        }
+
         public void LoadTexture(string path, bool mipMap = false)
         {
             var buffer = imageToByteArray(path);

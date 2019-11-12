@@ -18,7 +18,7 @@ namespace Larx.Terrain
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
+            base.SetDefaultUniformLocations();
             base.SetShadowUniformLocations();
 
             Texture = GL.GetUniformLocation(Program, "uTexture");

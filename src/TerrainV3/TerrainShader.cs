@@ -1,3 +1,4 @@
+using Larx.Terrain;
 using OpenTK.Graphics.OpenGL;
 
 namespace Larx.TerrainV3
@@ -8,7 +9,6 @@ namespace Larx.TerrainV3
 
         public int Position { get; private set; }
         public int Size { get; private set; }
-        public int Depth { get; private set; }
         public int LocalMatrix { get; private set; }
         public int WorldMatrix { get; private set; }
         public int Lod { get; private set; }
@@ -18,13 +18,15 @@ namespace Larx.TerrainV3
         public int TessSlope { get; private set; }
         public int TessShift { get; private set; }
         public int HeightMap { get; private set; }
+        public int NormalMap { get; private set; }
+        public int Texture { get; private set; }
+        public int ClipPlane { get; private set; }
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
+            base.SetDefaultUniformLocations();
             Position = GL.GetUniformLocation(Program, "uPosition");
             Size = GL.GetUniformLocation(Program, "uSize");
-            Depth = GL.GetUniformLocation(Program, "uDepth");
             LocalMatrix = GL.GetUniformLocation(Program, "uLocalMatrix");
             WorldMatrix = GL.GetUniformLocation(Program, "uWorldMatrix");
             Lod = GL.GetUniformLocation(Program, "uLod");
@@ -38,6 +40,9 @@ namespace Larx.TerrainV3
             TessSlope = GL.GetUniformLocation(Program, "uTessSlope");
             TessShift = GL.GetUniformLocation(Program, "uTessShift");
             HeightMap = GL.GetUniformLocation(Program, "uHeightMap");
+            NormalMap = GL.GetUniformLocation(Program, "uNormalMap");
+            Texture = GL.GetUniformLocation(Program, "uTexture");
+            ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
         }
     }
 }

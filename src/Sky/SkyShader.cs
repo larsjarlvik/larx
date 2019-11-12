@@ -11,7 +11,7 @@ namespace Larx.Sky
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
+            base.SetDefaultUniformLocations();
             BaseColorTexture = GL.GetUniformLocation(Program, "uBaseColorTexture");
             ClearColor = GL.GetUniformLocation(Program, "uClearColor");
             FarPlane = GL.GetUniformLocation(Program, "uFarPlane");

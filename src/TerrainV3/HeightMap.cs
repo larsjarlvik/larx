@@ -14,13 +14,13 @@ namespace Larx.TerrainV3
 
         public HeightMap()
         {
-            size = (int)(Map.MapData.MapSize / TerrainConfig.HeightMapDetail);
+            size = (int)(Map.MapData.MapSize * TerrainConfig.HeightMapDetail);
             heightMap = new float[size, size];
-            var random = new Random();
+            var noise = SimplexNoise.Noise.Calc2D(size, size, 0.02f);
 
             for(var x = 0; x < size; x ++)
                 for(var z = 0; z < size; z ++)
-                    heightMap[x, z] = (MathF.Sin((float)x / 100) + MathF.Cos((float)z / 100)) * 10.0f;
+                    heightMap[x, z] = noise[x, z] / 100.0f - 1.0f;
 
             Update();
         }

@@ -16,7 +16,7 @@ namespace Larx.MapAssets
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
+            base.SetDefaultUniformLocations();
             base.SetShadowUniformLocations();
 
             Position = GL.GetUniformLocation(Program, "uPosition");

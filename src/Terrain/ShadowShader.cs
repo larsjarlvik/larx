@@ -6,7 +6,7 @@ namespace Larx.Terrain
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
+            base.SetDefaultUniformLocations();
         }
     }
 }

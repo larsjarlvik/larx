@@ -13,8 +13,7 @@ namespace Larx.MapAssets
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
-
+            base.SetDefaultUniformLocations();
             Position = GL.GetUniformLocation(Program, "uPosition");
             Rotation = GL.GetUniformLocation(Program, "uRotation");
             BaseColorTexture = GL.GetUniformLocation(Program, "uBaseColorTexture");

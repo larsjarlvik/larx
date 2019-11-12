@@ -21,9 +21,14 @@ namespace Larx
         public int LightDiffuse { get; private set; }
         public int LightSpecular { get; private set; }
 
-        private string prepareShader(string name)
+        private void addShader(string name, ShaderType shaderType, string ext, string shaderDescriptor)
         {
-            var contents = File.ReadLines(Path.Combine("shaders", name));
+            var path = Path.Combine("shaders", $"{name}.{ext}.glsl");
+
+            if (!File.Exists(path))
+                return;
+
+            var contents = File.ReadLines(path);
             var finalShader = new StringBuilder();
 
             foreach(var line in contents)
@@ -38,51 +43,26 @@ namespace Larx
                 finalShader.AppendLine(line);
             }
 
-            return finalShader.ToString();
+            var shaderSource = finalShader.ToString();
+
+            var shader = GL.CreateShader(shaderType);
+            GL.ShaderSource(shader, shaderSource);
+            GL.CompileShader(shader);
+            checkCompileStatus($"{shaderDescriptor}: {name}", shader);
+            GL.AttachShader(Program, shader);
+
         }
 
         public Shader(string name)
         {
             Program = GL.CreateProgram();
 
-            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(vertexShader, prepareShader($"{name}.vs.glsl"));
-            GL.CompileShader(vertexShader);
-            checkCompileStatus($"Vertex Shader: {name}", vertexShader);
-            GL.AttachShader(Program, vertexShader);
-
-            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(fragmentShader, prepareShader($"{name}.fs.glsl"));
-            GL.CompileShader(fragmentShader);
-            checkCompileStatus($"Fragment Shader: {name}", fragmentShader);
-            GL.AttachShader(Program, fragmentShader);
-
-            if (File.Exists(Path.Combine("shaders", $"{name}.gs.glsl")))
-            {
-                var geometryShader = GL.CreateShader(ShaderType.GeometryShader);
-                GL.ShaderSource(geometryShader, prepareShader($"{name}.gs.glsl"));
-                GL.CompileShader(geometryShader);
-                checkCompileStatus($"Geometry Shader: {name}", geometryShader);
-                GL.AttachShader(Program, geometryShader);
-            }
-
-            if (File.Exists(Path.Combine("shaders", $"{name}.tc.glsl")))
-            {
-                var tessControlShader = GL.CreateShader(ShaderType.TessControlShader);
-                GL.ShaderSource(tessControlShader, prepareShader($"{name}.tc.glsl"));
-                GL.CompileShader(tessControlShader);
-                checkCompileStatus($"Tesselation Control Shader: {name}", tessControlShader);
-                GL.AttachShader(Program, tessControlShader);
-            }
-
-            if (File.Exists(Path.Combine("shaders", $"{name}.te.glsl")))
-            {
-                var tessEvaluationShader = GL.CreateShader(ShaderType.TessEvaluationShader);
-                GL.ShaderSource(tessEvaluationShader, prepareShader($"{name}.te.glsl"));
-                GL.CompileShader(tessEvaluationShader);
-                checkCompileStatus($"Tesselation Evalutation Shader: {name}", tessEvaluationShader);
-                GL.AttachShader(Program, tessEvaluationShader);
-            }
+            addShader(name, ShaderType.VertexShader, "vs", "Vertex Shader");
+            addShader(name, ShaderType.FragmentShader, "fs", "Fragment Shader");
+            addShader(name, ShaderType.GeometryShader, "gs", "Geometry Shader");
+            addShader(name, ShaderType.TessControlShader, "tc", "Tesselation Control Shader");
+            addShader(name, ShaderType.TessEvaluationShader, "te", "Tesselation Evaluation Shader");
+            addShader(name, ShaderType.ComputeShader, "cs", "Compute Shader");
 
             GL.LinkProgram(Program);
             GL.UseProgram(Program);
@@ -92,6 +72,10 @@ namespace Larx
         }
 
         protected virtual void SetUniformsLocations()
+        {
+        }
+
+        protected void SetDefaultUniformLocations()
         {
             ProjectionMatrix = GL.GetUniformLocation(Program, "uProjectionMatrix");
             ViewMatrix = GL.GetUniformLocation(Program, "uViewMatrix");

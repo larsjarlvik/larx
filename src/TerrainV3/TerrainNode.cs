@@ -56,7 +56,6 @@ namespace Larx.TerrainV3
                 GL.Uniform1(shader.Lod, Lod);
                 GL.Uniform2(shader.Index, Index);
                 GL.Uniform1(shader.Size, Size);
-                GL.Uniform1(shader.Depth, Depth);
                 GL.DrawArrays(PrimitiveType.Patches, 0, 16);
                 return;
             }
