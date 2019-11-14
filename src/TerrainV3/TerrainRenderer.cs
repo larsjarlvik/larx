@@ -16,22 +16,24 @@ namespace Larx.TerrainV3
         private Vector3 lastCameraPosition;
         private TerrainPicker picker;
         private readonly Texture texture;
+        private readonly Camera camera;
         private HeightMap heightMap;
         private NormalMap normalMap;
         public Vector3 MousePosition { get; private set; }
 
-        public TerrainRenderer()
+        public TerrainRenderer(Camera camera)
         {
+            this.camera = camera;
             shader = new TerrainShader();
             quadTree = new TerrainQuadTree();
             worldTransform = Matrix4.CreateScale(Map.MapData.MapSize) * Matrix4.CreateTranslation(-Map.MapData.MapSize / 2.0f, 0.0f, -Map.MapData.MapSize / 2.0f);
-            picker = new TerrainPicker();
             MousePosition = new Vector3();
 
             texture = new Texture();
             heightMap = new HeightMap();
             normalMap = new NormalMap();
             normalMap.Generate(heightMap.Texture);
+            picker = new TerrainPicker(camera, heightMap);
             loadTextures();
 
             build();
@@ -48,9 +50,9 @@ namespace Larx.TerrainV3
             texture.LoadTexture(paths.ToArray(), true);
         }
 
-        public void Update(Camera camera)
+        public void Update()
         {
-            MousePosition = picker.GetPosition(camera);
+            MousePosition = picker.GetPosition();
 
             if (camera.Position == lastCameraPosition)
                 return;
@@ -110,6 +112,7 @@ namespace Larx.TerrainV3
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, heightMap.Texture);
             GL.Uniform1(shader.HeightMap, 0);
+            GL.Uniform1(shader.HeightMapScale, TerrainConfig.HeightMapScale);
 
             GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, normalMap.Texture.TextureId);
@@ -120,6 +123,9 @@ namespace Larx.TerrainV3
             GL.Uniform1(shader.Texture, 2);
 
             GL.Uniform1(shader.ClipPlane, (int)clipPlane);
+            GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
+            GL.Uniform3(shader.MousePosition, MousePosition);
+            GL.Uniform1(shader.SelectionSize, State.ToolRadius);
 
             for (int i = 0; i < 8; i++){
                 GL.Uniform1(shader.LodMorphAreas[i], TerrainConfig.LodMorphAreas[i]);

@@ -4,11 +4,35 @@
 uniform sampler2DArray uTexture;
 uniform sampler2D uNormalMap;
 
+uniform int uGridLines;
+
+uniform vec3 uMousePosition;
+uniform float uSelectionSize;
+
 in vec2 gs_texCoord;
 in vec3 gs_position;
 in LightVectors gs_lightVectors;
 
 out vec4 outputColor;
+
+float circle() {
+    float radius = uSelectionSize;
+    float border = 0.08;
+    float dist = distance(uMousePosition.xz, gs_position.xz);
+
+    return 1.0 + smoothstep(radius, radius + border, dist)
+               - smoothstep(radius - border, radius, dist);
+}
+
+float gridLine() {
+    if (uGridLines == 0) return 0.0;
+
+    vec2 coord = gs_position.xz;
+    vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord);
+    float line = min(grid.x, grid.y);
+
+    return (1.0 - min(line, 1.0)) / 3;
+}
 
 vec3 getTriPlanarTexture(int textureId, vec3 n) {
     vec3 blending = abs(n);
@@ -33,5 +57,7 @@ vec3 finalTexture(int index, vec3 normal, LightVectors lv) {
 void main() {
     vec3 normal = (texture(uNormalMap, gs_texCoord).zyx * 2.0) - 1.0;
     vec3 color = finalTexture(0, normal, gs_lightVectors);
-    outputColor = vec4(color, 1.0);
+
+    vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
+    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);
 }

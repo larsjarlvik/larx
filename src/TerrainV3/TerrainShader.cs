@@ -18,9 +18,13 @@ namespace Larx.TerrainV3
         public int TessSlope { get; private set; }
         public int TessShift { get; private set; }
         public int HeightMap { get; private set; }
+        public int HeightMapScale { get; private set; }
         public int NormalMap { get; private set; }
         public int Texture { get; private set; }
         public int ClipPlane { get; private set; }
+        public int GridLines { get; private set; }
+        public int MousePosition { get; private set; }
+        public int SelectionSize { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -40,9 +44,13 @@ namespace Larx.TerrainV3
             TessSlope = GL.GetUniformLocation(Program, "uTessSlope");
             TessShift = GL.GetUniformLocation(Program, "uTessShift");
             HeightMap = GL.GetUniformLocation(Program, "uHeightMap");
+            HeightMapScale = GL.GetUniformLocation(Program, "uHeightMapScale");
             NormalMap = GL.GetUniformLocation(Program, "uNormalMap");
             Texture = GL.GetUniformLocation(Program, "uTexture");
             ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
+            GridLines = GL.GetUniformLocation(Program, "uGridLines");
+            MousePosition = GL.GetUniformLocation(Program, "uMousePosition");
+            SelectionSize = GL.GetUniformLocation(Program, "uSelectionSize");
         }
     }
 }

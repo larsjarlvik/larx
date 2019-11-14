@@ -9,6 +9,7 @@ uniform sampler2D uNormalMap;
 
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform float uHeightMapScale;
 
 in vec2 te_texCoord[];
 
@@ -41,7 +42,8 @@ void main() {
     vec3 tangent = calcTangent();
 
     for (int i = 0; i < gl_in.length(); ++i) {
-        vec4 position = gl_in[i].gl_Position * vec4(1, 25, 1, 1);
+        vec4 position = gl_in[i].gl_Position;
+        position.y *= uHeightMapScale;
         vec3 normal = (texture(uNormalMap, te_texCoord[i]).zyx * 2.0) - 1.0;
 
         gs_lightVectors = calculateLightVectors(normal, tangent, position.xyz, mat3(1.0));

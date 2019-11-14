@@ -64,7 +64,7 @@ namespace Larx
             debug = new ObjectRenderer();
             camera = new Camera();
             // terrain = new TerrainRenderer(camera);
-            terrainV3 = new v3.TerrainRenderer();
+            terrainV3 = new v3.TerrainRenderer(camera);
             water = new WaterRenderer();
             light = new Light();
             assets = new Assets(ui);
@@ -102,7 +102,7 @@ namespace Larx
             light.Update();
             // terrain.Update();
             shadows.Update(camera, light);
-            terrainV3.Update(camera);
+            terrainV3.Update();
 
             // if (!uiIntersect) {
             //     switch (State.ActiveTopMenu)
