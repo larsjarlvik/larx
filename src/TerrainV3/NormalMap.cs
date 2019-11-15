@@ -1,19 +1,19 @@
 using OpenTK.Graphics.OpenGL;
 using Larx.Storage;
 using OpenTK;
-using System;
+using Larx.TerrainV3.Shaders;
 
 namespace Larx.TerrainV3
 {
     public class NormalMap
     {
         public readonly Texture Texture;
-        private NormalMapShader shader;
+        private NormalCompute shader;
         private int size;
 
         public NormalMap()
         {
-            shader = new NormalMapShader();
+            shader = new NormalCompute();
             size = (int)(Map.MapData.MapSize * TerrainConfig.HeightMapDetail);
             Texture = new Texture();
             Texture.CreateTexture(new Point(size, size));

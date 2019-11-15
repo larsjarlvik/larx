@@ -59,7 +59,7 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
-            Map.New(4096);
+            Map.New(2048);
             ui = new Ui();
             debug = new ObjectRenderer();
             camera = new Camera();
@@ -118,7 +118,7 @@ namespace Larx
                         }
                         break;
                     case TopMenu.Paint:
-                        // if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
+                        if (mouse.LeftButton == ButtonState.Pressed) terrainV3.SplatMap.Paint(terrainV3.MousePosition);
                         break;
                 }
             }
@@ -130,7 +130,6 @@ namespace Larx
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
@@ -138,7 +137,9 @@ namespace Larx
             shadows.ShadowBuffer.Bind();
             GL.Clear(ClearBufferMask.DepthBufferBit);
             assets.RenderShadowMap(shadows, terrainV3);
-            terrainV3.RenderShadowMap(camera, shadows);
+            terrainV3.RenderShadowMap(camera, shadows, v3.ClipPlane.ClipBottom);
+
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
 
             // Water refraction rendering
             water.RefractionBuffer.Bind();
@@ -229,11 +230,11 @@ namespace Larx
                 if (e.Control && e.Keyboard[Key.G])
                     State.ShowGridLines = !State.ShowGridLines;
 
-                // if (e.Control && e.Keyboard[Key.S])
-                //     Map.Save(terrain, assets);
+                if (e.Control && e.Keyboard[Key.S])
+                    Map.Save(terrainV3, assets);
 
-                // if (e.Control && e.Keyboard[Key.O])
-                //     Map.Load(terrain, assets);
+                if (e.Control && e.Keyboard[Key.O])
+                    Map.Load(terrainV3, assets);
             }
 
             if (!e.Control)

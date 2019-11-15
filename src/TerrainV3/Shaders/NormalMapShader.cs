@@ -1,10 +1,10 @@
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.TerrainV3
+namespace Larx.TerrainV3.Shaders
 {
-    public class NormalMapShader : Shader
+    public class NormalCompute : Shader
     {
-        public NormalMapShader() : base("normals") { }
+        public NormalCompute() : base("normals") { }
 
         public int Input { get; private set; }
         public int Size { get; private set; }

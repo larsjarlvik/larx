@@ -3,8 +3,10 @@
 #include calculate-light
 
 uniform sampler2DArray uTexture;
+uniform sampler2DArray uSplatMap;
 uniform sampler2D uNormalMap;
 
+uniform int uSplatCount;
 uniform int uGridLines;
 
 uniform vec3 uMousePosition;
@@ -58,7 +60,14 @@ vec3 finalTexture(int index, vec3 normal, LightVectors lv) {
 
 void main() {
     vec3 normal = (texture(uNormalMap, gs_texCoord).zyx * 2.0) - 1.0;
-    vec3 color = finalTexture(0, normal, gs_lightVectors);
+
+    vec3 color = vec3(0);
+    for (int i = 0; i < uSplatCount; i++) {
+        float intesity = texture(uSplatMap, vec3(gs_texCoord.x, gs_texCoord.y, i)).r;
+        if (intesity > 0.0) {
+            color += finalTexture(i, normal, gs_lightVectors) * intesity;
+        }
+    }
 
     color *= getShadowFactor(gs_shadowCoords, 0.3);
 

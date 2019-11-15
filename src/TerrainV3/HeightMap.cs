@@ -19,11 +19,10 @@ namespace Larx.TerrainV3
             this.normalMap = normalMap;
             size = (int)(Map.MapData.MapSize * TerrainConfig.HeightMapDetail);
             Heights = new float[size, size];
-            // var noise = SimplexNoise.Noise.Calc2D(size, size, 0.02f);
 
-            // for(var x = 0; x < size; x ++)
-            //     for(var z = 0; z < size; z ++)
-            //         Heights[x, z] = noise[x, z] * 0.005f - 0.5f;
+            for(var x = 0; x < size; x ++)
+                for(var z = 0; z < size; z ++)
+                    Heights[x, z] = 1.0f / TerrainConfig.HeightMapScale;
 
             Update();
         }

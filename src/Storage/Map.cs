@@ -70,7 +70,10 @@ namespace Larx.Storage
                     MapData = binarySerializer.Read<MapDataContainer>(decompressedStream);
                 }
 
+            terrain.HeightMap.Heights = MapData.TerrainElevations;
             terrain.Update();
+            terrain.HeightMap.Update();
+            terrain.SplatMap.Refresh();
             assets.Refresh(terrain);
         }
     }

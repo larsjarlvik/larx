@@ -12,6 +12,8 @@ namespace Larx.TerrainV3.Shaders
         public int GridLines { get; private set; }
         public int MousePosition { get; private set; }
         public int SelectionSize { get; private set; }
+        public int SplatMap { get; private set; }
+        public int SplatCount { get; internal set; }
 
         protected override void SetUniformsLocations()
         {
@@ -23,6 +25,8 @@ namespace Larx.TerrainV3.Shaders
             GridLines = GL.GetUniformLocation(Program, "uGridLines");
             MousePosition = GL.GetUniformLocation(Program, "uMousePosition");
             SelectionSize = GL.GetUniformLocation(Program, "uSelectionSize");
+            SplatMap = GL.GetUniformLocation(Program, "uSplatMap");
+            SplatCount = GL.GetUniformLocation(Program, "uSplatCount");
         }
     }
 }
