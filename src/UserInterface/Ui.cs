@@ -93,11 +93,11 @@ namespace Larx.UserInterFace
                     buttons[Keys.AddAssets].Active = true;
                     break;
                 case Keys.Terrain.SizeIncrease:
-                    State.ToolRadius ++;
-                    if (State.ToolRadius > 12f) State.ToolRadius = 12f;
+                    State.ToolRadius += State.ToolRadius >= 20 ? 5 : State.ToolRadius >= 10 ? 2 : 1;
+                    if (State.ToolRadius > 50f) State.ToolRadius = 50f;
                     break;
                 case Keys.Terrain.SizeDecrease:
-                    State.ToolRadius --;
+                    State.ToolRadius += State.ToolRadius >= 20 ? -5 : State.ToolRadius >= 10 ? -2 : -1;
                     if (State.ToolRadius < 0f) State.ToolRadius = 0f;
                     break;
                 case Keys.Terrain.HardnessIncrease:
