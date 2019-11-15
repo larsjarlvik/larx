@@ -4,7 +4,7 @@ using System.IO;
 using System.IO.Compression;
 using Apex.Serialization;
 using Larx.MapAssets;
-using Larx.TerrainV3;
+using Larx.Terrain;
 using OpenTK;
 
 namespace Larx.Storage

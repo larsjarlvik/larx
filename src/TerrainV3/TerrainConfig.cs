@@ -1,4 +1,4 @@
-namespace Larx.TerrainV3
+namespace Larx.Terrain
 {
     public static class TerrainConfig
     {

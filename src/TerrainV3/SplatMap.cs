@@ -1,11 +1,11 @@
 using OpenTK.Graphics.OpenGL;
 using Larx.Storage;
 using OpenTK;
-using Larx.TerrainV3.Shaders;
+using Larx.Terrain.Shaders;
 using System;
 using System.Linq;
 
-namespace Larx.TerrainV3
+namespace Larx.Terrain
 {
     public class SplatMap
     {

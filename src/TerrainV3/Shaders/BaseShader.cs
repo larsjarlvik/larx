@@ -1,6 +1,6 @@
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.TerrainV3.Shaders
+namespace Larx.Terrain.Shaders
 {
     public class BaseShader : Shader
     {

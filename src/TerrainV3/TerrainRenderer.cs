@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using Larx.Shadows;
 using Larx.Storage;
-using Larx.TerrainV3.Shaders;
+using Larx.Terrain.Shaders;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.TerrainV3
+namespace Larx.Terrain
 {
     public enum ClipPlane {
         None = 0,

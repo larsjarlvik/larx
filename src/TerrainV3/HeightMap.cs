@@ -5,7 +5,7 @@ using Larx.Utils;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.TerrainV3
+namespace Larx.Terrain
 {
     public class HeightMap
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Larx.GltfModel;
 using Larx.Shadows;
 using Larx.Storage;
-using Larx.TerrainV3;
+using Larx.Terrain;
 using Larx.UserInterFace;
 using Larx.Utils;
 using OpenTK;

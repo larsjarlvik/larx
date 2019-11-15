@@ -1,11 +1,11 @@
 using Larx.Terrain;
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.TerrainV3.Shaders
+namespace Larx.Terrain.Shaders
 {
     public class RenderShader : BaseShader
     {
-        public RenderShader() : base("terrain-v2") { }
+        public RenderShader() : base("terrain") { }
 
         public int NormalMap { get; private set; }
         public int Texture { get; private set; }

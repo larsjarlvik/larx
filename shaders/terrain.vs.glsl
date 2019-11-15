@@ -1,34 +1,20 @@
-#version 330
-#include shadow-coords
-#include calculate-light-vectors
-#include clip
+#version 430
+#include morph
 
-precision highp float;
+layout (location = 0) in vec2 vPosition;
 
-layout(location = 0) in vec3 vPosition;
-layout(location = 1) in vec2 vTexCoord;
-layout(location = 2) in vec3 vNormal;
-layout(location = 3) in vec3 vTangent;
+uniform int uLod;
+uniform mat4 uLocalMatrix;
+uniform mat4 uWorldMatrix;
 
-uniform mat4 uProjectionMatrix;
-uniform mat4 uViewMatrix;
+out vec2 vs_texCoord;
 
-out vec3 vert_position;
-out vec2 vert_texCoord;
-out vec3 vert_normal;
-out LightVectors vert_lightVectors;
-out vec4 vert_shadowCoords;
+void main() {
+    vec2 position = (uLocalMatrix * vec4(vPosition.x, 0, vPosition.y, 1)).xz;
+    if (uLod > 0) position += morph(uWorldMatrix, vPosition, uLod);
 
-void main()
-{
-    vec4 worldPosition = uViewMatrix * vec4(vPosition, 1.0);
+    vec4 worldPosition = uWorldMatrix * vec4(position.x, 0.0, position.y, 1.0);
 
-    vert_position = vPosition;
-    vert_texCoord = vTexCoord;
-    vert_normal = vNormal;
-    vert_lightVectors = calculateLightVectors(vert_normal, vTangent.xyz, vert_position.xyz, mat3(1.0));
-    vert_shadowCoords = getShadowCoords(vec4(vert_position, 1.0));
-
-    gl_ClipDistance[0] = clip(vert_position.xyz);
-    gl_Position = uProjectionMatrix * worldPosition;
+    vs_texCoord = position;
+    gl_Position = worldPosition;
 }

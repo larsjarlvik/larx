@@ -1,7 +1,7 @@
 using System;
 using Larx.GltfModel;
 using Larx.Storage;
-using Larx.TerrainV3;
+using Larx.Terrain;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 

@@ -37,7 +37,7 @@ namespace Larx.UserInterFace
             alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.png")));
             alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.png")));
 
-            Tools.AddRange(TerrainRenderer.Textures.Select((t, i) =>
+            Tools.AddRange(TerrainConfig.Textures.Select((t, i) =>
                 new ToolbarItem(TopMenu.Paint, AddButton(i.ToString(), Path.Combine("textures", $"{t}-albedo.png")))
             ));
 

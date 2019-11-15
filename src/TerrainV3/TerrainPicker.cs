@@ -1,7 +1,7 @@
 using System;
 using OpenTK;
 
-namespace Larx.TerrainV3
+namespace Larx.Terrain
 {
     public class TerrainPicker
     {
