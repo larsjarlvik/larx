@@ -14,6 +14,7 @@ namespace Larx.TerrainV3.Shaders
         public int SelectionSize { get; private set; }
         public int SplatMap { get; private set; }
         public int SplatCount { get; internal set; }
+        public int TextureNoise { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -27,6 +28,7 @@ namespace Larx.TerrainV3.Shaders
             SelectionSize = GL.GetUniformLocation(Program, "uSelectionSize");
             SplatMap = GL.GetUniformLocation(Program, "uSplatMap");
             SplatCount = GL.GetUniformLocation(Program, "uSplatCount");
+            TextureNoise = GL.GetUniformLocation(Program, "uTextureNoise");
         }
     }
 }

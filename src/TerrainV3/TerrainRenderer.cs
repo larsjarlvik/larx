@@ -26,6 +26,7 @@ namespace Larx.TerrainV3
         private Vector3 lastCameraPosition;
         private TerrainPicker picker;
         private readonly Texture texture;
+        private readonly TextureNoise textureNoise;
         private readonly Camera camera;
         private readonly NormalMap normalMap;
         public readonly SplatMap SplatMap;
@@ -42,6 +43,7 @@ namespace Larx.TerrainV3
             MousePosition = new Vector3();
 
             texture = new Texture();
+            textureNoise = new TextureNoise(12312234);
             normalMap = new NormalMap();
             HeightMap = new HeightMap(normalMap);
             SplatMap = new SplatMap();
@@ -139,6 +141,10 @@ namespace Larx.TerrainV3
             GL.BindTexture(TextureTarget.Texture2DArray, SplatMap.Texture);
             GL.Uniform1(shader.SplatMap, 3);
             GL.Uniform1(shader.SplatCount, TerrainConfig.Textures.Length);
+
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, textureNoise.Texture);
+            GL.Uniform1(shader.TextureNoise, 4);
 
             GL.Uniform1(shader.ClipPlane, (int)clipPlane);
             GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);

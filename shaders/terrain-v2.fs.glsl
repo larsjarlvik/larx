@@ -5,6 +5,7 @@
 uniform sampler2DArray uTexture;
 uniform sampler2DArray uSplatMap;
 uniform sampler2D uNormalMap;
+uniform sampler2D uTextureNoise;
 
 uniform int uSplatCount;
 uniform int uGridLines;
@@ -52,7 +53,11 @@ vec3 getTriPlanarTexture(int textureId, vec3 n) {
 }
 
 vec3 finalTexture(int index, vec3 normal, LightVectors lv) {
-    float noise = 1.0;
+    float n1 = (texture(uTextureNoise, gs_texCoord / 0.6).r * 0.1) + 0.95;
+    float n2 = (texture(uTextureNoise, gs_texCoord / 9.0).r * 0.2) + 0.90;
+
+    float noise = (n1 + n2) / 2;
+
     vec3 n = texture(uTexture, getTriPlanarTexture(index * 3 + 1, normal)).rgb * 2.0 - 1.0;
     float r = texture(uTexture, getTriPlanarTexture(index * 3 + 2, normal)).r;
     return getTriPlanarTexture(index * 3, normal) * calculateLight(lv, n, r * 5.0, 1.0) * noise;

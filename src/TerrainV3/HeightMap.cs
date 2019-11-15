@@ -94,7 +94,7 @@ namespace Larx.TerrainV3
         private List<Vector2> getTilesInArea(Vector2 center, float radius)
         {
             var included = new List<Vector2>();
-            var r = radius + 2;
+            var r = (radius + 2) * TerrainConfig.HeightMapDetail;
 
             for (var z = center.Y - r; z <= center.Y + r; z++)
                 for (var x = center.X - r; x <= center.X + r; x++)
