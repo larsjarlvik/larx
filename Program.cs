@@ -30,7 +30,7 @@ namespace Larx
         private WaterRenderer water;
         private SkyRenderer sky;
         private Assets assets;
-        private ShadowRenderer shadows;
+        private ShadowBox shadows;
         private Ui ui;
 
         public Program() : base(
@@ -67,7 +67,7 @@ namespace Larx
             light = new Light();
             assets = new Assets(ui);
             sky = new SkyRenderer();
-            shadows = new ShadowRenderer();
+            shadows = new ShadowBox();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -98,7 +98,6 @@ namespace Larx
 
             camera.Update((float)e.Time);
             light.Update();
-            // terrain.Update();
             shadows.Update(camera, light);
             terrain.Update();
 

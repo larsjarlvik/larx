@@ -25,6 +25,7 @@ namespace Larx
         {
             Look = new Vector3();
             Rotation = new Vector2(0.0f, 30.0f);
+            Update(0.0f);
         }
 
         public void Move(Vector3 delta)
@@ -117,9 +118,9 @@ namespace Larx
             return Vector3.Add(Position, ray * pos.Z);
         }
 
-        public Vector3[] GetFrustumCorners(float near, float far)
+        public Vector3[] GetFrustumBox(float near, float far)
         {
-            return new Vector3[8] {
+            var furstumCorners = new Vector3[8] {
                 GetPoint(new Vector3(-1.0f,-1.0f, near)),
                 GetPoint(new Vector3(-1.0f,-1.0f, far)),
                 GetPoint(new Vector3( 1.0f,-1.0f, near)),
@@ -129,6 +130,48 @@ namespace Larx
                 GetPoint(new Vector3( 1.0f, 1.0f, near)),
                 GetPoint(new Vector3( 1.0f, 1.0f, far))
             };
+
+            var min = Vector3.Zero;
+            var max = Vector3.Zero;
+            var first = false;
+
+            foreach(var point in furstumCorners)
+            {
+                if (first) {
+                    min.X = point.X;
+                    max.X = point.X;
+                    min.Y = point.Y;
+                    max.Y = point.Y;
+                    min.Z = point.Z;
+                    max.Z = point.Z;
+                    first = false;
+                    continue;
+                }
+
+                max.X = MathF.Max(max.X, point.X);
+                min.X = MathF.Min(min.X, point.X);
+                max.Y = MathF.Max(max.Y, point.Y);
+                min.Y = MathF.Min(min.Y, point.Y);
+                max.Z = MathF.Max(max.Z, point.Z);
+                min.Z = MathF.Min(min.Z, point.Z);
+            }
+
+            return new Vector3[] {
+                min,
+                max,
+            };
+        }
+
+        public static bool InFrustum(Vector3[] frustumBox, Vector3 vMin, Vector3 vMax)
+        {
+            if (vMax.X < frustumBox[0].X) return false;
+            if (vMin.X > frustumBox[1].X) return false;
+            if (vMax.Y < frustumBox[0].Y) return false;
+            if (vMin.Y > frustumBox[1].Y) return false;
+            if (vMax.Z < frustumBox[0].Z) return false;
+            if (vMin.Z > frustumBox[1].Z) return false;
+
+            return true;
         }
     }
 }

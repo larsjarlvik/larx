@@ -31,6 +31,12 @@ namespace Larx
             public static Size Size { get; set; }
             public static float Aspect { get; set; }
 
+            static Window()
+            {
+                Size = new Size(1280, 720);
+                Aspect = 1280f / 720f;
+            }
+
             public static void Set(int Width, int Height)
             {
                 Size = new Size(Width, Height);

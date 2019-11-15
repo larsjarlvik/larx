@@ -65,7 +65,7 @@ namespace Larx.Water
             GL.BindVertexArray(0);
         }
 
-        public void Render(Camera camera, Light light, ShadowRenderer shadows)
+        public void Render(Camera camera, Light light, ShadowBox shadows)
         {
             GL.UseProgram(shader.Program);
 

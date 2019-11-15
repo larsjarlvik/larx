@@ -117,7 +117,7 @@ namespace Larx
             GL.Uniform3(LightSpecular, light.Specular);
         }
 
-        public void ApplyShadows(ShadowRenderer shadows)
+        public void ApplyShadows(ShadowBox shadows)
         {
             if (shadows != null) {
                 GL.ActiveTexture(TextureUnit.Texture9);

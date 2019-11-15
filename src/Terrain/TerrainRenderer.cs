@@ -33,6 +33,8 @@ namespace Larx.Terrain
         public readonly HeightMap HeightMap;
         public Vector3 MousePosition { get; private set; }
 
+        private Vector3[] frustumBox;
+
         public TerrainRenderer(Camera camera)
         {
             this.camera = camera;
@@ -51,6 +53,7 @@ namespace Larx.Terrain
             loadTextures();
 
             build();
+            Update();
         }
 
         private void loadTextures()
@@ -67,6 +70,7 @@ namespace Larx.Terrain
         public void Update()
         {
             MousePosition = picker.GetPosition();
+            frustumBox = camera.GetFrustumBox(State.Near, State.Far);
 
             if (camera.Position == lastCameraPosition)
                 return;
@@ -111,7 +115,7 @@ namespace Larx.Terrain
             GL.BindVertexArray(0);
         }
 
-        public void Render(Camera camera, Light light, ShadowRenderer shadows, ClipPlane clipPlane = ClipPlane.None)
+        public void Render(Camera camera, Light light, ShadowBox shadows, ClipPlane clipPlane = ClipPlane.None)
         {
             GL.UseProgram(shader.Program);
 
@@ -157,12 +161,12 @@ namespace Larx.Terrain
 
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
-            quadTree.Render(shader);
+            quadTree.Render(shader, frustumBox);
 
             GL.BindVertexArray(0);
         }
 
-        internal void RenderShadowMap(Camera camera, ShadowRenderer shadows, ClipPlane clipPlane = ClipPlane.None)
+        internal void RenderShadowMap(Camera camera, ShadowBox shadows, ClipPlane clipPlane = ClipPlane.None)
         {
             GL.UseProgram(shadowShader.Program);
 
@@ -187,7 +191,7 @@ namespace Larx.Terrain
 
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
-            quadTree.Render(shadowShader);
+            quadTree.Render(shadowShader, frustumBox);
 
             GL.BindVertexArray(0);
         }

@@ -21,6 +21,9 @@ namespace Larx.Terrain
         public int Lod { get; set; }
         public Vector2 Index { get; set; }
 
+        private readonly Vector3 vMin;
+        private readonly Vector3 vMax;
+
 
         public TerrainNode(Vector2 position, int lod, Vector2 index)
         {
@@ -36,6 +39,10 @@ namespace Larx.Terrain
 
             localTransform = Matrix4.CreateScale(localScaling) * Matrix4.CreateTranslation(localTranslation);
             worldPosition = new Vector3(Position.X + (Size / 2.0f), 0.0f, Position.Y + (Size / 2.0f)) * Map.MapData.MapSize - new Vector3(Map.MapData.MapSize / 2.0f, 0.0f, Map.MapData.MapSize / 2.0f);
+
+            var halfSize = Map.MapData.MapSize / (TerrainConfig.RootNodes * MathF.Pow(2.0f, Lod)) / 2.0f;
+            vMin = worldPosition + new Vector3(-halfSize, 0.0f, -halfSize);
+            vMax = worldPosition + new Vector3( halfSize, 0.0f,  halfSize);
         }
 
         public void UpdateQuadTree(Camera camera)
@@ -48,8 +55,12 @@ namespace Larx.Terrain
                 removeChildren();
         }
 
-        public void Render(BaseShader shader)
+        public void Render(BaseShader shader, Vector3[] frustumCorners)
         {
+            if (!Camera.InFrustum(frustumCorners, vMin, vMax)) {
+                return;
+            }
+
             if (IsLeafNode) {
                 GL.UniformMatrix4(shader.LocalMatrix, false, ref localTransform);
                 GL.Uniform2(shader.Position, Position);
@@ -61,7 +72,7 @@ namespace Larx.Terrain
             }
 
             foreach(var node in Children)
-                if (node != null) node.Render(shader);
+                if (node != null) node.Render(shader, frustumCorners);
         }
 
         private void addChildren(Camera camera)
