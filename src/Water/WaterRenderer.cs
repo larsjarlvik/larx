@@ -28,8 +28,8 @@ namespace Larx.Water
 
             dudvMap = new Texture();
             normalMap = new Texture();
-            dudvMap.LoadTexture(Path.Combine("resources", "textures", "water-dudv.png"));
-            normalMap.LoadTexture(Path.Combine("resources", "textures", "water-normal.png"));
+            dudvMap.LoadTexture(Path.Combine("resources", "textures", "water-dudv.png"), true);
+            normalMap.LoadTexture(Path.Combine("resources", "textures", "water-normal.png"), true);
 
             build();
         }
@@ -78,7 +78,6 @@ namespace Larx.Water
             GL.Uniform1(shader.TimeOffset, (float)(State.Time.Total * 0.001 % 1));
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, RefractionBuffer.ColorTexture);
             GL.Uniform1(shader.RefractionColorTexture, 0);
 
@@ -87,7 +86,6 @@ namespace Larx.Water
             GL.Uniform1(shader.RefractionDepthTexture, 1);
 
             GL.ActiveTexture(TextureUnit.Texture2);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             GL.BindTexture(TextureTarget.Texture2D, ReflectionBuffer.ColorTexture);
             GL.Uniform1(shader.ReflectionColorTexture, 2);
 

@@ -5,6 +5,7 @@ using System.Linq;
 using Larx.Button;
 using Larx.Terrain;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace Larx.UserInterFace
 {
@@ -149,7 +150,8 @@ namespace Larx.UserInterFace
 
         public void Render()
         {
-            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, State.Window.Size.Width, State.Window.Size.Height, 0f, 0f, -1.0f);
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
+            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, State.Window.Size.Width, State.Window.Size.Height, 0f, 0f, -1f);
 
             for(var i = 0; i < texts.Count; i ++)
                 texts.Values.ElementAt(i).Render(pMatrix, new Vector2(10, 20 + i * 20), 0.65f, 1.6f);

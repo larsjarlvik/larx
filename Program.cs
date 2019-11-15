@@ -37,7 +37,7 @@ namespace Larx
         public Program() : base(
             1280, 720,
             new GraphicsMode(32, 24, 0, 0), "Larx", 0,
-            DisplayDevice.Default, 4, 3,
+            DisplayDevice.Default, 4, 5,
             GraphicsContextFlags.ForwardCompatible)
         {
             State.PolygonMode = PolygonMode.Fill;
@@ -130,6 +130,7 @@ namespace Larx
         protected override void OnRenderFrame(FrameEventArgs e)
         {
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
