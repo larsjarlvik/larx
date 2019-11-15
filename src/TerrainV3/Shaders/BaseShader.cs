@@ -1,11 +1,10 @@
-using Larx.Terrain;
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.TerrainV3
+namespace Larx.TerrainV3.Shaders
 {
-    public class TerrainShader : Shader
+    public class BaseShader : Shader
     {
-        public TerrainShader() : base("terrain-v2") { }
+        public BaseShader(string shader) : base(shader) { }
 
         public int Position { get; private set; }
         public int Size { get; private set; }
@@ -19,16 +18,12 @@ namespace Larx.TerrainV3
         public int TessShift { get; private set; }
         public int HeightMap { get; private set; }
         public int HeightMapScale { get; private set; }
-        public int NormalMap { get; private set; }
-        public int Texture { get; private set; }
         public int ClipPlane { get; private set; }
-        public int GridLines { get; private set; }
-        public int MousePosition { get; private set; }
-        public int SelectionSize { get; private set; }
 
         protected override void SetUniformsLocations()
         {
             base.SetDefaultUniformLocations();
+
             Position = GL.GetUniformLocation(Program, "uPosition");
             Size = GL.GetUniformLocation(Program, "uSize");
             LocalMatrix = GL.GetUniformLocation(Program, "uLocalMatrix");
@@ -43,14 +38,9 @@ namespace Larx.TerrainV3
             TessFactor = GL.GetUniformLocation(Program, "uTessFactor");
             TessSlope = GL.GetUniformLocation(Program, "uTessSlope");
             TessShift = GL.GetUniformLocation(Program, "uTessShift");
+            ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
             HeightMap = GL.GetUniformLocation(Program, "uHeightMap");
             HeightMapScale = GL.GetUniformLocation(Program, "uHeightMapScale");
-            NormalMap = GL.GetUniformLocation(Program, "uNormalMap");
-            Texture = GL.GetUniformLocation(Program, "uTexture");
-            ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
-            GridLines = GL.GetUniformLocation(Program, "uGridLines");
-            MousePosition = GL.GetUniformLocation(Program, "uMousePosition");
-            SelectionSize = GL.GetUniformLocation(Program, "uSelectionSize");
         }
     }
 }

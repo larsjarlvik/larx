@@ -14,7 +14,7 @@ namespace Larx.TerrainV3
         public const float TessSlope = 1.8f;
         public const float TessShift = 0.3f;
         public const float HeightMapDetail = 0.25f;
-        public const float HeightMapScale = 25.0f;
+        public const float HeightMapScale = 5.0f;
 
         public static readonly string[] Textures = new [] {
             "grass-1",

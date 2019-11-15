@@ -1,7 +1,6 @@
 using System;
 using Larx.Utils;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
 
 namespace Larx
 {
@@ -11,7 +10,7 @@ namespace Larx
         public const float RotationDeceleration = 0.1f;
         public const float DistanceDeceleration = 4.0f;
 
-        public float Distance = 400.0f;
+        public float Distance = 150.0f;
         private float cameraDistanceSpeed = 0.0f;
         public Vector3 Look;
         public Vector2 Rotation;

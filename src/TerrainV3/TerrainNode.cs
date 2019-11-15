@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using Larx.Storage;
+using Larx.TerrainV3.Shaders;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
@@ -48,7 +48,7 @@ namespace Larx.TerrainV3
                 removeChildren();
         }
 
-        public void Render(TerrainShader shader)
+        public void Render(BaseShader shader)
         {
             if (IsLeafNode) {
                 GL.UniformMatrix4(shader.LocalMatrix, false, ref localTransform);

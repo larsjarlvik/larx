@@ -1,4 +1,5 @@
 #version 330
+#include shadow-factor
 #include calculate-light
 
 uniform sampler2DArray uTexture;
@@ -11,6 +12,7 @@ uniform float uSelectionSize;
 
 in vec2 gs_texCoord;
 in vec3 gs_position;
+in vec4 gs_shadowCoords;
 in LightVectors gs_lightVectors;
 
 out vec4 outputColor;
@@ -57,6 +59,8 @@ vec3 finalTexture(int index, vec3 normal, LightVectors lv) {
 void main() {
     vec3 normal = (texture(uNormalMap, gs_texCoord).zyx * 2.0) - 1.0;
     vec3 color = finalTexture(0, normal, gs_lightVectors);
+
+    color *= getShadowFactor(gs_shadowCoords, 0.3);
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
     outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);

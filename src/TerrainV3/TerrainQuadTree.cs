@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Larx.Storage;
+using Larx.TerrainV3.Shaders;
 using OpenTK;
 
 namespace Larx.TerrainV3
@@ -36,7 +37,7 @@ namespace Larx.TerrainV3
                 node.UpdateQuadTree(camera);
         }
 
-        public void Render(TerrainShader shader)
+        public void Render(BaseShader shader)
         {
             foreach(var node in Nodes)
                 node.Render(shader);

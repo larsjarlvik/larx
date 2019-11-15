@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Larx.GltfModel;
 using Larx.Shadows;
 using Larx.Storage;
-using Larx.Terrain;
+using Larx.TerrainV3;
 using Larx.UserInterFace;
 using Larx.Utils;
 using OpenTK;
@@ -47,7 +47,7 @@ namespace Larx.MapAssets
         {
             if (State.ActiveToolBarItem == null) return;
 
-            var elev = terrain.GetElevationAtPoint(position);
+            var elev = terrain.HeightMap.GetElevationAtPoint(position);
             if (elev == null) return;
 
             var count = (State.ToolHardness - 1) * State.ToolHardness + 1;

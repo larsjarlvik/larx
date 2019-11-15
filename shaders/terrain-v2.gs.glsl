@@ -1,6 +1,7 @@
 #version 430
 #include calculate-light-vectors
 #include clip
+#include shadow-coords
 
 layout(triangles) in;
 layout(triangle_strip, max_vertices = 4) out;
@@ -15,6 +16,7 @@ in vec2 te_texCoord[];
 
 out vec2 gs_texCoord;
 out vec3 gs_position;
+out vec4 gs_shadowCoords;
 out LightVectors gs_lightVectors;
 
 
@@ -49,6 +51,7 @@ void main() {
         gs_lightVectors = calculateLightVectors(normal, tangent, position.xyz, mat3(1.0));
         gs_texCoord = te_texCoord[i];
         gs_position = position.xyz;
+        gs_shadowCoords = getShadowCoords(position);
 
         gl_ClipDistance[0] = clip(position.xyz);
         gl_Position = uProjectionMatrix * uViewMatrix * position;

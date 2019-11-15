@@ -1,39 +1,49 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using Larx.Shadows;
 using Larx.Storage;
-using Larx.Terrain;
+using Larx.TerrainV3.Shaders;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
 namespace Larx.TerrainV3
 {
+    public enum ClipPlane {
+        None = 0,
+        ClipBottom = 1,
+        ClipTop = 2,
+    }
+
+
     public class TerrainRenderer
     {
         private int vaoId;
-        private TerrainShader shader;
+        private RenderShader shader;
+        private ShadowShader shadowShader;
         private TerrainQuadTree quadTree;
         private Matrix4 worldTransform;
         private Vector3 lastCameraPosition;
         private TerrainPicker picker;
         private readonly Texture texture;
         private readonly Camera camera;
-        private HeightMap heightMap;
+        public HeightMap HeightMap;
         private NormalMap normalMap;
         public Vector3 MousePosition { get; private set; }
 
         public TerrainRenderer(Camera camera)
         {
             this.camera = camera;
-            shader = new TerrainShader();
+            shader = new RenderShader();
+            shadowShader = new ShadowShader();
             quadTree = new TerrainQuadTree();
             worldTransform = Matrix4.CreateScale(Map.MapData.MapSize) * Matrix4.CreateTranslation(-Map.MapData.MapSize / 2.0f, 0.0f, -Map.MapData.MapSize / 2.0f);
             MousePosition = new Vector3();
 
             texture = new Texture();
-            heightMap = new HeightMap();
             normalMap = new NormalMap();
-            normalMap.Generate(heightMap.Texture);
-            picker = new TerrainPicker(camera, heightMap);
+            HeightMap = new HeightMap(normalMap);
+            picker = new TerrainPicker(camera, HeightMap);
             loadTextures();
 
             build();
@@ -97,12 +107,13 @@ namespace Larx.TerrainV3
             GL.BindVertexArray(0);
         }
 
-        public void Render(Camera camera, Light light, ClipPlane clipPlane = ClipPlane.None)
+        public void Render(Camera camera, Light light, ShadowRenderer shadows, ClipPlane clipPlane = ClipPlane.None)
         {
             GL.UseProgram(shader.Program);
 
             shader.ApplyCamera(camera);
             shader.ApplyLight(light);
+            shader.ApplyShadows(shadows);
 
             GL.UniformMatrix4(shader.WorldMatrix, false, ref worldTransform);
             GL.Uniform1(shader.TessFactor, TerrainConfig.TessFactor);
@@ -110,7 +121,7 @@ namespace Larx.TerrainV3
             GL.Uniform1(shader.TessShift, TerrainConfig.TessShift);
 
             GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, heightMap.Texture);
+            GL.BindTexture(TextureTarget.Texture2D, HeightMap.Texture);
             GL.Uniform1(shader.HeightMap, 0);
             GL.Uniform1(shader.HeightMapScale, TerrainConfig.HeightMapScale);
 
@@ -134,6 +145,36 @@ namespace Larx.TerrainV3
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
             quadTree.Render(shader);
+
+            GL.BindVertexArray(0);
+        }
+
+        internal void RenderShadowMap(Camera camera, ShadowRenderer shadows, ClipPlane clipPlane = ClipPlane.None)
+        {
+            GL.UseProgram(shadowShader.Program);
+
+            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
+            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
+            GL.UniformMatrix4(shadowShader.WorldMatrix, false, ref worldTransform);
+
+            GL.Uniform3(shadowShader.CameraPosition, camera.Position);
+            GL.Uniform1(shadowShader.TessFactor, TerrainConfig.TessFactor);
+            GL.Uniform1(shadowShader.TessSlope, TerrainConfig.TessSlope);
+            GL.Uniform1(shadowShader.TessShift, TerrainConfig.TessShift);
+
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, HeightMap.Texture);
+            GL.Uniform1(shadowShader.HeightMap, 0);
+            GL.Uniform1(shadowShader.HeightMapScale, TerrainConfig.HeightMapScale);
+
+            GL.Uniform1(shadowShader.ClipPlane, (int)clipPlane);
+            for (int i = 0; i < 8; i++){
+                GL.Uniform1(shadowShader.LodMorphAreas[i], TerrainConfig.LodMorphAreas[i]);
+            }
+
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
+            quadTree.Render(shadowShader);
 
             GL.BindVertexArray(0);
         }
