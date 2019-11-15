@@ -23,18 +23,9 @@ namespace Larx.Shadows
         public void Update(Camera camera, Light light)
         {
             var shadowFarPlane = camera.Distance * 3.0f + 20.0f;
-            var points = new Vector3[8];
-            points[0] = camera.GetPoint(new Vector3(-1.0f,-1.0f, State.Near));
-            points[1] = camera.GetPoint(new Vector3(-1.0f,-1.0f, shadowFarPlane));
-            points[2] = camera.GetPoint(new Vector3( 1.0f,-1.0f, State.Near));
-            points[3] = camera.GetPoint(new Vector3( 1.0f,-1.0f, shadowFarPlane));
-            points[4] = camera.GetPoint(new Vector3(-1.0f, 1.0f, State.Near));
-            points[5] = camera.GetPoint(new Vector3(-1.0f, 1.0f, shadowFarPlane));
-            points[6] = camera.GetPoint(new Vector3( 1.0f, 1.0f, State.Near));
-            points[7] = camera.GetPoint(new Vector3( 1.0f, 1.0f, shadowFarPlane));
             var first = true;
 
-            foreach(var point in points)
+            foreach(var point in camera.GetFrustumCorners(State.Near, shadowFarPlane))
             {
                 if (first) {
                     min.X = point.X;

@@ -116,5 +116,19 @@ namespace Larx
 
             return Vector3.Add(Position, ray * pos.Z);
         }
+
+        public Vector3[] GetFrustumCorners(float near, float far)
+        {
+            return new Vector3[8] {
+                GetPoint(new Vector3(-1.0f,-1.0f, near)),
+                GetPoint(new Vector3(-1.0f,-1.0f, far)),
+                GetPoint(new Vector3( 1.0f,-1.0f, near)),
+                GetPoint(new Vector3( 1.0f,-1.0f, far)),
+                GetPoint(new Vector3(-1.0f, 1.0f, near)),
+                GetPoint(new Vector3(-1.0f, 1.0f, far)),
+                GetPoint(new Vector3( 1.0f, 1.0f, near)),
+                GetPoint(new Vector3( 1.0f, 1.0f, far))
+            };
+        }
     }
 }
