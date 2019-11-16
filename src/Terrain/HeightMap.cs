@@ -103,5 +103,20 @@ namespace Larx.Terrain
 
             return included;
         }
+
+        public void LoadFromImage()
+        {
+            var tex = new Texture();
+            var ba = tex.ImageToByteArray("heightmap.png");
+            var stride = tex.PixelFormat == PixelFormat.Bgr ? 3 : 4;
+
+            for(var x = 0; x < size; x ++)
+                for(var z = 0; z < size; z ++)
+                {
+                    Heights[x, z] = (float)ba[(z * size + x) * 3] / 15.0f - 3.0f;
+                }
+
+            Update();
+        }
     }
 }
