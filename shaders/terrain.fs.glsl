@@ -79,7 +79,8 @@ void main() {
 
     float dist = length(uCameraPosition - gs_position.xyz);
     color *= getShadowFactor(gs_shadowCoords, 0.3);
+    color = fog(color, dist);
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
-    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), fog(dist));
+    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);
 }

@@ -32,5 +32,6 @@ void main() {
 
     float dist = length(uCameraPosition - vs_position.xyz);
 
-    outputColor = tex * vec4(calculateLight(vs_lightVectors, n, roughness, 1.0) * getShadowFactor(vs_shadowCoords, 0.3), tex.a * fog(dist));
+    outputColor = tex * vec4(calculateLight(vs_lightVectors, n, roughness, 1.0) * getShadowFactor(vs_shadowCoords, 0.3), tex.a);
+    outputColor = vec4(fog(outputColor.rgb, dist), tex.a);
 }

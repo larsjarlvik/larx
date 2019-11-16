@@ -13,6 +13,7 @@ namespace Larx.MapAssets
         public int Roughness { get; private set; }
         public int RoughnessTexture { get; private set; }
         public int ClipPlane { get; private set; }
+        public int FogColor { get; private set; }
         public int FarPlane { get; private set; }
 
         protected override void SetUniformsLocations()
@@ -27,6 +28,7 @@ namespace Larx.MapAssets
             Roughness = GL.GetUniformLocation(Program, "uRoughness");
             RoughnessTexture = GL.GetUniformLocation(Program, "uRoughnessTexture");
             ClipPlane = GL.GetUniformLocation(Program, "uClipPlane");
+            FogColor = GL.GetUniformLocation(Program, "uFogColor");
             FarPlane = GL.GetUniformLocation(Program, "uFarPlane");
         }
     }

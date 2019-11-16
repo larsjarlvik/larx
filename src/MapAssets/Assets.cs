@@ -73,6 +73,7 @@ namespace Larx.MapAssets
             Shader.ApplyShadows(shadows);
 
             GL.Uniform1(Shader.ClipPlane, (int)clip);
+            GL.Uniform4(Shader.FogColor, State.ClearColor);
             GL.Uniform1(Shader.FarPlane, State.Far);
 
             foreach(var key in models.Keys)

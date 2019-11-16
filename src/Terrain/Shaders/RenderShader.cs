@@ -15,6 +15,7 @@ namespace Larx.Terrain.Shaders
         public int SplatMap { get; private set; }
         public int SplatCount { get; internal set; }
         public int TextureNoise { get; private set; }
+        public int FogColor { get; private set; }
         public int FarPlane { get; private set; }
 
         protected override void SetUniformsLocations()
@@ -30,6 +31,7 @@ namespace Larx.Terrain.Shaders
             SplatMap = GL.GetUniformLocation(Program, "uSplatMap");
             SplatCount = GL.GetUniformLocation(Program, "uSplatCount");
             TextureNoise = GL.GetUniformLocation(Program, "uTextureNoise");
+            FogColor = GL.GetUniformLocation(Program, "uFogColor");
             FarPlane = GL.GetUniformLocation(Program, "uFarPlane");
         }
     }
