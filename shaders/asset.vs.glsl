@@ -13,10 +13,11 @@ layout(location = 5) in float iRotation;
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
 
-out vec2 vert_texCoord;
-out vec3 vert_normal;
-out LightVectors vert_lightVectors;
-out vec4 vert_shadowCoords;
+out vec2 vs_texCoord;
+out vec3 vs_normal;
+out LightVectors vs_lightVectors;
+out vec4 vs_shadowCoords;
+out vec3 vs_position;
 
 mat3 rotationYMatrix(float a) {
     return mat3(cos(a), 0, sin(a), 0, 1, 0, -sin(a), 0, cos(a));
@@ -27,10 +28,10 @@ void main() {
     vec4 position = vec4(vPosition * rotation + iPosition, 1.0);
     vec4 worldPosition = uViewMatrix * position;
 
-    vert_normal = vNormal;
-    vert_texCoord = vTexCoord;
-    vert_lightVectors = calculateLightVectors(vert_normal, vTangent.xyz, position.xyz, rotation);
-    vert_shadowCoords = getShadowCoords(position);
+    vs_normal = vNormal;
+    vs_texCoord = vTexCoord;
+    vs_lightVectors = calculateLightVectors(vs_normal, vTangent.xyz, position.xyz, rotation);
+    vs_shadowCoords = getShadowCoords(position);
 
     gl_ClipDistance[0] = clip(position.xyz);
     gl_Position = uProjectionMatrix * worldPosition;

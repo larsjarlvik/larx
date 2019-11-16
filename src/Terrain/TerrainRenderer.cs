@@ -154,6 +154,7 @@ namespace Larx.Terrain
             GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
             GL.Uniform3(shader.MousePosition, MousePosition);
             GL.Uniform1(shader.SelectionSize, State.ToolRadius);
+            GL.Uniform1(shader.FarPlane, State.Far);
 
             for (int i = 0; i < 8; i++){
                 GL.Uniform1(shader.LodMorphAreas[i], TerrainConfig.LodMorphAreas[i]);

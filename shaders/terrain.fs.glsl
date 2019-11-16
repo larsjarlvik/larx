@@ -1,6 +1,7 @@
 #version 330
 #include shadow-factor
 #include calculate-light
+#include fog
 
 uniform sampler2DArray uTexture;
 uniform sampler2DArray uSplatMap;
@@ -10,6 +11,7 @@ uniform sampler2D uTextureNoise;
 uniform int uSplatCount;
 uniform int uGridLines;
 
+uniform vec3 uCameraPosition;
 uniform vec3 uMousePosition;
 uniform float uSelectionSize;
 
@@ -38,6 +40,7 @@ float gridLine() {
 
     return (1.0 - min(line, 1.0)) / 3;
 }
+
 
 vec3 getTriPlanarTexture(int textureId, vec3 n) {
     vec3 blending = abs(n);
@@ -74,8 +77,9 @@ void main() {
         }
     }
 
+    float dist = length(uCameraPosition - gs_position.xyz);
     color *= getShadowFactor(gs_shadowCoords, 0.3);
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
-    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);
+    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), fog(dist));
 }

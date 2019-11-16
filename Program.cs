@@ -159,11 +159,10 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
 
+            sky.Render(camera, light);
             terrain.Render(camera, light, shadows, ClipPlane.ClipBottom);
-            // terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
             water.Render(camera, light, shadows);
-            sky.Render(camera, light);
 
             // Draw to screen
             multisampling.Draw();
