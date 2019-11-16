@@ -234,6 +234,9 @@ namespace Larx
 
                 if (e.Control && e.Keyboard[Key.H])
                     terrain.HeightMap.LoadFromImage();
+
+                if (e.Control && e.Keyboard[Key.P])
+                    terrain.SplatMap.AutoGenerate(terrain.HeightMap);
             }
 
             if (!e.Control)

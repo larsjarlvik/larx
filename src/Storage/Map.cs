@@ -48,7 +48,10 @@ namespace Larx.Storage
                     MapData.TerrainElevations[x, z] = 1.0f;
 
             MapData.SplatMap = new float[TerrainConfig.Textures.Length][,];
-            for(var i = 0; i < MapData.SplatMap.Length; i++) MapData.SplatMap[i] = new float[State.SplatDetail, State.SplatDetail];
+
+            var size = (int)(MapData.MapSize * TerrainConfig.HeightMapDetail);
+            for(var i = 0; i < MapData.SplatMap.Length; i++)
+                MapData.SplatMap[i] = new float[size, size];
         }
 
         public static void Save(TerrainRenderer terrain, Assets assets)
