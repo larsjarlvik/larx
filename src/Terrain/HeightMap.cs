@@ -72,7 +72,8 @@ namespace Larx.Terrain
         internal void ChangeElevation(Vector3 position, float offset)
         {
             var texturePos = getTextureCoordinate(position.Zx);
-            var toUpdate = getTilesInArea(texturePos, State.ToolRadius);
+            var r = (State.ToolRadius * TerrainConfig.HeightMapDetail) + 2;
+            var toUpdate = getTilesInArea(texturePos, r);
 
             foreach (var i in toUpdate)
             {
@@ -81,7 +82,7 @@ namespace Larx.Terrain
                 Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
 
                 var amount = Vector2.Distance(texturePos, i);
-                var elev = height + calcP(MathF.Min(1f, MathF.Sqrt((amount / State.ToolRadius > (State.ToolHardness * 0.1f) ? amount : 0.0f) / State.ToolRadius))) * offset / TerrainConfig.HeightMapScale;
+                var elev = height + calcP(MathF.Min(1f, MathF.Sqrt((amount / r > (State.ToolHardness * 0.1f) ? amount : 0.0f) / r))) * offset / TerrainConfig.HeightMapScale;
 
                 Heights[(int)i.X, (int)i.Y] = elev;
             }
@@ -89,10 +90,9 @@ namespace Larx.Terrain
             Update();
         }
 
-        private List<Vector2> getTilesInArea(Vector2 center, float radius)
+        private List<Vector2> getTilesInArea(Vector2 center, float r)
         {
             var included = new List<Vector2>();
-            var r = (radius + 2) * TerrainConfig.HeightMapDetail;
 
             for (var z = center.Y - r; z <= center.Y + r; z++)
                 for (var x = center.X - r; x <= center.X + r; x++)

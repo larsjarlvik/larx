@@ -15,7 +15,7 @@ namespace Larx
 
         public Light()
         {
-            Ambient = new Vector3(0.4f);
+            Ambient = new Vector3(0.2f);
             Diffuse = new Vector3(0.6f);
             Specular = new Vector3(0.2f);
             Rotation = new Vector2(MathLarx.DegToRad(0), MathLarx.DegToRad(45));
