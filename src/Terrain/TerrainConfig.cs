@@ -12,7 +12,7 @@ namespace Larx.Terrain
 
         public const int TessFactor = 600;
         public const float TessSlope = 1.8f;
-        public const float TessShift = 0.1f;
+        public const float TessShift = 0.2f;
         public const float HeightMapDetail = 0.5f;
         public const float HeightMapScale = 5.0f;
 
