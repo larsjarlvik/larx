@@ -35,7 +35,7 @@ namespace Larx.Terrain
 
         private float elevationAtPoint(float point)
         {
-            return renderer.GetElevationAtPoint(getPointOnRay(point).Xz) ?? 1.0f;
+            return renderer.GetElevationAtPoint(getPointOnRay(point).Xz) ?? 0.0f;
         }
 
         private Vector3 getPointOnRay(float distance)

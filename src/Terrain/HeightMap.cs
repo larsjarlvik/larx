@@ -41,39 +41,37 @@ namespace Larx.Terrain
             normalMap.Generate(Texture);
         }
 
-        public float? GetElevationAtPoint(Vector2 position)
+        public float? GetElevationAtPoint(Vector2 pos)
         {
-            Vector3 index0;
-            Vector3 index1;
-            Vector3 index2;
-
-            var tc = getTextureCoordinate(position);
-
+            var tc = getTextureCoordinate(pos);
             if (tc.X < 0.0f || tc.X >= size - 1 ||
                 tc.Y < 0.0f || tc.Y >= size - 1)
                 return null;
 
-            if ((tc.X % 1) + (tc.Y % 1) > 0.5f) {
-                index0 = new Vector3(tc.X, Heights[(int)tc.X, (int)tc.Y], tc.Y);
-                index1 = new Vector3(tc.X + 1, Heights[(int)tc.X + 1, (int)tc.Y], tc.Y);
-                index2 = new Vector3(tc.X, Heights[(int)tc.X, (int)tc.Y + 1], tc.Y + 1);
-            } else {
-                index0 = new Vector3(tc.X + 1, Heights[(int)tc.X + 1, (int)tc.Y], tc.Y);
-                index1 = new Vector3(tc.X, Heights[(int)tc.X, (int)tc.Y + 1], tc.Y + 1);
-                index2 = new Vector3(tc.X + 1, Heights[(int)tc.X + 1, (int)tc.Y + 1], tc.Y + 1);
-            }
+            var x = (int)tc.X;
+            var z = (int)tc.Y;
 
-            return MathLarx.BaryCentric(index0, index1, index2, tc) * TerrainConfig.HeightMapScale;
+            var h0 = Heights[z, x];
+            var h1 = Heights[z, x + 1];
+            var h2 = Heights[z + 1, x];
+            var h3 = Heights[z + 1, x + 1];
+
+            var percentU = tc.X - x;
+            var percentV = tc.Y - z;
+
+            var dU = percentU > percentV ? h1 - h0 : h3 - h2;
+            var dV = percentU > percentV ? h3 - h1 : h2 - h0;
+            return (h0 + (dU * percentU) + (dV * percentV)) * TerrainConfig.HeightMapScale;
         }
 
         private Vector2 getTextureCoordinate(Vector2 mapCoordinate)
         {
-            return ((mapCoordinate + new Vector2(Map.MapData.MapSize / 2.0f)) * TerrainConfig.HeightMapDetail).Yx;
+            return ((mapCoordinate + new Vector2(Map.MapData.MapSize / 2.0f)) * TerrainConfig.HeightMapDetail);
         }
 
         internal void ChangeElevation(Vector3 position, float offset)
         {
-            var texturePos = getTextureCoordinate(position.Xz);
+            var texturePos = getTextureCoordinate(position.Zx);
             var toUpdate = getTilesInArea(texturePos, State.ToolRadius);
 
             foreach (var i in toUpdate)
