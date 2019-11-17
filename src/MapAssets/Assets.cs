@@ -51,12 +51,17 @@ namespace Larx.MapAssets
             if (elev == null) return;
 
             var count = (State.ToolHardness - 1) * State.ToolHardness + 1;
+            var half = Map.MapData.MapSize / 2.0f;
 
             for(var i = 0; i < count; i ++) {
                 var r = (float)(random.NextDouble() * (State.ToolRadius - 1.0f));
                 var angle = (float)(random.NextDouble() * 2 * MathF.PI);
                 var x = position.X + r * MathF.Cos(angle);
                 var y = position.Y + r * MathF.Sin(angle);
+
+                if (x < -half || x >= half - 1 ||
+                    y < -half || y >= half - 1)
+                    continue;
 
                 Map.MapData.Assets[State.ActiveToolBarItem].Add(new PlacedAsset(new Vector2(x, y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
             }

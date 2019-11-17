@@ -32,6 +32,7 @@ void main() {
     vs_texCoord = vTexCoord;
     vs_lightVectors = calculateLightVectors(vs_normal, vTangent.xyz, position.xyz, rotation);
     vs_shadowCoords = getShadowCoords(position);
+    vs_position = position.xyz;
 
     gl_ClipDistance[0] = clip(position.xyz);
     gl_Position = uProjectionMatrix * worldPosition;
