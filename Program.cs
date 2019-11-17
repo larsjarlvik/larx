@@ -1,5 +1,4 @@
 ﻿using System;
-using Larx.Terrain;
 using Larx.Object;
 using Larx.UserInterFace;
 using OpenTK;
@@ -14,6 +13,7 @@ using Larx.Storage;
 using Larx.Shadows;
 using Larx.Buffers;
 using Larx.Utils;
+using Larx.Terrain;
 
 namespace Larx
 {
@@ -23,17 +23,20 @@ namespace Larx
         private Camera camera;
         private Light light;
         private ObjectRenderer debug;
-        private TerrainRenderer terrain;
+        // private TerrainRenderer terrain;
+
+        public TerrainRenderer terrain { get; private set; }
+
         private WaterRenderer water;
         private SkyRenderer sky;
         private Assets assets;
-        private ShadowRenderer shadows;
+        private ShadowBox shadows;
         private Ui ui;
 
         public Program() : base(
             1280, 720,
             new GraphicsMode(32, 24, 0, 0), "Larx", 0,
-            DisplayDevice.Default, 0, 0,
+            DisplayDevice.Default, 4, 5,
             GraphicsContextFlags.ForwardCompatible)
         {
             State.PolygonMode = PolygonMode.Fill;
@@ -55,7 +58,7 @@ namespace Larx
             GL.Enable(EnableCap.CullFace);
             GL.CullFace(CullFaceMode.Back);
 
-            Map.New(400);
+            Map.New(2048);
             ui = new Ui();
             debug = new ObjectRenderer();
             camera = new Camera();
@@ -64,7 +67,7 @@ namespace Larx
             light = new Light();
             assets = new Assets(ui);
             sky = new SkyRenderer();
-            shadows = new ShadowRenderer();
+            shadows = new ShadowBox();
         }
 
         protected override void OnUpdateFrame(FrameEventArgs e)
@@ -95,24 +98,24 @@ namespace Larx
 
             camera.Update((float)e.Time);
             light.Update();
-            terrain.Update();
             shadows.Update(camera, light);
+            terrain.Update();
 
             if (!uiIntersect) {
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Terrain:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            terrain.ChangeElevation(0.1f);
+                            terrain.HeightMap.ChangeElevation(terrain.MousePosition, 0.1f);
                             assets.Refresh(terrain);
                         }
                         if (mouse.RightButton == ButtonState.Pressed) {
-                            terrain.ChangeElevation(-0.1f);
+                            terrain.HeightMap.ChangeElevation(terrain.MousePosition, -0.1f);
                             assets.Refresh(terrain);
                         }
                         break;
                     case TopMenu.Paint:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.Paint();
+                        if (mouse.LeftButton == ButtonState.Pressed) terrain.SplatMap.Paint(terrain.MousePosition);
                         break;
                 }
             }
@@ -127,24 +130,25 @@ namespace Larx
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
-            // Asset shadow rendering
+            // Shadow rendering
             shadows.ShadowBuffer.Bind();
             GL.Clear(ClearBufferMask.DepthBufferBit);
             assets.RenderShadowMap(shadows, terrain);
-            terrain.RenderShadowMap(shadows);
+            terrain.RenderShadowMap(camera, shadows, ClipPlane.ClipBottom);
+
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
 
             // Water refraction rendering
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Render(camera, light, null, true, ClipPlane.ClipTop);
-            assets.Render(camera, light, null, terrain, ClipPlane.ClipTop);
+            terrain.Render(camera, light, null, ClipPlane.ClipTop);
 
             // Water reflection rendering
             camera.InvertY();
             water.ReflectionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            assets.Render(camera, light, null, terrain, ClipPlane.ClipBottom);
-            terrain.Render(camera, light, null, false, ClipPlane.ClipBottom);
+
+            terrain.Render(camera, light, null, ClipPlane.ClipBottom);
             sky.Render(camera, light);
             GL.Disable(EnableCap.ClipDistance0);
             camera.Reset();
@@ -155,10 +159,10 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
 
-            terrain.Render(camera, light, shadows, true, ClipPlane.ClipBottom);
+            sky.Render(camera, light);
+            terrain.Render(camera, light, shadows, ClipPlane.ClipBottom);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
             water.Render(camera, light, shadows);
-            sky.Render(camera, light);
 
             // Draw to screen
             multisampling.Draw();
@@ -200,7 +204,7 @@ namespace Larx
                 switch (State.ActiveTopMenu)
                 {
                     case TopMenu.Assets:
-                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.Picker.GetPosition().Xz, terrain);
+                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.MousePosition.Xz, terrain);
                         break;
                 }
             }
@@ -227,6 +231,12 @@ namespace Larx
 
                 if (e.Control && e.Keyboard[Key.O])
                     Map.Load(terrain, assets);
+
+                if (e.Control && e.Keyboard[Key.H])
+                    terrain.HeightMap.LoadFromImage();
+
+                if (e.Control && e.Keyboard[Key.P])
+                    terrain.SplatMap.AutoGenerate(terrain.HeightMap);
             }
 
             if (!e.Control)

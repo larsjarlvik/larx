@@ -27,7 +27,7 @@ namespace Larx.MapAssets
 
             for(var i = 0; i < placedAssets.Count; i++)
             {
-                positions[i] = new Vector3(placedAssets[i].Position.X, (float)terrain.GetElevationAtPoint(placedAssets[i].Position), placedAssets[i].Position.Y);
+                positions[i] = new Vector3(placedAssets[i].Position.X, (float)terrain.HeightMap.GetElevationAtPoint(placedAssets[i].Position), placedAssets[i].Position.Y);
                 rotations[i] = placedAssets[i].Rotation;
             }
 

@@ -20,16 +20,21 @@ namespace Larx
         public static float ToolHardness;
         public static TopMenu ActiveTopMenu;
         public static string ActiveToolBarItem;
-        public const float Near = 1.0f;
-        public const float Far = 1000.0f;
+        public const float Near = 2.0f;
+        public const float Far = 2000.0f;
         public static readonly Color ClearColor = Color.FromArgb(255, 193, 213, 230);
-        public const int SplatDetail = 1024;
         public const int ShadowMapResolution = 4096;
 
         public static class Window
         {
             public static Size Size { get; set; }
             public static float Aspect { get; set; }
+
+            static Window()
+            {
+                Size = new Size(1280, 720);
+                Aspect = 1280f / 720f;
+            }
 
             public static void Set(int Width, int Height)
             {

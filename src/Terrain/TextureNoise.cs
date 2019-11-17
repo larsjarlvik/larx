@@ -11,7 +11,6 @@ namespace Larx.Terrain
 
         public TextureNoise(int seed)
         {
-            // SimplexNoise.Noise.Seed = seed;
             build();
         }
 

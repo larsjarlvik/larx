@@ -1,6 +1,6 @@
-namespace Larx.Terrain
+namespace Larx.Terrain.Shaders
 {
-    public class ShadowShader : Shader
+    public class ShadowShader : BaseShader
     {
         public ShadowShader() : base("terrain-shadows") { }
 

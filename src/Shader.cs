@@ -21,9 +21,14 @@ namespace Larx
         public int LightDiffuse { get; private set; }
         public int LightSpecular { get; private set; }
 
-        private string prepareShader(string name)
+        private void addShader(string name, ShaderType shaderType, string ext, string shaderDescriptor)
         {
-            var contents = File.ReadLines(Path.Combine("shaders", name));
+            var path = Path.Combine("shaders", $"{name}.{ext}.glsl");
+
+            if (!File.Exists(path))
+                return;
+
+            var contents = File.ReadLines(path);
             var finalShader = new StringBuilder();
 
             foreach(var line in contents)
@@ -38,34 +43,39 @@ namespace Larx
                 finalShader.AppendLine(line);
             }
 
-            return finalShader.ToString();
+            var shaderSource = finalShader.ToString();
+
+            var shader = GL.CreateShader(shaderType);
+            GL.ShaderSource(shader, shaderSource);
+            GL.CompileShader(shader);
+            checkCompileStatus($"{shaderDescriptor}: {name}", shader);
+            GL.AttachShader(Program, shader);
+
         }
 
         public Shader(string name)
         {
-            var vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            var fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-
-            GL.ShaderSource(vertexShader, prepareShader($"{name}.vs.glsl"));
-            GL.CompileShader(vertexShader);
-            checkCompileStatus($"Vertex Shader: {name}", vertexShader);
-
-            GL.ShaderSource(fragmentShader, prepareShader($"{name}.fs.glsl"));
-            GL.CompileShader(fragmentShader);
-            checkCompileStatus($"Fragment Shader: {name}", fragmentShader);
-
             Program = GL.CreateProgram();
-            GL.AttachShader(Program, fragmentShader);
-            GL.AttachShader(Program, vertexShader);
+
+            addShader(name, ShaderType.VertexShader, "vs", "Vertex Shader");
+            addShader(name, ShaderType.FragmentShader, "fs", "Fragment Shader");
+            addShader(name, ShaderType.GeometryShader, "gs", "Geometry Shader");
+            addShader(name, ShaderType.TessControlShader, "tc", "Tesselation Control Shader");
+            addShader(name, ShaderType.TessEvaluationShader, "te", "Tesselation Evaluation Shader");
+            addShader(name, ShaderType.ComputeShader, "cs", "Compute Shader");
+
             GL.LinkProgram(Program);
             GL.UseProgram(Program);
-
             GL.ValidateProgram(Program);
 
             SetUniformsLocations();
         }
 
         protected virtual void SetUniformsLocations()
+        {
+        }
+
+        protected void SetDefaultUniformLocations()
         {
             ProjectionMatrix = GL.GetUniformLocation(Program, "uProjectionMatrix");
             ViewMatrix = GL.GetUniformLocation(Program, "uViewMatrix");
@@ -107,7 +117,7 @@ namespace Larx
             GL.Uniform3(LightSpecular, light.Specular);
         }
 
-        public void ApplyShadows(ShadowRenderer shadows)
+        public void ApplyShadows(ShadowBox shadows)
         {
             if (shadows != null) {
                 GL.ActiveTexture(TextureUnit.Texture9);

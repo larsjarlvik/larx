@@ -10,7 +10,7 @@ namespace Larx.Object
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
+            base.SetDefaultUniformLocations();
             Position = GL.GetUniformLocation(Program, "position");
         }
     }

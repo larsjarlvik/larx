@@ -7,10 +7,10 @@ namespace Larx.Terrain
     {
         private const float RayRange = 1000;
         private const int MaxRecursions = 300;
-        private readonly TerrainRenderer renderer;
+        private readonly HeightMap renderer;
         private readonly Camera camera;
 
-        public TerrainPicker(TerrainRenderer renderer, Camera camera)
+        public TerrainPicker(Camera camera, HeightMap renderer)
         {
             this.renderer = renderer;
             this.camera = camera;
@@ -35,7 +35,7 @@ namespace Larx.Terrain
 
         private float elevationAtPoint(float point)
         {
-            return renderer.GetElevationAtPoint(getPointOnRay(point).Xz) ?? 1.0f;
+            return renderer.GetElevationAtPoint(getPointOnRay(point).Xz) ?? 0.0f;
         }
 
         private Vector3 getPointOnRay(float distance)

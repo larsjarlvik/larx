@@ -21,7 +21,7 @@ namespace Larx.Water
 
         protected override void SetUniformsLocations()
         {
-            base.SetUniformsLocations();
+            base.SetDefaultUniformLocations();
             base.SetShadowUniformLocations();
 
             RefractionColorTexture = GL.GetUniformLocation(Program, "uRefractionColorTexture");

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.IO;
-using OpenTK.Graphics.OpenGL4;
+using OpenTK.Graphics.OpenGL;
 using OpenTK;
 
 namespace Larx
@@ -10,7 +10,7 @@ namespace Larx
     {
         private const int BitmapHeaderLength = 54;
 
-        private PixelFormat pixelFormat;
+        public PixelFormat PixelFormat;
         public Point Size { get; private set; }
         public int TextureId { get; private set; }
 
@@ -29,12 +29,12 @@ namespace Larx
             }
         }
 
-        public byte[] imageToByteArray(string path)
+        public byte[] ImageToByteArray(string path)
         {
             var image = new System.Drawing.Bitmap(path);
             var pixelSize = image.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb ? 3 : 4;
 
-            pixelFormat = pixelSize == 3 ? PixelFormat.Bgr : PixelFormat.Bgra;
+            PixelFormat = pixelSize == 3 ? PixelFormat.Bgr : PixelFormat.Bgra;
             Size = new Point(image.Width, image.Height);
 
             var buffer = new byte[image.Width * image.Height * pixelSize];
@@ -49,17 +49,30 @@ namespace Larx
             }
         }
 
+        public void CreateTexture(Point size)
+        {
+            Size = size;
+            TextureId = GL.GenTexture();
+
+            GL.BindTexture(TextureTarget.Texture2D, TextureId);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexStorage2D(TextureTarget2d.Texture2D, (int)(Math.Log(Size.X) / Math.Log(Size.Y)), SizedInternalFormat.Rgba32f, Size.X, Size.Y);
+
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+        }
+
         public void LoadTexture(string path, bool mipMap = false)
         {
-            var buffer = imageToByteArray(path);
+            var buffer = ImageToByteArray(path);
 
             TextureId = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, TextureId);
             GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
-            GL.TexImage2D<byte>(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Size.X, Size.Y, 0, pixelFormat, PixelType.UnsignedByte, buffer);
+            GL.TexImage2D<byte>(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Size.X, Size.Y, 0, PixelFormat, PixelType.UnsignedByte, buffer);
 
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
 
             if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
@@ -72,7 +85,7 @@ namespace Larx
 
         public void LoadTexture(string[] path, bool mipMap = false)
         {
-            var buffers = path.Select(p => imageToByteArray(p)).ToList();
+            var buffers = path.Select(p => ImageToByteArray(p)).ToList();
 
             TextureId = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, TextureId);
@@ -87,7 +100,7 @@ namespace Larx
 
             for (var i = 0; i < buffers.Count(); i ++)
             {
-                GL.TexSubImage3D<byte>(TextureTarget.Texture2DArray, 0, 0, 0, i, Size.X, Size.Y, 1, pixelFormat, PixelType.UnsignedByte, buffers[i]);
+                GL.TexSubImage3D<byte>(TextureTarget.Texture2DArray, 0, 0, 0, i, Size.X, Size.Y, 1, PixelFormat, PixelType.UnsignedByte, buffers[i]);
             }
 
             if (mipMap) GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);

@@ -47,13 +47,16 @@ namespace Larx.Storage
                 for (var x = 0; x <= Map.MapData.MapSize; x++)
                     MapData.TerrainElevations[x, z] = 1.0f;
 
-            MapData.SplatMap = new float[TerrainRenderer.Textures.Length][,];
-            for(var i = 0; i < MapData.SplatMap.Length; i++) MapData.SplatMap[i] = new float[State.SplatDetail, State.SplatDetail];
+            MapData.SplatMap = new float[TerrainConfig.Textures.Length][,];
+
+            var size = (int)(MapData.MapSize * TerrainConfig.HeightMapDetail);
+            for(var i = 0; i < MapData.SplatMap.Length; i++)
+                MapData.SplatMap[i] = new float[size, size];
         }
 
         public static void Save(TerrainRenderer terrain, Assets assets)
         {
-            MapData.TerrainElevations = terrain.GetTerrainElevations();
+            MapData.TerrainElevations = terrain.HeightMap.Heights;
 
             using (var stream = File.Open(MapFileName, FileMode.Create))
                 using (var compressedStream = new GZipStream(stream, CompressionMode.Compress)) {
@@ -70,7 +73,10 @@ namespace Larx.Storage
                     MapData = binarySerializer.Read<MapDataContainer>(decompressedStream);
                 }
 
-            terrain.Build();
+            terrain.HeightMap.Heights = MapData.TerrainElevations;
+            terrain.Update();
+            terrain.HeightMap.Update();
+            terrain.SplatMap.Refresh();
             assets.Refresh(terrain);
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using Larx.Button;
 using Larx.Terrain;
 using OpenTK;
+using OpenTK.Graphics.OpenGL;
 
 namespace Larx.UserInterFace
 {
@@ -36,7 +37,7 @@ namespace Larx.UserInterFace
             alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.png")));
             alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.png")));
 
-            Tools.AddRange(TerrainRenderer.Textures.Select((t, i) =>
+            Tools.AddRange(TerrainConfig.Textures.Select((t, i) =>
                 new ToolbarItem(TopMenu.Paint, AddButton(i.ToString(), Path.Combine("textures", $"{t}-albedo.png")))
             ));
 
@@ -92,11 +93,11 @@ namespace Larx.UserInterFace
                     buttons[Keys.AddAssets].Active = true;
                     break;
                 case Keys.Terrain.SizeIncrease:
-                    State.ToolRadius ++;
-                    if (State.ToolRadius > 12f) State.ToolRadius = 12f;
+                    State.ToolRadius += State.ToolRadius >= 20 ? 5 : State.ToolRadius >= 10 ? 2 : 1;
+                    if (State.ToolRadius > 100f) State.ToolRadius = 100f;
                     break;
                 case Keys.Terrain.SizeDecrease:
-                    State.ToolRadius --;
+                    State.ToolRadius += State.ToolRadius >= 20 ? -5 : State.ToolRadius >= 10 ? -2 : -1;
                     if (State.ToolRadius < 0f) State.ToolRadius = 0f;
                     break;
                 case Keys.Terrain.HardnessIncrease:
@@ -149,7 +150,8 @@ namespace Larx.UserInterFace
 
         public void Render()
         {
-            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, State.Window.Size.Width, State.Window.Size.Height, 0f, 0f, -1.0f);
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
+            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, State.Window.Size.Width, State.Window.Size.Height, 0f, 0f, -1f);
 
             for(var i = 0; i < texts.Count; i ++)
                 texts.Values.ElementAt(i).Render(pMatrix, new Vector2(10, 20 + i * 20), 0.65f, 1.6f);

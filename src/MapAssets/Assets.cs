@@ -47,7 +47,7 @@ namespace Larx.MapAssets
         {
             if (State.ActiveToolBarItem == null) return;
 
-            var elev = terrain.GetElevationAtPoint(position);
+            var elev = terrain.HeightMap.GetElevationAtPoint(position);
             if (elev == null) return;
 
             var count = (State.ToolHardness - 1) * State.ToolHardness + 1;
@@ -64,7 +64,7 @@ namespace Larx.MapAssets
             Refresh(models[State.ActiveToolBarItem], terrain);
         }
 
-        public void Render(Camera camera, Light light, ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
+        public void Render(Camera camera, Light light, ShadowBox shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.UseProgram(Shader.Program);
 
@@ -73,6 +73,8 @@ namespace Larx.MapAssets
             Shader.ApplyShadows(shadows);
 
             GL.Uniform1(Shader.ClipPlane, (int)clip);
+            GL.Uniform4(Shader.FogColor, State.ClearColor);
+            GL.Uniform1(Shader.FarPlane, State.Far);
 
             foreach(var key in models.Keys)
             {
@@ -84,7 +86,7 @@ namespace Larx.MapAssets
             GL.DisableVertexAttribArray(5);
         }
 
-        public void RenderShadowMap(ShadowRenderer shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
+        public void RenderShadowMap(ShadowBox shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.UseProgram(ShadowShader.Program);
 
