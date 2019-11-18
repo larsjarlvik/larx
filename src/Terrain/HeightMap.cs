@@ -69,7 +69,7 @@ namespace Larx.Terrain
             return ((mapCoordinate + new Vector2(Map.MapData.MapSize / 2.0f)) * TerrainConfig.HeightMapDetail);
         }
 
-        internal void ChangeElevation(Vector3 position, float offset)
+        public void Sculpt(Vector3 position, float offset)
         {
             var texturePos = getTextureCoordinate(position.Zx);
             var r = (State.ToolRadius * TerrainConfig.HeightMapDetail) + 2;
@@ -86,6 +86,15 @@ namespace Larx.Terrain
 
                 Heights[(int)i.X, (int)i.Y] = elev;
             }
+
+            Update();
+        }
+
+        public void ChangeElevation(float offset)
+        {
+            for(var x = 0; x < size; x ++)
+                for(var z = 0; z < size; z ++)
+                    Heights[x, z] += offset;
 
             Update();
         }
@@ -112,9 +121,7 @@ namespace Larx.Terrain
 
             for(var x = 0; x < size; x ++)
                 for(var z = 0; z < size; z ++)
-                {
-                    Heights[x, z] = (float)ba[(z * size + x) * 3] / 15.0f - 3.0f;
-                }
+                    Heights[size - z - 1, size - x - 1] = (float)ba[(z * size + x) * stride] / 15.0f - 3.0f;
 
             Update();
         }

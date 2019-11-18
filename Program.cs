@@ -106,11 +106,11 @@ namespace Larx
                 {
                     case TopMenu.Terrain:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            terrain.HeightMap.ChangeElevation(terrain.MousePosition, 0.1f);
+                            terrain.HeightMap.Sculpt(terrain.MousePosition, 0.1f);
                             assets.Refresh(terrain);
                         }
                         if (mouse.RightButton == ButtonState.Pressed) {
-                            terrain.HeightMap.ChangeElevation(terrain.MousePosition, -0.1f);
+                            terrain.HeightMap.Sculpt(terrain.MousePosition, -0.1f);
                             assets.Refresh(terrain);
                         }
                         break;
@@ -238,6 +238,11 @@ namespace Larx
                 if (e.Control && e.Keyboard[Key.P])
                     terrain.SplatMap.AutoGenerate(terrain.HeightMap);
             }
+
+            if (e.Control && e.Keyboard[Key.Plus])
+                terrain.HeightMap.ChangeElevation(0.1f);
+            if (e.Control && e.Keyboard[Key.Minus])
+                terrain.HeightMap.ChangeElevation(-0.1f);
 
             if (!e.Control)
                 State.Keyboard.Set(e.Keyboard);
