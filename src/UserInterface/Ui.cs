@@ -48,15 +48,16 @@ namespace Larx.UserInterface
             );
 
             State.ChildMenus.Add(TopMenuKeys.Assets, Assets.AssetKeys
-                .Select(a => new KeyValuePair<string, int>(a , addTexture(Path.Combine($"ui/assets/{a}.png"))))
+                .Select(a => new KeyValuePair<string, int>(a , addTexture(Path.Combine($"ui/assets/{a}.png"), true)))
                 .ToDictionary(x => x.Key, x => x.Value)
             );
+            State.ChildMenus[TopMenuKeys.Assets].Add(ActionKeys.Erase, addTexture("ui/erase.png"));
 
             State.RightMenu = new Dictionary<string, int>() {
-                { RightMenuKeys.SizeIncrease, addTexture("ui/terrain-increase.png") },
-                { RightMenuKeys.SizeDecrease, addTexture("ui/terrain-decrease.png") },
-                { RightMenuKeys.HardnessIncrease, addTexture("ui/hardness-increase.png") },
-                { RightMenuKeys.HardnessDecrease, addTexture("ui/hardness-decrease.png") },
+                { ActionKeys.SizeIncrease, addTexture("ui/terrain-increase.png") },
+                { ActionKeys.SizeDecrease, addTexture("ui/terrain-decrease.png") },
+                { ActionKeys.HardnessIncrease, addTexture("ui/hardness-increase.png") },
+                { ActionKeys.HardnessDecrease, addTexture("ui/hardness-decrease.png") },
             };
 
             State.SetActiveTopMenuKey(TopMenuKeys.ElevationTools);

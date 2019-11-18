@@ -65,6 +65,14 @@ namespace Larx.MapAssets
             Refresh(models[key], terrain);
         }
 
+        public void Remove(Vector2 position, TerrainRenderer terrain)
+        {
+            foreach(var assetType in Map.MapData.Assets) {
+                assetType.Value.RemoveAll(x => Vector2.Distance(position, x.Position) <= State.ToolRadius);
+            }
+            Refresh(terrain);
+        }
+
         public void Render(Camera camera, Light light, ShadowBox shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.UseProgram(Shader.Program);

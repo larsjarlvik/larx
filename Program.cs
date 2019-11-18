@@ -126,7 +126,13 @@ namespace Larx
                         if (mouse.LeftButton == ButtonState.Pressed) terrain.SplatMap.Paint(terrain.MousePosition, byte.Parse(ui.State.ActiveChildMenuKey));
                         break;
                     case TopMenuKeys.Assets:
-                        if (mouse.LeftButton == ButtonState.Pressed && !ui.State.MouseRepeat) assets.Add(terrain.MousePosition.Xz, terrain, ui.State.ActiveChildMenuKey);
+                        if (mouse.LeftButton == ButtonState.Pressed) {
+                            if (ui.State.ActiveChildMenuKey == ActionKeys.Erase) {
+                                assets.Remove(terrain.MousePosition.Xz, terrain);
+                            } else if (!ui.State.MouseRepeat) {
+                                assets.Add(terrain.MousePosition.Xz, terrain, ui.State.ActiveChildMenuKey);
+                            }
+                        }
                         break;
                 }
             }

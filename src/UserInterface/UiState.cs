@@ -11,12 +11,13 @@ namespace Larx.UserInterface
         public const string Assets = "assets";
     }
 
-    public static class RightMenuKeys
+    public static class ActionKeys
     {
         public const string SizeIncrease = "size_increase";
         public const string SizeDecrease = "size_decrease";
         public const string HardnessIncrease = "hardness_increase";
         public const string HardnessDecrease = "hardness_decrease";
+        public const string Erase = "erase";
     }
 
     public static class TextKeys
@@ -61,19 +62,19 @@ namespace Larx.UserInterface
         public void SetControls(string key)
         {
             switch(key) {
-                case RightMenuKeys.SizeIncrease:
+                case ActionKeys.SizeIncrease:
                     State.ToolRadius += State.ToolRadius >= 20 ? 5 : State.ToolRadius >= 10 ? 2 : 1;
                     if (State.ToolRadius > 100f) State.ToolRadius = 100f;
                     break;
-                case RightMenuKeys.SizeDecrease:
+                case ActionKeys.SizeDecrease:
                     State.ToolRadius += State.ToolRadius >= 20 ? -5 : State.ToolRadius >= 10 ? -2 : -1;
                     if (State.ToolRadius < 0f) State.ToolRadius = 0f;
                     break;
-                case RightMenuKeys.HardnessIncrease:
+                case ActionKeys.HardnessIncrease:
                     State.ToolHardness += 1f;
                     if (State.ToolHardness > 10f) State.ToolHardness = 10f;
                     break;
-                case RightMenuKeys.HardnessDecrease:
+                case ActionKeys.HardnessDecrease:
                     State.ToolHardness -= 1f;
                     if (State.ToolHardness < 0f) State.ToolHardness = 0f;
                     break;
