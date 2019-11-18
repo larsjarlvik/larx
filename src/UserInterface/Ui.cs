@@ -2,171 +2,180 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Larx.Button;
+using Larx.MapAssets;
 using Larx.Terrain;
+using Larx.UserInterface.Button;
+using Larx.UserInterface.Text;
 using OpenTK;
-using OpenTK.Graphics.OpenGL;
 
-namespace Larx.UserInterFace
+namespace Larx.UserInterface
 {
-    public class Ui : Builder
+    public class Ui
     {
-        public List<ToolbarItem> Tools;
-        private List<ToolbarItem> alignRight;
+        private Matrix4 pMatrix;
+        public readonly UiState State;
+        private readonly ButtonRenderer buttonRenderer;
+        private readonly TextRenderer textRenderer;
+        private Vector2 buttonLeftOrigin;
+        private Vector2 buttonRightOrigin;
+        private const float buttonSize = 45.0f;
+        private const float buttonSpacing = 5.0f;
+        private const float windowPadding = 10.0f;
+        private const float textSize = 13.0f;
 
-        public Ui() : base()
+        public Ui()
         {
-            Tools = new List<ToolbarItem>();
-            alignRight = new List<ToolbarItem>();
-            build();
+            pMatrix = Matrix4.CreateOrthographicOffCenter(0, Larx.State.Window.Size.Width, Larx.State.Window.Size.Height, 0f, 0f, -1f);
+            State = new UiState();
+            buttonRenderer = new ButtonRenderer();
+            textRenderer = new TextRenderer();
+
+            State.ChildMenus = new Dictionary<string, Dictionary<string, int>>();
+            State.TopMenu = new Dictionary<string, int>() {
+                { TopMenuKeys.ElevationTools, addTexture("ui/terrain.png") },
+                { TopMenuKeys.TerrainPaint, addTexture("ui/paint.png") },
+                { TopMenuKeys.Assets, addTexture("ui/assets.png") },
+            };
+
+            State.ChildMenus.Add(TopMenuKeys.ElevationTools, new Dictionary<string, int>() {
+                { TerrainConfig.ElevationTool, addTexture("ui/raise-lower.png") },
+                { TerrainConfig.SmudgeTool, addTexture("ui/smudge.png") },
+            });
+
+            State.ChildMenus.Add(TopMenuKeys.TerrainPaint, TerrainConfig.Textures
+                .Select(t => new KeyValuePair<string, int>(Array.IndexOf(TerrainConfig.Textures, t).ToString(), addTexture(Path.Combine($"textures/{t}-albedo.png"), true)))
+                .ToDictionary(x => x.Key, x => x.Value)
+            );
+
+            State.ChildMenus.Add(TopMenuKeys.Assets, Assets.AssetKeys
+                .Select(a => new KeyValuePair<string, int>(a , addTexture(Path.Combine($"ui/assets/{a}.png"))))
+                .ToDictionary(x => x.Key, x => x.Value)
+            );
+
+            State.RightMenu = new Dictionary<string, int>() {
+                { RightMenuKeys.SizeIncrease, addTexture("ui/terrain-increase.png") },
+                { RightMenuKeys.SizeDecrease, addTexture("ui/terrain-decrease.png") },
+                { RightMenuKeys.HardnessIncrease, addTexture("ui/hardness-increase.png") },
+                { RightMenuKeys.HardnessDecrease, addTexture("ui/hardness-decrease.png") },
+            };
+
+            State.SetActiveTopMenuKey(TopMenuKeys.ElevationTools);
+            State.Texts = new Dictionary<string, DisplayText>() {
+                { TextKeys.Title, textRenderer.CreateText("Larx Terrain Editor v0.1", textSize) },
+                { TextKeys.Radius, textRenderer.CreateText($"Radius: {Larx.State.ToolRadius}", textSize) },
+                { TextKeys.Hardness, textRenderer.CreateText($"Hardness: {Larx.State.ToolHardness}", textSize) },
+                { TextKeys.Position, textRenderer.CreateText("Position: 0 0", textSize) }
+            };
         }
 
-        private void build()
+        private int addTexture(string path, bool mipMap = false)
         {
-            AddText("title", "Larx Terrain Editor v0.1");
-            AddText("size", $"Tool Size: 0");
-            AddText("hardness", $"Hardness: 0");
-            AddText("position", $"Position: 0 0");
-
-            AddButton(Keys.ElevationTools, "ui/terrain.png");
-            AddButton(Keys.TerrainPaint, "ui/paint.png");
-            AddButton(Keys.AddAssets, "ui/assets.png");
-
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeIncrease, "ui/terrain-increase.png")));
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.SizeDecrease, "ui/terrain-decrease.png")));
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessIncrease, "ui/hardness-increase.png")));
-            alignRight.Add(new ToolbarItem(TopMenu.Terrain, AddButton(Keys.Terrain.HardnessDecrease, "ui/hardness-decrease.png")));
-
-            Tools.AddRange(TerrainConfig.Textures.Select((t, i) =>
-                new ToolbarItem(TopMenu.Paint, AddButton(i.ToString(), Path.Combine("textures", $"{t}-albedo.png")))
-            ));
-
-            State.ActiveTopMenu = TopMenu.Terrain;
-            buttons[Keys.ElevationTools].Active = true;
+            var texture = new Texture();
+            texture.LoadTexture(Path.Combine("resources", path), mipMap);
+            return texture.TextureId;
         }
 
         public bool Update()
         {
-            updateButtonPositions();
+            pMatrix = Matrix4.CreateOrthographicOffCenter(0, Larx.State.Window.Size.Width, Larx.State.Window.Size.Height, 0f, 0f, -1f);
 
-            UpdateText("size", $"Tool Size: {State.ToolRadius}");
-            UpdateText("hardness", $"Hardness: {MathF.Round(State.ToolHardness, 1)}");
+            buttonLeftOrigin = new Vector2(windowPadding, Larx.State.Window.Size.Height - buttonSize - windowPadding);
+            buttonRightOrigin = new Vector2(Larx.State.Window.Size.Width - buttonSize - windowPadding, buttonLeftOrigin.Y);
 
-            var uiIntersect = UiIntersect(getVisibleTools(), State.Mouse.Position);
-            if (uiIntersect != null) {
-                buttons[uiIntersect].State = State.Mouse.LeftButton ? ButtonState.Pressed : ButtonState.Hover;
+            var position = buttonLeftOrigin;
+            var size = new Vector2(buttonSize);
+            State.MouseRepeat = State.MousePressed;
+            State.MousePressed = Larx.State.Mouse.LeftButton;
+            State.ResetButtonStates();
+
+            foreach(var button in State.TopMenu)
+            {
+                if (intersect(button.Key, Larx.State.Mouse.Position, position, size))
+                    if (Larx.State.Mouse.LeftButton) State.SetActiveTopMenuKey(button.Key);
+
+                position.X += buttonSize + buttonSpacing;
             }
 
-            return uiIntersect != null;
-        }
+            position.X += buttonSpacing * 2.0f;
+            if (State.ActiveTopMenuKey != null)
+                foreach(var button in State.ChildMenus[State.ActiveTopMenuKey])
+                {
+                    if (intersect(button.Key, Larx.State.Mouse.Position, position, size))
+                        if (Larx.State.Mouse.LeftButton) State.ActiveChildMenuKey = button.Key;
 
-        public string Click()
-        {
-            if (!State.Mouse.LeftButton) return null;
+                    position.X += buttonSize + buttonSpacing;
+                }
 
-            var uiIntersect = UiIntersect(getVisibleTools(), State.Mouse.Position);
-            if (uiIntersect == null) return uiIntersect;
-
-            switch(uiIntersect) {
-                case Keys.ElevationTools:
-                    State.ToolRadius = 3f;
-                    State.ToolHardness = 5f;
-                    State.ActiveTopMenu = TopMenu.Terrain;
-                    buttons[Keys.ElevationTools].Active = true;
-                    buttons[Keys.TerrainPaint].Active = false;
-                    buttons[Keys.AddAssets].Active = false;
-                    break;
-                case Keys.TerrainPaint:
-                    State.ToolRadius = 3f;
-                    State.ToolHardness = 5f;
-                    State.ActiveTopMenu = TopMenu.Paint;
-                    buttons[Keys.ElevationTools].Active = false;
-                    buttons[Keys.TerrainPaint].Active = true;
-                    buttons[Keys.AddAssets].Active = false;
-                    break;
-                case Keys.AddAssets:
-                    State.ToolRadius = 1f;
-                    State.ToolHardness = 1;
-                    State.ActiveTopMenu = TopMenu.Assets;
-                    buttons[Keys.ElevationTools].Active = false;
-                    buttons[Keys.TerrainPaint].Active = false;
-                    buttons[Keys.AddAssets].Active = true;
-                    break;
-                case Keys.Terrain.SizeIncrease:
-                    State.ToolRadius += State.ToolRadius >= 20 ? 5 : State.ToolRadius >= 10 ? 2 : 1;
-                    if (State.ToolRadius > 100f) State.ToolRadius = 100f;
-                    break;
-                case Keys.Terrain.SizeDecrease:
-                    State.ToolRadius += State.ToolRadius >= 20 ? -5 : State.ToolRadius >= 10 ? -2 : -1;
-                    if (State.ToolRadius < 0f) State.ToolRadius = 0f;
-                    break;
-                case Keys.Terrain.HardnessIncrease:
-                    State.ToolHardness += 1f;
-                    if (State.ToolHardness > 10f) State.ToolHardness = 10f;
-                    break;
-                case Keys.Terrain.HardnessDecrease:
-                    State.ToolHardness -= 1f;
-                    if (State.ToolHardness < 0f) State.ToolHardness = 0f;
-                    break;
-                default:
-                    if (Tools.Any(t => t.Key == uiIntersect)) {
-                        State.ActiveToolBarItem = uiIntersect;
-                        Tools.ForEach(t => buttons[t.Key].Active = false);
-                        buttons[State.ActiveToolBarItem].Active = true;
+            position.X = buttonRightOrigin.X;
+            foreach(var button in State.RightMenu)
+            {
+                if(intersect(button.Key, Larx.State.Mouse.Position, position, size)) {
+                    if (Larx.State.Mouse.LeftButton && !State.MouseRepeat) {
+                        State.SetControls(button.Key);
+                        UpdateText(TextKeys.Radius, $"Radius: {Larx.State.ToolRadius}");
+                        UpdateText(TextKeys.Hardness, $"Hardness: {Larx.State.ToolHardness}");
                     }
-                    break;
+                }
+
+                position.X -= buttonSize + buttonSpacing;
             }
 
-            return uiIntersect;
+            return State.HoverKey != null;
         }
 
-        private void updateButtonPositions()
+        public void UpdateText(string key, string value)
         {
-            var padding = 55.0f;
-            var position = new Vector2(10.0f, State.Window.Size.Height - padding);
-
-            position = setButtonPosition(Keys.ElevationTools, position);
-            position = setButtonPosition(Keys.TerrainPaint, position);
-            position = setButtonPosition(Keys.AddAssets, position);
-            position.X += 10.0f;
-
-            foreach(var key in Tools.Where(t => t.TopMenu == State.ActiveTopMenu).Select(k => k.Key)) {
-                position = setButtonPosition(key, position);
-            }
-
-            position = new Vector2(State.Window.Size.Width - padding, State.Window.Size.Height - padding);
-            foreach(var key in alignRight.Select(k => k.Key)) {
-                position = setButtonPosition(key, position, true);
-            }
+            State.Texts[key] = textRenderer.CreateText(value, textSize);
         }
 
-        private Vector2 setButtonPosition(string key, Vector2 position, bool floatRight = false)
+        private bool intersect(string key, Vector2 mouse, Vector2 position, Vector2 size)
         {
-            buttons[key].Position = position;
-            position.X += (buttons[key].Size.X + (buttons[key].Size.X / 10)) * (floatRight ? -1 : 1);
+            if (mouse.X >= position.X && mouse.Y >= position.Y &&
+                mouse.X <= position.X + size.X && mouse.Y <= position.Y + size.Y) {
+                State.HoverKey = key;
+                if (Larx.State.Mouse.LeftButton)
+                    State.PressedKey = key;
 
-            return position;
+                return true;
+            }
+
+            return false;
         }
 
         public void Render()
         {
-            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
-            var pMatrix = Matrix4.CreateOrthographicOffCenter(0, State.Window.Size.Width, State.Window.Size.Height, 0f, 0f, -1f);
+            var position = new Vector2(windowPadding, windowPadding + textSize);
+            foreach(var text in State.Texts) {
+                textRenderer.Render(text.Value, pMatrix, position, 1.0f, 1.6f);
+                position.Y += textSize * 1.5f;
+            }
 
-            for(var i = 0; i < texts.Count; i ++)
-                texts.Values.ElementAt(i).Render(pMatrix, new Vector2(10, 20 + i * 20), 0.65f, 1.6f);
+            position = buttonLeftOrigin;
+            var size = new Vector2(buttonSize);
 
-            foreach(var key in getVisibleTools())
-                buttons[key].Render(pMatrix);
+            foreach(var button in State.TopMenu)
+                renderButton(button, ref position, size, buttonSize + buttonSpacing, State.ActiveTopMenuKey);
+
+            if (State.ActiveTopMenuKey != null)
+            {
+                position.X += buttonSpacing * 2.0f;
+                foreach(var button in State.ChildMenus[State.ActiveTopMenuKey])
+                    renderButton(button, ref position, size, buttonSize + buttonSpacing, State.ActiveChildMenuKey);
+            }
+
+            position.X = buttonRightOrigin.X;
+            foreach(var button in State.RightMenu)
+                renderButton(button, ref position, size, -(buttonSize + buttonSpacing), State.ActiveChildMenuKey);
         }
 
-        private List<string> getVisibleTools()
+        private void renderButton(KeyValuePair<string, int> button, ref Vector2 position, Vector2 size, float advance, string compareKey)
         {
-            var visble = new List<string> { Keys.ElevationTools, Keys.TerrainPaint, Keys.AddAssets };
-            visble.AddRange(Tools.Where(t => t.TopMenu == State.ActiveTopMenu).Select(t => t.Key));
-            visble.AddRange(alignRight.Select(t => t.Key));
+            var buttonState = button.Key == State.PressedKey
+                ? ButtonState.Pressed
+                : button.Key == State.HoverKey ? ButtonState.Hover : ButtonState.Default;
 
-            return visble;
+            buttonRenderer.Render(pMatrix, position, size, button.Value, buttonState, button.Key == compareKey);
+            position.X += advance;
         }
     }
 }

@@ -4,7 +4,6 @@ using Larx.GltfModel;
 using Larx.Shadows;
 using Larx.Storage;
 using Larx.Terrain;
-using Larx.UserInterFace;
 using Larx.Utils;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -13,24 +12,23 @@ namespace Larx.MapAssets
 {
     public class Assets : AssetRenderer
     {
-        private readonly string[] assets = new string[] {
+        public static readonly string[] AssetKeys = new string[] {
             "tree",
             "rock",
             "grass"
         };
+
         private readonly Dictionary<string, Model> models;
         private readonly Random random;
 
-        public Assets(Ui ui)
+        public Assets()
         {
             models = new Dictionary<string, Model>();
             random = new Random();
 
-            foreach(var asset in assets) {
+            foreach(var asset in AssetKeys) {
                 var model = Model.Load(asset);
                 AppendBuffers(model);
-
-                ui.Tools.Add(new ToolbarItem(TopMenu.Assets, ui.AddButton(asset, $"ui/assets/{asset}.png")));
                 models.Add(asset, model);
                 Map.MapData.Assets.Add(asset, new List<PlacedAsset>());
             }
@@ -43,10 +41,8 @@ namespace Larx.MapAssets
             }
         }
 
-        public void Add(Vector2 position, TerrainRenderer terrain)
+        public void Add(Vector2 position, TerrainRenderer terrain, string key)
         {
-            if (State.ActiveToolBarItem == null) return;
-
             var elev = terrain.HeightMap.GetElevationAtPoint(position);
             if (elev == null) return;
 
@@ -63,10 +59,10 @@ namespace Larx.MapAssets
                     y < -half || y >= half - 1)
                     continue;
 
-                Map.MapData.Assets[State.ActiveToolBarItem].Add(new PlacedAsset(new Vector2(x, y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
+                Map.MapData.Assets[key].Add(new PlacedAsset(new Vector2(x, y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
             }
 
-            Refresh(models[State.ActiveToolBarItem], terrain);
+            Refresh(models[key], terrain);
         }
 
         public void Render(Camera camera, Light light, ShadowBox shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)

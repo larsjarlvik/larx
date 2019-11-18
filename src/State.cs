@@ -16,10 +16,7 @@ namespace Larx
         public static bool ShowGridLines;
         public static PolygonMode PolygonMode;
         public static float ToolRadius;
-
         public static float ToolHardness;
-        public static TopMenu ActiveTopMenu;
-        public static string ActiveToolBarItem;
         public const float Near = 2.0f;
         public const float Far = 2000.0f;
         public static readonly Color ClearColor = Color.FromArgb(255, 193, 213, 230);

@@ -1,6 +1,6 @@
 ﻿using System;
 using Larx.Object;
-using Larx.UserInterFace;
+using Larx.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
@@ -40,8 +40,6 @@ namespace Larx
             GraphicsContextFlags.ForwardCompatible)
         {
             State.PolygonMode = PolygonMode.Fill;
-            State.ToolRadius = 3f;
-            State.ToolHardness = 5f;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -65,7 +63,7 @@ namespace Larx
             terrain = new TerrainRenderer(camera);
             water = new WaterRenderer();
             light = new Light();
-            assets = new Assets(ui);
+            assets = new Assets();
             sky = new SkyRenderer();
             shadows = new ShadowBox();
         }
@@ -102,9 +100,9 @@ namespace Larx
             terrain.Update();
 
             if (!uiIntersect) {
-                switch (State.ActiveTopMenu)
+                switch (ui.State.ActiveTopMenuKey)
                 {
-                    case TopMenu.Terrain:
+                    case TopMenuKeys.ElevationTools:
                         if (mouse.LeftButton == ButtonState.Pressed) {
                             terrain.HeightMap.Sculpt(terrain.MousePosition, 0.1f);
                             assets.Refresh(terrain);
@@ -114,13 +112,16 @@ namespace Larx
                             assets.Refresh(terrain);
                         }
                         break;
-                    case TopMenu.Paint:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.SplatMap.Paint(terrain.MousePosition);
+                    case TopMenuKeys.TerrainPaint:
+                        if (mouse.LeftButton == ButtonState.Pressed) terrain.SplatMap.Paint(terrain.MousePosition, byte.Parse(ui.State.ActiveChildMenuKey));
+                        break;
+                    case TopMenuKeys.Assets:
+                        if (mouse.LeftButton == ButtonState.Pressed && !ui.State.MouseRepeat) assets.Add(terrain.MousePosition.Xz, terrain, ui.State.ActiveChildMenuKey);
                         break;
                 }
             }
 
-            ui.UpdateText("position", $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
+            ui.UpdateText(TextKeys.Position, $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
             Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
 
@@ -172,6 +173,7 @@ namespace Larx
             GL.Disable(EnableCap.DepthTest);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
 
+            GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
             ui.Render();
             // shadows.ShadowBuffer.DrawDepthBuffer();
 
@@ -198,16 +200,6 @@ namespace Larx
         {
             var mouse = Mouse.GetCursorState();
             State.Mouse.Set(PointToClient(new Point(mouse.X, mouse.Y)), mouse);
-            var intersection = ui.Click();
-
-            if (intersection == null) {
-                switch (State.ActiveTopMenu)
-                {
-                    case TopMenu.Assets:
-                        if (mouse.LeftButton == ButtonState.Pressed) assets.Add(terrain.MousePosition.Xz, terrain);
-                        break;
-                }
-            }
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
@@ -217,32 +209,36 @@ namespace Larx
                 if (e.Keyboard[Key.Escape])
                     Exit();
 
-                if (e.Control && e.Keyboard[Key.F])
-                    WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
+                if (e.Control) {
+                    if (e.Keyboard[Key.F])
+                        WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
 
-                if (e.Control && e.Keyboard[Key.W])
-                    State.PolygonMode = State.PolygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
+                    if (e.Keyboard[Key.W])
+                        State.PolygonMode = State.PolygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
 
-                if (e.Control && e.Keyboard[Key.G])
-                    State.ShowGridLines = !State.ShowGridLines;
+                    if (e.Keyboard[Key.G])
+                        State.ShowGridLines = !State.ShowGridLines;
 
-                if (e.Control && e.Keyboard[Key.S])
-                    Map.Save(terrain, assets);
+                    if (e.Keyboard[Key.S])
+                        Map.Save(terrain, assets);
 
-                if (e.Control && e.Keyboard[Key.O])
-                    Map.Load(terrain, assets);
+                    if (e.Keyboard[Key.O])
+                        Map.Load(terrain, assets);
 
-                if (e.Control && e.Keyboard[Key.H])
-                    terrain.HeightMap.LoadFromImage();
+                    if (e.Keyboard[Key.H])
+                        terrain.HeightMap.LoadFromImage();
 
-                if (e.Control && e.Keyboard[Key.P])
-                    terrain.SplatMap.AutoGenerate(terrain.HeightMap);
+                    if (e.Keyboard[Key.P])
+                        terrain.SplatMap.AutoGenerate(terrain.HeightMap);
+                }
             }
 
-            if (e.Control && e.Keyboard[Key.Plus])
-                terrain.HeightMap.ChangeElevation(0.1f);
-            if (e.Control && e.Keyboard[Key.Minus])
-                terrain.HeightMap.ChangeElevation(-0.1f);
+            if (e.Control) {
+                if (e.Keyboard[Key.Plus])
+                    terrain.HeightMap.ChangeElevation(0.1f);
+                if (e.Keyboard[Key.Minus])
+                    terrain.HeightMap.ChangeElevation(-0.1f);
+            }
 
             if (!e.Control)
                 State.Keyboard.Set(e.Keyboard);

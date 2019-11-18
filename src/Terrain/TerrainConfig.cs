@@ -31,5 +31,8 @@ namespace Larx.Terrain
             "rock-1",
             "rock-2"
         };
+
+        public const string SmudgeTool = "terrain_smudge";
+        public const string ElevationTool = "terrain_elevation";
     }
 }

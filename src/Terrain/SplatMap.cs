@@ -37,15 +37,13 @@ namespace Larx.Terrain
                 ToTexture(n);
         }
 
-        public void Paint(Vector3 mousePosition)
+        public void Paint(Vector3 mousePosition, byte splatId)
         {
-            if (State.ActiveToolBarItem == null) return;
-
             var position = (mousePosition.Xz / Map.MapData.MapSize);
             position.X = (position.X + 0.5f) * size;
             position.Y = (position.Y + 0.5f) * size;
 
-            update(position, byte.Parse(State.ActiveToolBarItem));
+            update(position, splatId);
         }
 
         private float calcP(float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
