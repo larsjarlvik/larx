@@ -109,7 +109,7 @@ namespace Larx.Terrain
             foreach (var i in toUpdate)
             {
                 var strength = Vector2.Distance(texturePos, i);
-                var diff = average - Heights[(int)i.X, (int)i.Y];
+                var diff = (average - Heights[(int)i.X, (int)i.Y]) * (State.ToolHardness * 0.01f);
                 Heights[(int)i.X, (int)i.Y] += diff * smoothBrush(strength, r);
             }
 
