@@ -103,13 +103,23 @@ namespace Larx
                 switch (ui.State.ActiveTopMenuKey)
                 {
                     case TopMenuKeys.ElevationTools:
-                        if (mouse.LeftButton == ButtonState.Pressed) {
-                            terrain.HeightMap.Sculpt(terrain.MousePosition, 0.1f);
-                            assets.Refresh(terrain);
-                        }
-                        if (mouse.RightButton == ButtonState.Pressed) {
-                            terrain.HeightMap.Sculpt(terrain.MousePosition, -0.1f);
-                            assets.Refresh(terrain);
+                        switch(ui.State.ActiveChildMenuKey)
+                        {
+                            case TerrainConfig.ElevationTool:
+                                if (mouse.LeftButton == ButtonState.Pressed) {
+                                    terrain.HeightMap.Sculpt(terrain.MousePosition, 0.1f);
+                                    assets.Refresh(terrain);
+                                } else if (mouse.RightButton == ButtonState.Pressed) {
+                                    terrain.HeightMap.Sculpt(terrain.MousePosition, -0.1f);
+                                    assets.Refresh(terrain);
+                                }
+                                break;
+                            case TerrainConfig.SmudgeTool:
+                                if (mouse.LeftButton == ButtonState.Pressed) {
+                                    terrain.HeightMap.Smudge(terrain.MousePosition);
+                                    assets.Refresh(terrain);
+                                }
+                                break;
                         }
                         break;
                     case TopMenuKeys.TerrainPaint:

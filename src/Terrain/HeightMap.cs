@@ -69,6 +69,12 @@ namespace Larx.Terrain
             return ((mapCoordinate + new Vector2(Map.MapData.MapSize / 2.0f)) * TerrainConfig.HeightMapDetail);
         }
 
+        private float smoothBrush(float strength, float r)
+        {
+            var t = MathF.Min(1f, MathF.Sqrt((strength / r > (State.ToolHardness * 0.1f) ? strength : 0.0f) / r));
+            return MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
+        }
+
         public void Sculpt(Vector3 position, float offset)
         {
             var texturePos = getTextureCoordinate(position.Zx);
@@ -77,14 +83,34 @@ namespace Larx.Terrain
 
             foreach (var i in toUpdate)
             {
-                var height = Heights[(int)i.X, (int)i.Y];
+                var strength = Vector2.Distance(texturePos, i);
+                var elev = smoothBrush(strength, r) * offset / TerrainConfig.HeightMapScale;
+                Heights[(int)i.X, (int)i.Y] += elev;
+            }
 
-                Func<float, float> calcP = (float t) => MathF.Pow(1f - t, 2) * MathF.Pow(1f + t, 2);
+            Update();
+        }
 
-                var amount = Vector2.Distance(texturePos, i);
-                var elev = height + calcP(MathF.Min(1f, MathF.Sqrt((amount / r > (State.ToolHardness * 0.1f) ? amount : 0.0f) / r))) * offset / TerrainConfig.HeightMapScale;
+        public void Smudge(Vector3 position)
+        {
+            var texturePos = getTextureCoordinate(position.Zx);
+            var r = (State.ToolRadius * TerrainConfig.HeightMapDetail) + 2;
+            var toUpdate = getTilesInArea(texturePos, r);
+            var total = 0.0f;
+            var count = 0;
 
-                Heights[(int)i.X, (int)i.Y] = elev;
+            foreach (var i in toUpdate)
+                if (Vector2.Distance(texturePos, i) < r) {
+                    total += Heights[(int)i.X, (int)i.Y];
+                    count ++;
+                }
+
+            var average = total / count;
+            foreach (var i in toUpdate)
+            {
+                var strength = Vector2.Distance(texturePos, i);
+                var diff = average - Heights[(int)i.X, (int)i.Y];
+                Heights[(int)i.X, (int)i.Y] += diff * smoothBrush(strength, r);
             }
 
             Update();
