@@ -159,6 +159,7 @@ namespace Larx
             water.RefractionBuffer.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             terrain.Render(camera, light, null, ClipPlane.ClipTop);
+            assets.Render(camera, light, null, terrain, ClipPlane.ClipTop);
 
             // Water reflection rendering
             camera.InvertY();
@@ -171,7 +172,6 @@ namespace Larx
             camera.Reset();
 
             // Main rendering
-            GL.Disable(EnableCap.ClipDistance0);
             multisampling.Bind();
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.PolygonMode(MaterialFace.FrontAndBack, State.PolygonMode);
