@@ -7,6 +7,7 @@ layout(triangles) in;
 layout(triangle_strip, max_vertices = 4) out;
 
 uniform sampler2D uNormalMap;
+uniform sampler2D uTextureNoise;
 
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
@@ -18,6 +19,7 @@ out vec2 gs_texCoord;
 out vec3 gs_position;
 out vec4 gs_shadowCoords;
 out vec3 gs_normal;
+out float gs_noise;
 out LightVectors gs_lightVectors;
 
 
@@ -48,6 +50,10 @@ void main() {
         vec4 position = gl_in[i].gl_Position;
         position.y *= uHeightMapScale;
         vec3 normal = normalize((texture(uNormalMap, te_texCoord[i]).zyx * 2.0) - 1.0);
+
+        float n1 = (texture(uTextureNoise, te_texCoord[i] / 0.6).r * 0.1) + 0.95;
+        float n2 = (texture(uTextureNoise, te_texCoord[i] / 9.0).r * 0.2) + 0.90;
+        gs_noise = (n1 + n2) / 2;
 
         gs_lightVectors = calculateLightVectors(normal, tangent, position.xyz, mat3(1.0));
         gs_texCoord = te_texCoord[i];

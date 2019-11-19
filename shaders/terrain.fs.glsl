@@ -6,7 +6,6 @@
 uniform sampler2DArray uTexture;
 uniform sampler2DArray uSplatMap;
 uniform sampler2D uNormalMap;
-uniform sampler2D uTextureNoise;
 
 uniform int uSplatCount;
 uniform int uGridLines;
@@ -19,6 +18,7 @@ in vec2 gs_texCoord;
 in vec3 gs_position;
 in vec4 gs_shadowCoords;
 in vec3 gs_normal;
+in float gs_noise;
 in LightVectors gs_lightVectors;
 
 out vec4 outputColor;
@@ -50,8 +50,7 @@ vec3 getTriPlanarTexture(int textureId, vec3 n) {
     blending /= vec3(b, b, b);
 
     vec3 yaxis = texture(uTexture, vec3(gs_position.xz * 0.1, textureId)).rgb;
-    if (blending.y > 0.3)
-        return yaxis;
+    if (blending.y > 0.3) return yaxis;
 
     vec3 xaxis = texture(uTexture, vec3(gs_position.yz * 0.1, textureId)).rgb;
     vec3 zaxis = texture(uTexture, vec3(gs_position.xy * 0.1, textureId)).rgb;
@@ -60,14 +59,10 @@ vec3 getTriPlanarTexture(int textureId, vec3 n) {
 }
 
 vec3 finalTexture(int index, vec3 normal, LightVectors lv) {
-    float n1 = (texture(uTextureNoise, gs_texCoord / 0.6).r * 0.1) + 0.95;
-    float n2 = (texture(uTextureNoise, gs_texCoord / 9.0).r * 0.2) + 0.90;
 
-    float noise = (n1 + n2) / 2;
-
-    vec3 n = texture(uTexture, getTriPlanarTexture(index * 3 + 1, normal)).rgb * 2.0 - 1.0;
-    float r = texture(uTexture, getTriPlanarTexture(index * 3 + 2, normal)).r;
-    return getTriPlanarTexture(index * 3, normal) * calculateLight(lv, n, (1.0 - r) * 5.0, 1.0) * noise;
+    vec3 n = normalize(texture(uTexture, vec3(index * 3 + 1)).rgb * 2.0 - 1.0);
+    float r = texture(uTexture, vec3(index * 3 + 2)).r;
+    return getTriPlanarTexture(index * 3, normal) * calculateLight(lv, n, 1.0, 1.0) * gs_noise;
 }
 
 void main() {

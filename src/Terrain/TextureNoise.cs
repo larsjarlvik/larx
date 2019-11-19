@@ -24,7 +24,7 @@ namespace Larx.Terrain
             Texture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Texture);
             GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-            GL.TexImage2D<float>(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Detail, Detail, 0, PixelFormat.Red, PixelType.Float, noise);
+            GL.TexImage2D<float>(TextureTarget.Texture2D, 0, PixelInternalFormat.R16f, Detail, Detail, 0, PixelFormat.Red, PixelType.Float, noise);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
