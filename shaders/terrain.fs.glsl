@@ -67,7 +67,7 @@ vec3 finalTexture(int index, vec3 normal, LightVectors lv) {
 
     vec3 n = texture(uTexture, getTriPlanarTexture(index * 3 + 1, normal)).rgb * 2.0 - 1.0;
     float r = texture(uTexture, getTriPlanarTexture(index * 3 + 2, normal)).r;
-    return getTriPlanarTexture(index * 3, normal) * calculateLight(lv, n, r * 5.0, 1.0) * noise;
+    return getTriPlanarTexture(index * 3, normal) * calculateLight(lv, n, (1.0 - r) * 5.0, 1.0) * noise;
 }
 
 void main() {

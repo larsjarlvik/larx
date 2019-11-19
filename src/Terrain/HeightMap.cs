@@ -39,7 +39,6 @@ namespace Larx.Terrain
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
             normalMap.Generate(Texture);
-            normalMap.GetNormals();
         }
 
         public float? GetElevationAtPoint(Vector2 pos)
