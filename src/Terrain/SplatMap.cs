@@ -89,24 +89,28 @@ namespace Larx.Terrain
             GL.TexSubImage3D<float>(TextureTarget.Texture2DArray, 0, 0, 0, textureId, size, size, 1, PixelFormat.Red, PixelType.Float, Map.MapData.SplatMap[textureId]);
         }
 
-        public void AutoGenerate(HeightMap heightMap)
+        public void AutoGenerate(HeightMap heightMap, NormalMap normalMap)
         {
+            var normals = normalMap.GetNormals();
             var n1 = SimplexNoise.Noise.Calc2D(size, size, 0.01f);
             var n2 = SimplexNoise.Noise.Calc2D(size, size, 0.05f);
-
+            var n3 = SimplexNoise.Noise.Calc2D(size, size, 0.1f);
             var c1 = SimplexNoise.Noise.Calc2D(size, size, 0.005f);
 
-            for (var z = 0; z < size; z ++)
-                for (var x = 0; x < size; x ++) {
-                    var height = heightMap.Heights[z, x] * TerrainConfig.HeightMapScale;
+            for (var z = 1; z < size; z ++)
+                for (var x = 1; x < size; x ++) {
+                    for(var i = 0; i < TerrainConfig.Textures.Length; i++)
+                        Map.MapData.SplatMap[i][z, x] = 0.0f;
+
+                    var angle = 1.0f - normals[z, x].Y;
                     var v = (n1[z, x] + n2[z, x]) / 512.0f;
+                    var height = heightMap.Heights[z, x] * TerrainConfig.HeightMapScale;
                     var c = c1[z, x] / 256.0f * 5.0f - 2.5f;
 
-                    addSplatMix(height,-30.0f, 35.0f, 7, 8, x, z, v, c, 0.5f);
-                    addSplatMix(height, 12.0f, 12.0f, 0, 1, x, z, v, c, 0.1f);
-                    addSplatMix(height, 15.0f, 12.0f, 2, 3, x, z, v, c, 0.05f);
-                    addSplatMix(height, 25.0f, 15.0f, 5, 6, x, z, v, c, 0.05f);
-                    addSplatMix(height, 55.0f, 25.0f, 10, 5, x, z, v, c, 0.2f);
+                    addSplatMix(height,-30.0f, 32.0f, 7, 8, x, z, v, c, 0.5f, 1.0f);
+                    addSplatMix(height, 62.0f, 64.0f, 0, 1, x, z, v, c, 0.1f, 0.6f);
+                    addSplatMix(angle, 0.32f, 0.12f, 5, 6, x, z, v, 0.0f, 0.5f, 1.0f, 15.0f);
+                    addSplatMix(angle, 0.40f, 0.08f, 11, 12, x, z, v, 0.0f, 0.5f, 1.0f, 15.0f);
 
                     var split = 1.0f / Map.MapData.SplatMap.Sum(s => s[z, x]);
                     for(var i = 0; i < TerrainConfig.Textures.Length; i++) {
@@ -115,15 +119,16 @@ namespace Larx.Terrain
                 }
 
             Refresh();
+
         }
 
-        private void addSplatMix(float height, float center, float spread, int s1, int s2, int x, int z, float v, float c, float strength)
+        private void addSplatMix(float height, float center, float spread, int s1, int s2, int x, int z, float v, float c, float strength, float mix = 1.0f, float multiplier = 1.0f)
         {
             var distance = MathF.Abs(height + c - center);
             var n = calcP(MathF.Min(1.0f, MathF.Sqrt((distance / spread > strength ? distance : 0.0f) / spread)));
 
-            Map.MapData.SplatMap[s1][z, x] = v * n;
-            Map.MapData.SplatMap[s2][z, x] = (1.0f - v) * n;
+            Map.MapData.SplatMap[s1][z, x] = v / mix * n * multiplier;
+            Map.MapData.SplatMap[s2][z, x] = (1.0f - v * mix) * n * multiplier;
         }
     }
 }

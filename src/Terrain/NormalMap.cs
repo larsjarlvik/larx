@@ -33,5 +33,15 @@ namespace Larx.Terrain
             GL.DispatchCompute(size / 16, size / 16, 1);
             GL.Finish();
         }
+
+        public Vector4[,] GetNormals()
+        {
+            var normals = new Vector4[size, size];
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, Texture.TextureId);
+            GL.GetTexImage(TextureTarget.Texture2D, 0, PixelFormat.Rgba, PixelType.Float, normals);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            return normals;
+        }
     }
 }
