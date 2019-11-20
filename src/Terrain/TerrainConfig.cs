@@ -32,6 +32,11 @@ namespace Larx.Terrain
             "rock-2"
         };
 
+        public const string LevelRaise = "terrain_raise";
+        public const string LevelLower = "terrain_lower";
+        public const string StrengthIncrease = "terrain_increase_strength";
+        public const string StrengthDecrease = "terrain_decrease_strength";
+
         public const string SmudgeTool = "terrain_smudge";
         public const string ElevationTool = "terrain_elevation";
     }

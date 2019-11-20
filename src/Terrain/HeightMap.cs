@@ -116,11 +116,13 @@ namespace Larx.Terrain
             Update();
         }
 
-        public void ChangeElevation(float offset)
+        public void ChangeSettings(float offset, float strength)
         {
             for(var x = 0; x < size; x ++)
-                for(var z = 0; z < size; z ++)
+                for(var z = 0; z < size; z ++) {
                     Heights[x, z] += offset;
+                    Heights[x, z] *= strength;
+                }
 
             Update();
         }

@@ -135,6 +135,22 @@ namespace Larx
                         }
                         break;
                 }
+            } else {
+                switch (ui.State.PressedKey)
+                {
+                    case TerrainConfig.LevelRaise:
+                        terrain.HeightMap.ChangeSettings(0.1f, 1.0f);
+                        break;
+                    case TerrainConfig.LevelLower:
+                        terrain.HeightMap.ChangeSettings(-0.1f, 1.0f);
+                        break;
+                    case TerrainConfig.StrengthIncrease:
+                        terrain.HeightMap.ChangeSettings(0.0f, 1.02f);
+                        break;
+                    case TerrainConfig.StrengthDecrease:
+                        terrain.HeightMap.ChangeSettings(0.0f, 0.98f);
+                        break;
+                }
             }
 
             ui.UpdateText(TextKeys.Position, $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
@@ -247,13 +263,6 @@ namespace Larx
                     if (e.Keyboard[Key.P])
                         terrain.SplatMap.AutoGenerate(terrain.HeightMap, terrain.NormalMap);
                 }
-            }
-
-            if (e.Control) {
-                if (e.Keyboard[Key.Plus])
-                    terrain.HeightMap.ChangeElevation(0.1f);
-                if (e.Keyboard[Key.Minus])
-                    terrain.HeightMap.ChangeElevation(-0.1f);
             }
 
             if (!e.Control)

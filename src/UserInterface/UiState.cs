@@ -30,15 +30,16 @@ namespace Larx.UserInterface
 
     public class UiState
     {
-        public Dictionary<string, int> TopMenu { get; set; }
-        public Dictionary<string, int> RightMenu { get; set; }
-        public Dictionary<string, Dictionary<string, int>> ChildMenus { get; set; }
+        public Dictionary<string, UiElement> TopMenu { get; set; }
+        public Dictionary<string, UiElement> RightMenu { get; set; }
+        public Dictionary<string, Dictionary<string, UiElement>> ChildMenus { get; set; }
         public Dictionary<string, DisplayText> Texts { get; set; }
 
         public string HoverKey { get; set; }
         public string PressedKey { get; set; }
         public string ActiveTopMenuKey { get; set; }
         public string ActiveChildMenuKey { get; set; }
+        public string ButtonPressed { get; set; }
         public bool MousePressed { get; set; }
         public bool MouseRepeat { get; set; }
 

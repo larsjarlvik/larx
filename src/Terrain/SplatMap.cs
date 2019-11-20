@@ -108,7 +108,7 @@ namespace Larx.Terrain
                     var c = c1[z, x] / 256.0f * 5.0f - 2.5f;
 
                     addSplatMix(height,-30.0f, 32.0f, 7, 8, x, z, v, c, 0.5f, 1.0f);
-                    addSplatMix(height, 62.0f, 64.0f, 0, 1, x, z, v, c, 0.1f, 0.6f);
+                    addSplatMix(height, 92.0f, 94.0f, 0, 1, x, z, v, c, 0.1f, 0.6f);
                     addSplatMix(angle, 0.32f, 0.12f, 5, 6, x, z, v, 0.0f, 0.5f, 1.0f, 15.0f);
                     addSplatMix(angle, 0.40f, 0.08f, 11, 12, x, z, v, 0.0f, 0.5f, 1.0f, 15.0f);
 
