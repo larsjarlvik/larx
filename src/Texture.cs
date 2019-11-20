@@ -70,7 +70,7 @@ namespace Larx
             GL.BindTexture(TextureTarget.Texture2D, TextureId);
             GL.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 
-            GL.TexImage2D<byte>(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Size.X, Size.Y, 0, PixelFormat, PixelType.UnsignedByte, buffer);
+            GL.TexImage2D<byte>(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Size.X, Size.Y, 0, PixelFormat, PixelType.UnsignedByte, buffer);
 
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);
@@ -90,7 +90,7 @@ namespace Larx
             TextureId = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, TextureId);
 
-            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 8, SizedInternalFormat.Rgba32f, Size.X, Size.Y, buffers.Count());
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 8, SizedInternalFormat.Rgba8, Size.X, Size.Y, buffers.Count());
 
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, mipMap ? (int)TextureMinFilter.LinearMipmapLinear : (int)TextureMinFilter.Linear);

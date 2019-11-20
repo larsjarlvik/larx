@@ -1,8 +1,12 @@
 #version 430
+#include clip
 
 layout(quads, fractional_odd_spacing, cw) in;
 
 uniform sampler2D uHeightMap;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
+uniform float uHeightMapScale;
 
 in vec2 tc_texCoord[];
 
@@ -25,7 +29,8 @@ void main() {
     );
 
     float height = texture(uHeightMap, texCoord).r;
-    position.y = height;
+    position.y = height * uHeightMapScale;
 
-    gl_Position = position;
+    gl_ClipDistance[0] = clip(position.xyz);
+    gl_Position = uProjectionMatrix * uViewMatrix * position;
 }
