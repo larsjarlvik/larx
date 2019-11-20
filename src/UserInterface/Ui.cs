@@ -32,44 +32,46 @@ namespace Larx.UserInterface
 
             State.ChildMenus = new Dictionary<string, Dictionary<string, UiElement>>();
             State.TopMenu = new Dictionary<string, UiElement>() {
-                { TopMenuKeys.ElevationTools, new UiElement("ui/terrain.png", true) },
-                { TopMenuKeys.TerrainPaint, new UiElement("ui/paint.png", true) },
-                { TopMenuKeys.Assets, new UiElement("ui/assets.png", true) },
+                { UiKeys.TopMenu.ElevationTools, new UiElement("ui/terrain.png", true) },
+                { UiKeys.TopMenu.TerrainPaint, new UiElement("ui/paint.png", true) },
+                { UiKeys.TopMenu.Assets, new UiElement("ui/assets.png", true) },
             };
 
-            State.ChildMenus.Add(TopMenuKeys.ElevationTools, new Dictionary<string, UiElement>() {
-                { TerrainConfig.ElevationTool, new UiElement("ui/raise-lower.png", true) },
-                { TerrainConfig.SmudgeTool, new UiElement("ui/smudge.png", true) },
-                { TerrainConfig.LevelRaise, new UiElement("ui/level-raise.png") },
-                { TerrainConfig.LevelLower, new UiElement("ui/level-lower.png") },
-                { TerrainConfig.StrengthIncrease, new UiElement("ui/strength-increase.png") },
-                { TerrainConfig.StrengthDecrease, new UiElement("ui/strength-decrease.png") },
+            State.ChildMenus.Add(UiKeys.TopMenu.ElevationTools, new Dictionary<string, UiElement>() {
+                { UiKeys.Terrain.ElevationTool, new UiElement("ui/raise-lower.png", true) },
+                { UiKeys.Terrain.SmudgeTool, new UiElement("ui/smudge.png", true) },
+                { UiKeys.Terrain.LevelRaise, new UiElement("ui/level-raise.png") },
+                { UiKeys.Terrain.LevelLower, new UiElement("ui/level-lower.png") },
+                { UiKeys.Terrain.StrengthIncrease, new UiElement("ui/strength-increase.png") },
+                { UiKeys.Terrain.StrengthDecrease, new UiElement("ui/strength-decrease.png") },
             });
 
-            State.ChildMenus.Add(TopMenuKeys.TerrainPaint, TerrainConfig.Textures
+            State.ChildMenus.Add(UiKeys.TopMenu.TerrainPaint, TerrainConfig.Textures
                 .Select(t => new KeyValuePair<string, UiElement>(Array.IndexOf(TerrainConfig.Textures, t).ToString(), new UiElement(Path.Combine($"textures/{t}-albedo.png"), true, true)))
                 .ToDictionary(x => x.Key, x => x.Value)
             );
+            State.ChildMenus[UiKeys.TopMenu.TerrainPaint].Add(UiKeys.SplatMap.AutoPaint, new UiElement("ui/auto.png", true));
+            State.ChildMenus[UiKeys.TopMenu.TerrainPaint].Add(UiKeys.SplatMap.AutoPaintGlobal, new UiElement("ui/auto-global.png"));
 
-            State.ChildMenus.Add(TopMenuKeys.Assets, Assets.AssetKeys
+            State.ChildMenus.Add(UiKeys.TopMenu.Assets, Assets.AssetKeys
                 .Select(a => new KeyValuePair<string, UiElement>(a , new UiElement(Path.Combine($"ui/assets/{a}.png"), true, true)))
                 .ToDictionary(x => x.Key, x => x.Value)
             );
-            State.ChildMenus[TopMenuKeys.Assets].Add(ActionKeys.Erase, new UiElement("ui/erase.png"));
+            State.ChildMenus[UiKeys.TopMenu.Assets].Add(UiKeys.Assets.Erase, new UiElement("ui/erase.png", true));
 
             State.RightMenu = new Dictionary<string, UiElement>() {
-                { ActionKeys.SizeIncrease, new UiElement("ui/terrain-increase.png") },
-                { ActionKeys.SizeDecrease, new UiElement("ui/terrain-decrease.png") },
-                { ActionKeys.HardnessIncrease, new UiElement("ui/hardness-increase.png") },
-                { ActionKeys.HardnessDecrease, new UiElement("ui/hardness-decrease.png") },
+                { UiKeys.Actions.SizeIncrease, new UiElement("ui/terrain-increase.png") },
+                { UiKeys.Actions.SizeDecrease, new UiElement("ui/terrain-decrease.png") },
+                { UiKeys.Actions.HardnessIncrease, new UiElement("ui/hardness-increase.png") },
+                { UiKeys.Actions.HardnessDecrease, new UiElement("ui/hardness-decrease.png") },
             };
 
-            State.SetActiveTopMenuKey(TopMenuKeys.ElevationTools);
+            State.SetActiveTopMenuKey(UiKeys.TopMenu.ElevationTools);
             State.Texts = new Dictionary<string, DisplayText>() {
-                { TextKeys.Title, textRenderer.CreateText("Larx Terrain Editor v0.1", textSize) },
-                { TextKeys.Radius, textRenderer.CreateText($"Radius: {Larx.State.ToolRadius}", textSize) },
-                { TextKeys.Hardness, textRenderer.CreateText($"Hardness: {Larx.State.ToolHardness}", textSize) },
-                { TextKeys.Position, textRenderer.CreateText("Position: 0 0", textSize) }
+                { UiKeys.Texts.Title, textRenderer.CreateText("Larx Terrain Editor v0.1", textSize) },
+                { UiKeys.Texts.Radius, textRenderer.CreateText($"Radius: {Larx.State.ToolRadius}", textSize) },
+                { UiKeys.Texts.Hardness, textRenderer.CreateText($"Hardness: {Larx.State.ToolHardness}", textSize) },
+                { UiKeys.Texts.Position, textRenderer.CreateText("Position: 0 0", textSize) }
             };
         }
 
@@ -82,42 +84,32 @@ namespace Larx.UserInterface
 
             var position = bottomLeftOrigin;
             var size = new Vector2(buttonSize);
-            State.PressedKey = null;
             State.MouseRepeat = State.MousePressed;
             State.MousePressed = Larx.State.Mouse.LeftButton;
-            State.ResetButtonStates();
+            State.HoverKey = null;
 
-            foreach(var button in State.TopMenu)
-            {
-                if (intersect(button.Key, Larx.State.Mouse.Position, position, size))
-                    if (Larx.State.Mouse.LeftButton) State.SetActiveTopMenuKey(button.Key);
+            foreach(var button in State.TopMenu) {
+                if (intersect(button.Key, Larx.State.Mouse.Position, position, size) && Larx.State.Mouse.LeftButton && !State.MouseRepeat)
+                    State.SetActiveTopMenuKey(button.Key);
 
                 position.X += buttonSize + buttonSpacing;
             }
 
             position.X += buttonSpacing * 2.0f;
             if (State.ActiveTopMenuKey != null)
-                foreach(var button in State.ChildMenus[State.ActiveTopMenuKey])
-                {
-                    if (intersect(button.Key, Larx.State.Mouse.Position, position, size))
-                        if (Larx.State.Mouse.LeftButton) {
-                            if(button.Value.IsToggle) {
-                                State.ActiveChildMenuKey = button.Key;
-                            }
-                        }
+                foreach(var button in State.ChildMenus[State.ActiveTopMenuKey]) {
+                    if (intersect(button.Key, Larx.State.Mouse.Position, position, size) && Larx.State.Mouse.LeftButton && button.Value.IsToggle && !State.MouseRepeat)
+                        State.ActiveChildMenuKey = button.Key;
 
                     position.X += buttonSize + buttonSpacing;
                 }
 
             position.X = bottomRightOrigin.X;
-            foreach(var button in State.RightMenu)
-            {
-                if(intersect(button.Key, Larx.State.Mouse.Position, position, size)) {
-                    if (Larx.State.Mouse.LeftButton && !State.MouseRepeat) {
-                        State.SetControls(button.Key);
-                        UpdateText(TextKeys.Radius, $"Radius: {Larx.State.ToolRadius}");
-                        UpdateText(TextKeys.Hardness, $"Hardness: {Larx.State.ToolHardness}");
-                    }
+            foreach(var button in State.RightMenu) {
+                if (intersect(button.Key, Larx.State.Mouse.Position, position, size) && Larx.State.Mouse.LeftButton && !State.MouseRepeat) {
+                    State.SetControls(button.Key);
+                    UpdateText(UiKeys.Texts.Radius, $"Radius: {Larx.State.ToolRadius}");
+                    UpdateText(UiKeys.Texts.Hardness, $"Hardness: {Larx.State.ToolHardness}");
                 }
 
                 position.X -= buttonSize + buttonSpacing;
@@ -136,9 +128,7 @@ namespace Larx.UserInterface
             if (mouse.X >= position.X && mouse.Y >= position.Y &&
                 mouse.X <= position.X + size.X && mouse.Y <= position.Y + size.Y) {
                 State.HoverKey = key;
-                if (Larx.State.Mouse.LeftButton)
-                    State.PressedKey = key;
-
+                State.PressedKey = Larx.State.Mouse.LeftButton && (!State.MouseRepeat || State.PressedKey == key) ? key : null;
                 return true;
             }
 
@@ -159,8 +149,7 @@ namespace Larx.UserInterface
             foreach(var uiElement in State.TopMenu)
                 renderButton(uiElement, ref position, size, buttonSize + buttonSpacing, State.ActiveTopMenuKey);
 
-            if (State.ActiveTopMenuKey != null)
-            {
+            if (State.ActiveTopMenuKey != null) {
                 position.X += buttonSpacing * 2.0f;
                 foreach(var uiElement in State.ChildMenus[State.ActiveTopMenuKey])
                     renderButton(uiElement, ref position, size, buttonSize + buttonSpacing, State.ActiveChildMenuKey);

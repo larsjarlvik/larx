@@ -4,29 +4,6 @@ using Larx.UserInterface.Text;
 
 namespace Larx.UserInterface
 {
-    public static class TopMenuKeys
-    {
-        public const string ElevationTools = "elevation";
-        public const string TerrainPaint = "paint";
-        public const string Assets = "assets";
-    }
-
-    public static class ActionKeys
-    {
-        public const string SizeIncrease = "size_increase";
-        public const string SizeDecrease = "size_decrease";
-        public const string HardnessIncrease = "hardness_increase";
-        public const string HardnessDecrease = "hardness_decrease";
-        public const string Erase = "erase";
-    }
-
-    public static class TextKeys
-    {
-        public const string Title = "title";
-        public const string Position = "position";
-        public const string Radius = "radius";
-        public const string Hardness = "hardness";
-    }
 
     public class UiState
     {
@@ -39,7 +16,6 @@ namespace Larx.UserInterface
         public string PressedKey { get; set; }
         public string ActiveTopMenuKey { get; set; }
         public string ActiveChildMenuKey { get; set; }
-        public string ButtonPressed { get; set; }
         public bool MousePressed { get; set; }
         public bool MouseRepeat { get; set; }
 
@@ -48,12 +24,12 @@ namespace Larx.UserInterface
             ActiveTopMenuKey = key;
             ActiveChildMenuKey = ChildMenus[ActiveTopMenuKey].Keys.First();
             switch(key) {
-                case TopMenuKeys.ElevationTools:
-                case TopMenuKeys.TerrainPaint:
+                case UiKeys.TopMenu.ElevationTools:
+                case UiKeys.TopMenu.TerrainPaint:
                     State.ToolRadius = 5f;
                     State.ToolHardness = 5f;
                     break;
-                case TopMenuKeys.Assets:
+                case UiKeys.TopMenu.Assets:
                     State.ToolRadius = 1f;
                     State.ToolHardness = 1f;
                     break;
@@ -63,29 +39,23 @@ namespace Larx.UserInterface
         public void SetControls(string key)
         {
             switch(key) {
-                case ActionKeys.SizeIncrease:
+                case UiKeys.Actions.SizeIncrease:
                     State.ToolRadius += State.ToolRadius >= 20 ? 5 : State.ToolRadius >= 10 ? 2 : 1;
                     if (State.ToolRadius > 100f) State.ToolRadius = 100f;
                     break;
-                case ActionKeys.SizeDecrease:
+                case UiKeys.Actions.SizeDecrease:
                     State.ToolRadius += State.ToolRadius >= 20 ? -5 : State.ToolRadius >= 10 ? -2 : -1;
                     if (State.ToolRadius < 0f) State.ToolRadius = 0f;
                     break;
-                case ActionKeys.HardnessIncrease:
+                case UiKeys.Actions.HardnessIncrease:
                     State.ToolHardness += 1f;
                     if (State.ToolHardness > 10f) State.ToolHardness = 10f;
                     break;
-                case ActionKeys.HardnessDecrease:
+                case UiKeys.Actions.HardnessDecrease:
                     State.ToolHardness -= 1f;
                     if (State.ToolHardness < 0f) State.ToolHardness = 0f;
                     break;
             }
-        }
-
-        public void ResetButtonStates()
-        {
-            HoverKey = null;
-            PressedKey = null;
         }
     }
 }

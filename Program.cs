@@ -102,10 +102,10 @@ namespace Larx
             if (!uiIntersect) {
                 switch (ui.State.ActiveTopMenuKey)
                 {
-                    case TopMenuKeys.ElevationTools:
+                    case UiKeys.TopMenu.ElevationTools:
                         switch(ui.State.ActiveChildMenuKey)
                         {
-                            case TerrainConfig.ElevationTool:
+                            case UiKeys.Terrain.ElevationTool:
                                 if (mouse.LeftButton == ButtonState.Pressed) {
                                     terrain.HeightMap.Sculpt(terrain.MousePosition, 0.1f);
                                     assets.Refresh(terrain);
@@ -114,7 +114,7 @@ namespace Larx
                                     assets.Refresh(terrain);
                                 }
                                 break;
-                            case TerrainConfig.SmudgeTool:
+                            case UiKeys.Terrain.SmudgeTool:
                                 if (mouse.LeftButton == ButtonState.Pressed) {
                                     terrain.HeightMap.Smudge(terrain.MousePosition);
                                     assets.Refresh(terrain);
@@ -122,12 +122,17 @@ namespace Larx
                                 break;
                         }
                         break;
-                    case TopMenuKeys.TerrainPaint:
-                        if (mouse.LeftButton == ButtonState.Pressed) terrain.SplatMap.Paint(terrain.MousePosition, byte.Parse(ui.State.ActiveChildMenuKey));
-                        break;
-                    case TopMenuKeys.Assets:
+                    case UiKeys.TopMenu.TerrainPaint:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            if (ui.State.ActiveChildMenuKey == ActionKeys.Erase) {
+                            if (ui.State.ActiveChildMenuKey == UiKeys.SplatMap.AutoPaint)
+                                terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap, terrain.MousePosition);
+                            else
+                                terrain.SplatMap.Paint(terrain.MousePosition, byte.Parse(ui.State.ActiveChildMenuKey));
+                        }
+                        break;
+                    case UiKeys.TopMenu.Assets:
+                        if (mouse.LeftButton == ButtonState.Pressed) {
+                            if (ui.State.ActiveChildMenuKey == UiKeys.Assets.Erase) {
                                 assets.Remove(terrain.MousePosition.Xz, terrain);
                             } else if (!ui.State.MouseRepeat) {
                                 assets.Add(terrain.MousePosition.Xz, terrain, ui.State.ActiveChildMenuKey);
@@ -138,22 +143,29 @@ namespace Larx
             } else {
                 switch (ui.State.PressedKey)
                 {
-                    case TerrainConfig.LevelRaise:
+                    case UiKeys.Terrain.LevelRaise:
                         terrain.HeightMap.ChangeSettings(0.1f, 1.0f);
+                        assets.Refresh(terrain);
                         break;
-                    case TerrainConfig.LevelLower:
+                    case UiKeys.Terrain.LevelLower:
                         terrain.HeightMap.ChangeSettings(-0.1f, 1.0f);
+                        assets.Refresh(terrain);
                         break;
-                    case TerrainConfig.StrengthIncrease:
+                    case UiKeys.Terrain.StrengthIncrease:
                         terrain.HeightMap.ChangeSettings(0.0f, 1.02f);
+                        assets.Refresh(terrain);
                         break;
-                    case TerrainConfig.StrengthDecrease:
+                    case UiKeys.Terrain.StrengthDecrease:
                         terrain.HeightMap.ChangeSettings(0.0f, 0.98f);
+                        assets.Refresh(terrain);
+                        break;
+                    case UiKeys.SplatMap.AutoPaintGlobal:
+                        terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap);
                         break;
                 }
             }
 
-            ui.UpdateText(TextKeys.Position, $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
+            ui.UpdateText(UiKeys.Texts.Position, $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
             Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
 
@@ -259,9 +271,6 @@ namespace Larx
 
                     if (e.Keyboard[Key.H])
                         terrain.HeightMap.LoadFromImage();
-
-                    if (e.Keyboard[Key.P])
-                        terrain.SplatMap.AutoGenerate(terrain.HeightMap, terrain.NormalMap);
                 }
             }
 
