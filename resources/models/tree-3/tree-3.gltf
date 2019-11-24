@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "tree.013",
+            "name" : "tree.011",
             "rotation" : [
                 0.7071068286895752,
                 0,
@@ -48,7 +48,7 @@
     ],
     "meshes" : [
         {
-            "name" : "tree.013",
+            "name" : "tree.011",
             "primitives" : [
                 {
                     "attributes" : {
@@ -82,8 +82,8 @@
         },
         {
             "mimeType" : "image/png",
-            "name" : "tree-4",
-            "uri" : "tree-4.png"
+            "name" : "tree",
+            "uri" : "tree.png"
         },
         {
             "mimeType" : "image/png",
@@ -95,74 +95,74 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 726,
+            "count" : 1230,
             "max" : [
-                0.6032007932662964,
-                2.8624179363250732,
-                0.6855520009994507
+                1.8064630031585693,
+                4.026801109313965,
+                1.234326958656311
             ],
             "min" : [
-                -0.6421360969543457,
-                -0.14587964117527008,
-                -0.680864691734314
+                -1.5169700384140015,
+                -0.3069539964199066,
+                -1.6025490760803223
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 726,
+            "count" : 1230,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 726,
+            "count" : 1230,
             "type" : "VEC4"
         },
         {
             "bufferView" : 3,
             "componentType" : 5126,
-            "count" : 726,
+            "count" : 1230,
             "type" : "VEC2"
         },
         {
             "bufferView" : 4,
             "componentType" : 5123,
-            "count" : 1536,
+            "count" : 3471,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 8712,
+            "byteLength" : 14760,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 8712,
-            "byteOffset" : 8712
+            "byteLength" : 14760,
+            "byteOffset" : 14760
         },
         {
             "buffer" : 0,
-            "byteLength" : 11616,
-            "byteOffset" : 17424
+            "byteLength" : 19680,
+            "byteOffset" : 29520
         },
         {
             "buffer" : 0,
-            "byteLength" : 5808,
-            "byteOffset" : 29040
+            "byteLength" : 9840,
+            "byteOffset" : 49200
         },
         {
             "buffer" : 0,
-            "byteLength" : 3072,
-            "byteOffset" : 34848
+            "byteLength" : 6942,
+            "byteOffset" : 59040
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 37920,
+            "byteLength" : 65984,
             "uri" : "tree-3.bin"
         }
     ]

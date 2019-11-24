@@ -18,6 +18,7 @@ namespace Larx.MapAssets
             "tree-2",
             "tree-3",
             "tree-4",
+            "tree-5",
             "rock",
             "grass"
         };

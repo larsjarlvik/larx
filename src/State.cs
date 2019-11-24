@@ -19,7 +19,7 @@ namespace Larx
         public static float ToolHardness;
         public const float Near = 2.0f;
         public const float Far = 2000.0f;
-        public static readonly Color ClearColor = Color.FromArgb(255, 193, 213, 230);
+        public static readonly Color ClearColor = Color.FromArgb(255, 207, 210, 230);
         public const int ShadowMapResolution = 4096;
 
         public static class Window

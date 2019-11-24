@@ -77,18 +77,18 @@
     "images" : [
         {
             "mimeType" : "image/png",
-            "name" : "tree-0_s",
-            "uri" : "tree-0_s.png"
+            "name" : "tree_n",
+            "uri" : "tree_n.png"
         },
         {
             "mimeType" : "image/png",
-            "name" : "tree-0",
-            "uri" : "tree-0.png"
+            "name" : "tree",
+            "uri" : "tree.png"
         },
         {
             "mimeType" : "image/png",
-            "name" : "tree-0_s",
-            "uri" : "tree-0_s-1.png"
+            "name" : "tree_s",
+            "uri" : "tree_s-1.png"
         }
     ],
     "accessors" : [

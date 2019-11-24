@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "tree.016",
+            "name" : "tree.015",
             "rotation" : [
                 0.7071068286895752,
                 0,
@@ -48,7 +48,7 @@
     ],
     "meshes" : [
         {
-            "name" : "tree.016",
+            "name" : "tree.015",
             "primitives" : [
                 {
                     "attributes" : {
@@ -95,75 +95,75 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 1025,
+            "count" : 586,
             "max" : [
-                3.4562623500823975,
-                9.08827018737793,
-                2.960010290145874
+                2.0158159732818604,
+                3.448197603225708,
+                1.6357033252716064
             ],
             "min" : [
-                -2.135863780975342,
-                -0.5710873603820801,
-                -2.6024436950683594
+                -1.5159510374069214,
+                -0.23460736870765686,
+                -1.9883836507797241
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 1025,
+            "count" : 586,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 1025,
+            "count" : 586,
             "type" : "VEC4"
         },
         {
             "bufferView" : 3,
             "componentType" : 5126,
-            "count" : 1025,
+            "count" : 586,
             "type" : "VEC2"
         },
         {
             "bufferView" : 4,
             "componentType" : 5123,
-            "count" : 2826,
+            "count" : 1596,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 12300,
+            "byteLength" : 7032,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 12300,
-            "byteOffset" : 12300
+            "byteLength" : 7032,
+            "byteOffset" : 7032
         },
         {
             "buffer" : 0,
-            "byteLength" : 16400,
-            "byteOffset" : 24600
+            "byteLength" : 9376,
+            "byteOffset" : 14064
         },
         {
             "buffer" : 0,
-            "byteLength" : 8200,
-            "byteOffset" : 41000
+            "byteLength" : 4688,
+            "byteOffset" : 23440
         },
         {
             "buffer" : 0,
-            "byteLength" : 5652,
-            "byteOffset" : 49200
+            "byteLength" : 3192,
+            "byteOffset" : 28128
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 54852,
-            "uri" : "tree-2.bin"
+            "byteLength" : 31320,
+            "uri" : "tree-5.bin"
         }
     ]
 }
