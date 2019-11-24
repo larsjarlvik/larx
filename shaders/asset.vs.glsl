@@ -9,6 +9,7 @@ layout(location = 2) in vec3 vNormal;
 layout(location = 3) in vec4 vTangent;
 layout(location = 4) in vec3 iPosition;
 layout(location = 5) in float iRotation;
+layout(location = 6) in float iScale;
 
 uniform mat4 uProjectionMatrix;
 uniform mat4 uViewMatrix;
@@ -25,7 +26,7 @@ mat3 rotationYMatrix(float a) {
 
 void main() {
     mat3 rotation = rotationYMatrix(iRotation);
-    vec4 position = vec4(vPosition * rotation + iPosition, 1.0);
+    vec4 position = vec4(vPosition * iScale * rotation + iPosition, 1.0);
     vec4 worldPosition = uViewMatrix * position;
 
     vs_normal = vNormal;

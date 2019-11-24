@@ -29,11 +29,13 @@ namespace Larx.MapAssets
             var placedAssets = Map.MapData.Assets.ContainsKey(model.ModelName) ? Map.MapData.Assets[model.ModelName] : null;
             var positions = new Vector3[placedAssets.Count];
             var rotations = new float[placedAssets.Count];
+            var scales = new float[placedAssets.Count];
 
             for(var i = 0; i < placedAssets.Count; i++)
             {
                 positions[i] = new Vector3(placedAssets[i].Position.X, (float)terrain.HeightMap.GetElevationAtPoint(placedAssets[i].Position), placedAssets[i].Position.Y);
                 rotations[i] = placedAssets[i].Rotation;
+                scales[i] = placedAssets[i].Scale;
             }
 
             foreach(var mesh in model.Meshes) {
@@ -42,6 +44,9 @@ namespace Larx.MapAssets
 
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.AdditionalBuffers[1]);
                 GL.BufferData<float>(BufferTarget.ArrayBuffer, rotations.Length * sizeof(float), rotations, BufferUsageHint.StaticDraw);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.AdditionalBuffers[2]);
+                GL.BufferData<float>(BufferTarget.ArrayBuffer, scales.Length * sizeof(float), scales, BufferUsageHint.StaticDraw);
             }
         }
 
@@ -50,7 +55,8 @@ namespace Larx.MapAssets
             foreach(var mesh in model.Meshes) {
                 GL.BindVertexArray(mesh.VaoId);
 
-                mesh.AdditionalBuffers = new int[2] {
+                mesh.AdditionalBuffers = new int[3] {
+                    GL.GenBuffer(),
                     GL.GenBuffer(),
                     GL.GenBuffer(),
                 };
@@ -62,6 +68,10 @@ namespace Larx.MapAssets
                 GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.AdditionalBuffers[1]);
                 GL.VertexAttribPointer(5, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
                 GL.VertexAttribDivisor(5, 1);
+
+                GL.BindBuffer(BufferTarget.ArrayBuffer, mesh.AdditionalBuffers[2]);
+                GL.VertexAttribPointer(6, 1, VertexAttribPointerType.Float, false, sizeof(float), 0);
+                GL.VertexAttribDivisor(6, 1);
             }
         }
 
@@ -98,6 +108,7 @@ namespace Larx.MapAssets
                 GL.EnableVertexAttribArray(3);
                 GL.EnableVertexAttribArray(4);
                 GL.EnableVertexAttribArray(5);
+                GL.EnableVertexAttribArray(6);
 
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, mesh.IndexBuffer);
                 GL.DrawElementsInstanced(PrimitiveType.Triangles, mesh.IndexCount, DrawElementsType.UnsignedShort, IntPtr.Zero, Map.MapData.Assets[key].Count);

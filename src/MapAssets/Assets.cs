@@ -59,12 +59,13 @@ namespace Larx.MapAssets
                 var angle = (float)(random.NextDouble() * 2 * MathF.PI);
                 var x = position.X + r * MathF.Cos(angle);
                 var y = position.Y + r * MathF.Sin(angle);
+                var scale = 1.0f + ((float)(random.NextDouble() * 0.5f) - 0.25f);
 
                 if (x < -half || x >= half - 1 ||
                     y < -half || y >= half - 1)
                     continue;
 
-                Map.MapData.Assets[key].Add(new PlacedAsset(new Vector2(x, y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f)));
+                Map.MapData.Assets[key].Add(new PlacedAsset(new Vector2(x, y), MathLarx.DegToRad((float)random.NextDouble() * 360.0f), scale));
             }
 
             Refresh(models[key], terrain);
@@ -98,6 +99,7 @@ namespace Larx.MapAssets
 
             GL.DisableVertexAttribArray(4);
             GL.DisableVertexAttribArray(5);
+            GL.DisableVertexAttribArray(6);
         }
 
         public void RenderShadowMap(ShadowBox shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
@@ -117,6 +119,7 @@ namespace Larx.MapAssets
 
             GL.DisableVertexAttribArray(4);
             GL.DisableVertexAttribArray(5);
+            GL.DisableVertexAttribArray(6);
         }
     }
 }
