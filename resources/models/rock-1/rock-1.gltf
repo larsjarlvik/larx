@@ -1,0 +1,162 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v0.9.36",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "LP_B-Rocks_05.001"
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "name" : "Material",
+            "normalTexture" : {
+                "index" : 0,
+                "texCoord" : 0
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 1,
+                    "texCoord" : 0
+                },
+                "metallicFactor" : 0,
+                "metallicRoughnessTexture" : {
+                    "index" : 2,
+                    "texCoord" : 0
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "LP_B-Rocks_05.001",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TANGENT" : 2,
+                        "TEXCOORD_0" : 3
+                    },
+                    "indices" : 4,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "source" : 0
+        },
+        {
+            "source" : 1
+        },
+        {
+            "source" : 2
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "Rock_Forest_004_NRM",
+            "uri" : "Rock_Forest_004_NRM.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Rock_Forest_004_CLR",
+            "uri" : "Rock_Forest_004_CLR.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "Rock_Forest_004_SPC",
+            "uri" : "Rock_Forest_004_SPC.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 880,
+            "max" : [
+                3.588017702102661,
+                3.5134153366088867,
+                3.992068290710449
+            ],
+            "min" : [
+                -3.658313274383545,
+                -0.6659402847290039,
+                -3.704092025756836
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 880,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 880,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 880,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5123,
+            "count" : 2130,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 10560,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 10560,
+            "byteOffset" : 10560
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 14080,
+            "byteOffset" : 21120
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 7040,
+            "byteOffset" : 35200
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 4260,
+            "byteOffset" : 42240
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 46500,
+            "uri" : "rock-1.bin"
+        }
+    ]
+}
