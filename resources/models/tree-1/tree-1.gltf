@@ -15,15 +15,22 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Tree Low Poly"
+            "name" : "tree.016",
+            "rotation" : [
+                0.7071068286895752,
+                0,
+                0,
+                0.7071067094802856
+            ]
         }
     ],
     "materials" : [
         {
             "doubleSided" : true,
-            "name" : "Material",
+            "name" : "tree.003",
             "normalTexture" : {
                 "index" : 0,
+                "scale" : 6,
                 "texCoord" : 0
             },
             "pbrMetallicRoughness" : {
@@ -32,13 +39,16 @@
                     "texCoord" : 0
                 },
                 "metallicFactor" : 0,
-                "roughnessFactor" : 0.4000000059604645
+                "metallicRoughnessTexture" : {
+                    "index" : 2,
+                    "texCoord" : 0
+                }
             }
         }
     ],
     "meshes" : [
         {
-            "name" : "Plane.001",
+            "name" : "tree.016",
             "primitives" : [
                 {
                     "attributes" : {
@@ -59,93 +69,101 @@
         },
         {
             "source" : 1
+        },
+        {
+            "source" : 2
         }
     ],
     "images" : [
         {
             "mimeType" : "image/png",
-            "name" : "Tree Normal",
-            "uri" : "Tree Normal.png"
+            "name" : "tree-1_n",
+            "uri" : "tree-1_n.png"
         },
         {
             "mimeType" : "image/png",
-            "name" : "Tree Diffuse",
-            "uri" : "Tree Diffuse.png"
+            "name" : "tree-1",
+            "uri" : "tree-1.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "tree-1_s",
+            "uri" : "tree-1_s.png"
         }
     ],
     "accessors" : [
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 663,
+            "count" : 1025,
             "max" : [
-                1.5702173709869385,
-                4.053038120269775,
-                1.6446934938430786
+                3.4562623500823975,
+                9.08827018737793,
+                2.960010290145874
             ],
             "min" : [
-                -2.5568535327911377,
-                -0.20925064384937286,
-                -2.0374786853790283
+                -2.135863780975342,
+                -0.5710873603820801,
+                -2.6024436950683594
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 663,
+            "count" : 1025,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 663,
+            "count" : 1025,
             "type" : "VEC4"
         },
         {
             "bufferView" : 3,
             "componentType" : 5126,
-            "count" : 663,
+            "count" : 1025,
             "type" : "VEC2"
         },
         {
             "bufferView" : 4,
             "componentType" : 5123,
-            "count" : 2484,
+            "count" : 2826,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 7956,
+            "byteLength" : 12300,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 7956,
-            "byteOffset" : 7956
+            "byteLength" : 12300,
+            "byteOffset" : 12300
         },
         {
             "buffer" : 0,
-            "byteLength" : 10608,
-            "byteOffset" : 15912
+            "byteLength" : 16400,
+            "byteOffset" : 24600
         },
         {
             "buffer" : 0,
-            "byteLength" : 5304,
-            "byteOffset" : 26520
+            "byteLength" : 8200,
+            "byteOffset" : 41000
         },
         {
             "buffer" : 0,
-            "byteLength" : 4968,
-            "byteOffset" : 31824
+            "byteLength" : 5652,
+            "byteOffset" : 49200
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 36792,
-            "uri" : "tree.bin"
+            "byteLength" : 54852,
+            "uri" : "tree-1.bin"
         }
     ]
 }

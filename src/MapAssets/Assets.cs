@@ -13,7 +13,11 @@ namespace Larx.MapAssets
     public class Assets : AssetRenderer
     {
         public static readonly string[] AssetKeys = new string[] {
-            "tree",
+            "tree-0",
+            "tree-1",
+            "tree-2",
+            "tree-3",
+            "tree-4",
             "rock",
             "grass"
         };

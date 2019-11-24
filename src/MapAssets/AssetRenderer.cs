@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Larx.GltfModel;
 using Larx.Storage;
 using Larx.Terrain;
@@ -21,7 +22,11 @@ namespace Larx.MapAssets
 
         public void Refresh(Model model, TerrainRenderer terrain)
         {
-            var placedAssets = Map.MapData.Assets[model.ModelName];
+            if (!Map.MapData.Assets.ContainsKey(model.ModelName)) {
+                Map.MapData.Assets.Add(model.ModelName, new List<PlacedAsset>());
+            }
+
+            var placedAssets = Map.MapData.Assets.ContainsKey(model.ModelName) ? Map.MapData.Assets[model.ModelName] : null;
             var positions = new Vector3[placedAssets.Count];
             var rotations = new float[placedAssets.Count];
 

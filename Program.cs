@@ -52,9 +52,10 @@ namespace Larx
             GL.Enable(EnableCap.Blend);
             GL.Enable(EnableCap.Texture2D);
             GL.Enable(EnableCap.DepthTest);
-
             GL.Enable(EnableCap.CullFace);
+
             GL.CullFace(CullFaceMode.Back);
+            GL.MinSampleShading(1.0f);
 
             Map.New(2048);
             ui = new Ui();
@@ -171,7 +172,6 @@ namespace Larx
 
         protected override void OnRenderFrame(FrameEventArgs e)
         {
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
 
@@ -206,8 +206,13 @@ namespace Larx
 
             sky.Render(camera, light);
             terrain.Render(camera, light, shadows, ClipPlane.ClipBottom);
-            assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
             water.Render(camera, light, shadows);
+
+            GL.Enable(EnableCap.SampleShading);
+            GL.Enable(EnableCap.Blend);
+            assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
+
+            GL.Disable(EnableCap.SampleShading);
 
             // Draw to screen
             multisampling.Draw();

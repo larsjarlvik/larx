@@ -1,0 +1,169 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v0.9.36",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "tree.015",
+            "rotation" : [
+                0.7071068286895752,
+                0,
+                0,
+                0.7071067094802856
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "name" : "tree.003",
+            "normalTexture" : {
+                "index" : 0,
+                "scale" : 6,
+                "texCoord" : 0
+            },
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 1,
+                    "texCoord" : 0
+                },
+                "metallicFactor" : 0,
+                "metallicRoughnessTexture" : {
+                    "index" : 2,
+                    "texCoord" : 0
+                }
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "tree.015",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TANGENT" : 2,
+                        "TEXCOORD_0" : 3
+                    },
+                    "indices" : 4,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "source" : 0
+        },
+        {
+            "source" : 1
+        },
+        {
+            "source" : 2
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "tree-4_n",
+            "uri" : "tree-4_n.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "tree-4",
+            "uri" : "tree-4.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "tree-4_s",
+            "uri" : "tree-4_s.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 586,
+            "max" : [
+                2.0158159732818604,
+                3.448197603225708,
+                1.6357033252716064
+            ],
+            "min" : [
+                -1.5159510374069214,
+                -0.23460736870765686,
+                -1.9883836507797241
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 586,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 586,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 586,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5123,
+            "count" : 1596,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 7032,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 7032,
+            "byteOffset" : 7032
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 9376,
+            "byteOffset" : 14064
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 4688,
+            "byteOffset" : 23440
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 3192,
+            "byteOffset" : 28128
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 31320,
+            "uri" : "tree-4.bin"
+        }
+    ]
+}
