@@ -32,7 +32,6 @@ void main() {
         roughness = texture(uRoughnessTexture, vs_texCoord).r;
     }
 
-
     outputColor = tex * vec4(calculateLight(vs_lightVectors, n, roughness, 1.0) * getShadowFactor(vs_shadowCoords, 0.3), tex.a);
     outputColor = vec4(fog(outputColor.rgb, dist), tex.a * 2.0);
 }

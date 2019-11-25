@@ -169,12 +169,12 @@ namespace Larx.Terrain
             GL.BindVertexArray(0);
         }
 
-        internal void RenderShadowMap(Camera camera, ShadowBox shadows, ClipPlane clipPlane = ClipPlane.None)
+        internal void RenderShadowMap(int level, Camera camera, ShadowBox shadows, ClipPlane clipPlane = ClipPlane.None)
         {
             GL.UseProgram(shadowShader.Program);
 
-            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
-            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
+            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix[level]);
+            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix[level]);
             GL.UniformMatrix4(shadowShader.WorldMatrix, false, ref worldTransform);
 
             GL.Uniform3(shadowShader.CameraPosition, camera.Position);

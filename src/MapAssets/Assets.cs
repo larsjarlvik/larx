@@ -104,13 +104,12 @@ namespace Larx.MapAssets
             GL.DisableVertexAttribArray(6);
         }
 
-        public void RenderShadowMap(ShadowBox shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
+        public void RenderShadowMap(int level, ShadowBox shadows, TerrainRenderer terrain, ClipPlane clip = ClipPlane.None)
         {
             GL.UseProgram(ShadowShader.Program);
 
-            GL.UniformMatrix4(ShadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
-            GL.UniformMatrix4(ShadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
-
+            GL.UniformMatrix4(ShadowShader.ViewMatrix, false, ref shadows.ViewMatrix[level]);
+            GL.UniformMatrix4(ShadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix[level]);
             GL.Uniform1(ShadowShader.ClipPlane, (int)clip);
 
             foreach(var key in models.Keys)
