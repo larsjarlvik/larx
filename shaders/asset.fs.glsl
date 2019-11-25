@@ -20,7 +20,9 @@ out vec4 outputColor;
 
 void main() {
     vec4 tex = texture(uBaseColorTexture, vs_texCoord);
-    if (tex.a < 0.4) discard;
+    float dist = length(uCameraPosition - vs_position.xyz);
+
+    if (tex.a < 0.48 - clamp(dist * 0.001, 0.0, 0.1)) discard;
 
     vec3 normalMap = texture(uNormalTexture, vs_texCoord).rgb * 2.0 - 1.0;
     vec3 n = normalize(normalMap);
@@ -30,7 +32,6 @@ void main() {
         roughness = texture(uRoughnessTexture, vs_texCoord).r;
     }
 
-    float dist = length(uCameraPosition - vs_position.xyz);
 
     outputColor = tex * vec4(calculateLight(vs_lightVectors, n, roughness, 1.0) * getShadowFactor(vs_shadowCoords, 0.3), tex.a);
     outputColor = vec4(fog(outputColor.rgb, dist), tex.a * 2.0);
