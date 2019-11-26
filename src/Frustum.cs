@@ -5,12 +5,10 @@ namespace Larx
 {
     public class Frustum
     {
-        public static Vector4[] ExtractFrustum(Camera camera)
+        public static Vector4[] ExtractFrustum(Matrix4 viewMatrix, Matrix4 projectionMatrix)
         {
-            var proj = camera.ProjectionMatrix;
-            var modl = camera.ViewMatrix;
             var frustum = new Vector4[6];
-            var clip = camera.ViewMatrix * camera.ProjectionMatrix;
+            var clip = viewMatrix * projectionMatrix;
 
             frustum[0] = (clip.Column3 - clip.Column0).Normalized(); // right plane
             frustum[1] = (clip.Column3 + clip.Column0).Normalized(); // left plane
@@ -37,6 +35,38 @@ namespace Larx
             }
 
             return true;
+        }
+
+        public static Vector3[] GetFrustumCorners(Vector4[] frustum)
+        {
+            var points = new Vector3[8];
+
+            points[0] = getFrustumCorner(frustum[4], frustum[3], frustum[0]);
+            points[1] = getFrustumCorner(frustum[4], frustum[3], frustum[1]);
+            points[2] = getFrustumCorner(frustum[4], frustum[2], frustum[0]);
+            points[3] = getFrustumCorner(frustum[4], frustum[2], frustum[1]);
+            points[4] = getFrustumCorner(frustum[5], frustum[3], frustum[0]);
+            points[5] = getFrustumCorner(frustum[5], frustum[3], frustum[1]);
+            points[6] = getFrustumCorner(frustum[5], frustum[2], frustum[0]);
+            points[7] = getFrustumCorner(frustum[5], frustum[2], frustum[1]);
+
+            return points;
+        }
+
+        private static Vector3 getFrustumCorner(Vector4 f1, Vector4 f2, Vector4 f3)
+        {
+            var normals = new Matrix3(f1.Xyz, f2.Xyz, f3.Xyz);
+            var det = normals.Determinant;
+
+            var v1 = Vector3.Cross(f2.Xyz, f3.Xyz);
+            var v2 = Vector3.Cross(f3.Xyz, f1.Xyz);
+            var v3 = Vector3.Cross(f1.Xyz, f2.Xyz);
+
+            v1.X *= -f1.W; v1.Y *= -f1.W; v1.Z *= -f1.W;
+            v2.X *= -f2.W; v2.Y *= -f2.W; v2.Z *= -f2.W;
+            v3.X *= -f3.W; v3.Y *= -f3.W; v3.Z *= -f3.W;
+
+            return (v1 + v2 + v3) / det;
         }
     }
 }

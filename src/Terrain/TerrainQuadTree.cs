@@ -37,10 +37,10 @@ namespace Larx.Terrain
                 node.UpdateQuadTree(camera);
         }
 
-        public void Render(Camera camera, BaseShader shader)
+        public void Render(Vector4[] frustumPlanes, BaseShader shader)
         {
             foreach(var node in Nodes)
-                node.Render(shader, camera.FrustumPlanes);
+                node.Render(shader, frustumPlanes);
         }
     }
 }

@@ -36,7 +36,7 @@ float getShadowFactor(vec4 shadowCoords, float strength) {
     float total = 0.0;
 
     for (int i = 0; i < TEXTURE_SAMPLES; i++){
-        float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + poissonDisk[i] / 1000.0, (shadowCoords.z - BIAS) / shadowCoords.w));
+        float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + poissonDisk[i] / 2000.0, (shadowCoords.z - BIAS) / shadowCoords.w));
         if(shadowCoords.z - BIAS > nearestLight) {
             total += strength / TEXTURE_SAMPLES;
         }

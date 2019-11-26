@@ -33,8 +33,6 @@ namespace Larx.Terrain
         public readonly HeightMap HeightMap;
         public Vector3 MousePosition { get; private set; }
 
-        private Vector3[] frustumBox;
-
         public TerrainRenderer(Camera camera)
         {
             this.camera = camera;
@@ -70,7 +68,6 @@ namespace Larx.Terrain
         public void Update()
         {
             MousePosition = picker.GetPosition();
-            frustumBox = camera.GetFrustumBox(State.Near, State.Far);
 
             if (camera.Position == lastCameraPosition)
                 return;
@@ -164,7 +161,7 @@ namespace Larx.Terrain
 
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
-            quadTree.Render(camera, shader);
+            quadTree.Render(camera.FrustumPlanes, shader);
 
             GL.BindVertexArray(0);
         }
@@ -194,7 +191,7 @@ namespace Larx.Terrain
 
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
-            quadTree.Render(camera, shadowShader);
+            quadTree.Render(shadows.ShadowFrustumPlanes, shadowShader);
 
             GL.BindVertexArray(0);
         }

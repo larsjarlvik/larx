@@ -27,8 +27,8 @@ namespace Larx.Terrain
             Children = new TerrainNode[4];
             Lod = lod;
             Index = index;
-            worldSize = Map.MapData.MapSize / (TerrainConfig.RootNodes * MathF.Pow(2.0f, Lod));
             size = 1.0f / (TerrainConfig.RootNodes * MathF.Pow(2.0f, Lod));
+            worldSize = size * Map.MapData.MapSize;
             Position = position;
             Depth = (float)Lod / (float)TerrainConfig.RootNodes;
 
