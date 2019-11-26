@@ -44,7 +44,7 @@ namespace Larx.Terrain
         public float? GetElevationAtPoint(Vector2 pos)
         {
             var tc = getTextureCoordinate(pos);
-            if (tc.X == float.NaN || tc.Y == float.NaN ||
+            if (float.IsNaN(tc.X) || float.IsNaN(tc.Y) ||
                 tc.X < 0.0f || tc.X >= size - 1 ||
                 tc.Y < 0.0f || tc.Y >= size - 1)
                 return null;

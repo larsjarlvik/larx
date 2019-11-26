@@ -19,12 +19,26 @@ namespace Larx.Shadows
             ShadowBuffer = new Framebuffer(new Size(State.ShadowMapResolution, State.ShadowMapResolution), false, true);
         }
 
+        private Matrix4 getLightViewMatrix(Camera camera, Light light)
+        {
+            var ld = light.Direction.Normalized();
+            var pitch = MathF.Acos(ld.Xz.Length);
+            var yaw = MathF.Atan(ld.X / ld.Z);
+
+            yaw = ld.Z > 0 ? yaw - MathF.PI : yaw;
+
+            return Matrix4.CreateTranslation(-camera.Position) *
+                Matrix4.CreateRotationY(-yaw) *
+                Matrix4.CreateRotationX(pitch);
+        }
+
         public void Update(Camera camera, Light light)
         {
+            ViewMatrix = getLightViewMatrix(camera, light);
+
             var shadowFarPlane = 400.0f;
             var projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, State.Near, shadowFarPlane);
 
-            ViewMatrix = Matrix4.LookAt(camera.Position - light.Direction, camera.Position, new Vector3(0.0f, 1.0f, 0.0f));
             var frustumCorners = Frustum.GetFrustumCorners(Frustum.ExtractFrustum(ViewMatrix, projectionMatrix));
 
             var min = Vector3.Zero;
@@ -52,8 +66,8 @@ namespace Larx.Shadows
                 min.Z = MathF.Min(min.Z, point.Z);
             }
 
-            min *= new Vector3(2.0f);
-            max *= new Vector3(2.0f);
+            min *= 2.0f;
+            max *= 2.0f;
 
             ProjectionMatrix = Matrix4.Identity;
             ProjectionMatrix.M11 =  2.0f / (max.X - min.X);

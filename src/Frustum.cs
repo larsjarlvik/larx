@@ -22,6 +22,8 @@ namespace Larx
 
         public static bool CubeInFrustum(Vector4[] f, Vector3 c, float s)
         {
+            if (f == null) return true;
+
             for(var i = 0; i < 6; i++ ) {
                 if(f[i].X * (c.X - s) + f[i].Y * (c.Y - s) + f[i].Z * (c.Z - s) + f[i].W > 0) continue;
                 if(f[i].X * (c.X + s) + f[i].Y * (c.Y - s) + f[i].Z * (c.Z - s) + f[i].W > 0) continue;
