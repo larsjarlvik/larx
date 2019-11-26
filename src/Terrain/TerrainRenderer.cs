@@ -164,7 +164,7 @@ namespace Larx.Terrain
 
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
-            quadTree.Render(shader, frustumBox);
+            quadTree.Render(camera, shader);
 
             GL.BindVertexArray(0);
         }
@@ -194,7 +194,7 @@ namespace Larx.Terrain
 
             GL.BindVertexArray(vaoId);
             GL.EnableVertexAttribArray(0);
-            quadTree.Render(shadowShader, frustumBox);
+            quadTree.Render(camera, shadowShader);
 
             GL.BindVertexArray(0);
         }

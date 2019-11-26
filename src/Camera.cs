@@ -21,6 +21,8 @@ namespace Larx
         public Matrix4 ProjectionMatrix;
         public Matrix4 ViewMatrix;
 
+        public Vector4[] FrustumPlanes { get; private set; }
+
         public Camera()
         {
             Look = new Vector3();
@@ -104,6 +106,7 @@ namespace Larx
 
             ProjectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, State.Near, State.Far);
             ViewMatrix = Matrix4.LookAt(Position, Look, new Vector3(0, 1, 0));
+            FrustumPlanes = Frustum.ExtractFrustum(this);
         }
 
         public Vector3 GetPoint(Vector3 pos)
