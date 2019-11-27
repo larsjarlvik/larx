@@ -16,7 +16,7 @@ uniform float uSelectionSize;
 
 in vec2 te_texCoord;
 in vec3 te_position;
-in vec4 te_shadowCoords;
+in vec4[3] te_shadowCoords;
 in vec3 te_normal;
 in float te_noise;
 in LightVectors te_lightVectors;
@@ -58,24 +58,24 @@ vec3 getTriPlanarTexture(int textureId, vec3 n) {
     return xaxis * blending.x + yaxis * blending.y + zaxis * blending.z;
 }
 
-vec3 finalTexture(int index, vec3 normal, LightVectors lv) {
-
+vec3 finalTexture(int index, vec3 normal, LightVectors lv, float shadowFactor) {
     vec3 n = normalize(texture(uTexture, vec3(index * 3 + 1)).rgb * 2.0 - 1.0);
     float r = texture(uTexture, vec3(index * 3 + 2)).r;
-    return getTriPlanarTexture(index * 3, normal) * calculateLight(lv, n, 1.0, 1.0) * te_noise;
+    return getTriPlanarTexture(index * 3, normal) * calculateLight(lv, n, 1.0, 1.0, shadowFactor) * te_noise;
 }
 
 void main() {
+    float dist = length(uCameraPosition - te_position.xyz);
+    float shadowFactor = getShadowFactor(te_shadowCoords, dist, 0.5);
+
     vec3 color = vec3(0);
     for (int i = 0; i < uSplatCount; i++) {
         float intesity = texture(uSplatMap, vec3(te_texCoord.x, te_texCoord.y, i)).r;
         if (intesity > 0.02) {
-            color += finalTexture(i, te_normal, te_lightVectors) * intesity;
+            color += finalTexture(i, te_normal, te_lightVectors, shadowFactor) * intesity;
         }
     }
 
-    float dist = length(uCameraPosition - te_position.xyz);
-    color *= getShadowFactor(te_shadowCoords, 0.3);
     color = fog(color, dist);
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());

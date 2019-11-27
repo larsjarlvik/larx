@@ -11,7 +11,7 @@ const float reflectivity = 1.0;
 in vec4 vert_position;
 in vec2 vert_texCoord;
 in LightVectors vert_lightVectors;
-in vec4 vert_shadowCoords;
+in vec4[3] vert_shadowCoords;
 
 uniform sampler2D uRefractionColorTexture;
 uniform sampler2D uRefractionDepthTexture;
@@ -19,6 +19,7 @@ uniform sampler2D uReflectionColorTexture;
 uniform sampler2D uDuDvMap;
 uniform sampler2D uNormalMap;
 
+uniform vec3 uCameraPosition;
 uniform float uNear;
 uniform float uFar;
 uniform float uTimeOffset;
@@ -53,7 +54,8 @@ void main() {
     vec3 n = normalize(nm1 + nm2 - 1.0);
     vec3 light = calculateLight(vert_lightVectors, n, uShininess, 0.0) * clamp(waterDepth / 5.0, 0, 1);
 
-    vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb * getShadowFactor(vert_shadowCoords, 0.2);
+    float dist = length(uCameraPosition - vert_position.xyz);
+    vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb * getShadowFactor(vert_shadowCoords, dist, 0.2);
     vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 35.0 + 0.3, 0.0, 1.0)) + light;
 
     outputColor = vec4(waterColor, clamp(waterDepth, 0.0, 1.0));

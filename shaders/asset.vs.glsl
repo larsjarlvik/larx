@@ -17,7 +17,7 @@ uniform mat4 uViewMatrix;
 out vec2 vs_texCoord;
 out vec3 vs_normal;
 out LightVectors vs_lightVectors;
-out vec4 vs_shadowCoords;
+out vec4[3] vs_shadowCoords;
 out vec3 vs_position;
 
 mat3 rotationYMatrix(float a) {

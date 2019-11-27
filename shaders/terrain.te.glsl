@@ -17,7 +17,7 @@ in vec2 tc_texCoord[];
 
 out vec2 te_texCoord;
 out vec3 te_position;
-out vec4 te_shadowCoords;
+out vec4[3] te_shadowCoords;
 out vec3 te_normal;
 out float te_noise;
 out LightVectors te_lightVectors;
