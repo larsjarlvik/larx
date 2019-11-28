@@ -1,8 +1,8 @@
-uniform sampler2DShadow uShadowMap[3];
+uniform sampler2DShadow uShadowMap;
 uniform int uEnableShadows;
 
 #define TEXTURE_SAMPLES 16
-#define BIAS 0.003
+#define BIAS 0.002
 
 vec2 poissonDisk[TEXTURE_SAMPLES] = vec2[](
    vec2( -0.94201624, -0.39906216 ),
@@ -23,10 +23,10 @@ vec2 poissonDisk[TEXTURE_SAMPLES] = vec2[](
    vec2( 0.14383161, -0.14100790 )
 );
 
-float getShadowFactor(vec4[3] shadowCoords, float distance, float strength) {
+float getShadowFactor(vec4 shadowCoords, float strength) {
     float shadowFactor = clamp(min(
-        1.0 - abs((shadowCoords[2].x * 2.0) - 1.0),
-        1.0 - abs((shadowCoords[2].y * 2.0) - 1.0)
+        1.0 - abs((shadowCoords.x * 2.0) - 1.0),
+        1.0 - abs((shadowCoords.y * 2.0) - 1.0)
     ) * 4.0, 0, 1);
 
     if(shadowFactor == 0.0 || uEnableShadows != 1.0) {
@@ -36,21 +36,9 @@ float getShadowFactor(vec4[3] shadowCoords, float distance, float strength) {
     float total = 0.0;
 
     for (int i = 0; i < TEXTURE_SAMPLES; i++) {
-        if (distance < 100) {
-            float nearestLight = texture(uShadowMap[0], vec3(shadowCoords[0].xy + poissonDisk[i] / 3000.0, (shadowCoords[0].z - BIAS) / shadowCoords[0].w));
-            if(shadowCoords[0].z - BIAS > nearestLight) {
-                total += strength / TEXTURE_SAMPLES;
-            }
-        } else if (distance < 300) {
-            float nearestLight = texture(uShadowMap[1], vec3(shadowCoords[1].xy + poissonDisk[i] / 2000.0, (shadowCoords[1].z - BIAS) / shadowCoords[1].w));
-            if(shadowCoords[1].z - BIAS > nearestLight) {
-                total += strength / TEXTURE_SAMPLES;
-            }
-        } else {
-            float nearestLight = texture(uShadowMap[2], vec3(shadowCoords[2].xy + poissonDisk[i] / 1000.0, (shadowCoords[2].z - BIAS) / shadowCoords[2].w));
-            if(shadowCoords[2].z - BIAS > nearestLight) {
-                total += strength / TEXTURE_SAMPLES;
-            }
+        float nearestLight = texture(uShadowMap, vec3(shadowCoords.xy + poissonDisk[i] / 1000.0, (shadowCoords.z - BIAS) / shadowCoords.w));
+        if(shadowCoords.z - BIAS > nearestLight) {
+            total += strength / TEXTURE_SAMPLES;
         }
     }
 

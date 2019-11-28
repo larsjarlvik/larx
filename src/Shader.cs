@@ -8,8 +8,8 @@ namespace Larx
 {
     public class Shader
     {
-        private int[] shadowMap;
-        private int[] shadowMatrix;
+        private int shadowMap;
+        private int shadowMatrix;
         private int enableShadows;
 
         public int Program { get; }
@@ -89,13 +89,8 @@ namespace Larx
         protected void SetShadowUniformLocations()
         {
             enableShadows = GL.GetUniformLocation(Program, "uEnableShadows");
-
-            shadowMatrix = new int[ShadowBox.CascadeCount];
-            shadowMap = new int[ShadowBox.CascadeCount];
-            for (var i = 0; i < ShadowBox.CascadeCount; i ++) {
-                shadowMap[i] = GL.GetUniformLocation(Program, $"uShadowMap[{i}]");
-                shadowMatrix[i] = GL.GetUniformLocation(Program, $"uShadowMatrix[{i}]");
-            }
+            shadowMatrix = GL.GetUniformLocation(Program, $"uShadowMatrix");
+            shadowMap = GL.GetUniformLocation(Program, $"uShadowMap");
         }
 
         private void checkCompileStatus(string shaderName, int shader)
@@ -127,12 +122,10 @@ namespace Larx
             if (shadows != null) {
                 GL.Uniform1(enableShadows, 1);
 
-                for (var i = 0; i < ShadowBox.CascadeCount; i ++) {
-                    GL.ActiveTexture(TextureUnit.Texture9 + i);
-                    GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer[i].DepthTexture);
-                    GL.Uniform1(shadowMap[i], 9 + i);
-                    GL.UniformMatrix4(shadowMatrix[i], false, ref shadows.ShadowMatrix[i]);
-                }
+                GL.ActiveTexture(TextureUnit.Texture9);
+                GL.BindTexture(TextureTarget.Texture2D, shadows.ShadowBuffer.DepthTexture);
+                GL.Uniform1(shadowMap, 9);
+                GL.UniformMatrix4(shadowMatrix, false, ref shadows.ShadowMatrix);
             } else {
                 GL.Uniform1(enableShadows, 0);
             }

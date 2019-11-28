@@ -176,11 +176,10 @@ namespace Larx
             GL.Enable(EnableCap.DepthTest);
 
             // Shadow rendering
-            for (var i = 0; i < ShadowBox.CascadeCount; i ++) {
-                shadows.ShadowBuffer[i].Bind();
-                GL.Clear(ClearBufferMask.DepthBufferBit);
-                assets.RenderShadowMap(i, shadows, terrain);
-            }
+            shadows.ShadowBuffer.Bind();
+            GL.Clear(ClearBufferMask.DepthBufferBit);
+            assets.RenderShadowMap(shadows, terrain);
+            terrain.RenderShadowMap(camera, shadows, ClipPlane.ClipBottom);
 
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.ZeroToOne);
 
@@ -225,7 +224,7 @@ namespace Larx
 
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
             ui.Render();
-            shadows.ShadowBuffer[1].DrawDepthBuffer();
+            shadows.ShadowBuffer.DrawDepthBuffer();
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -243,7 +242,7 @@ namespace Larx
             water.ReflectionBuffer.Size = State.Window.Size;
             water.ReflectionBuffer.RefreshBuffers();
 
-            shadows.RefreshBuffers();
+            shadows.ShadowBuffer.RefreshBuffers();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)

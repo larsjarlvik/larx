@@ -16,7 +16,7 @@ uniform float uSelectionSize;
 
 in vec2 te_texCoord;
 in vec3 te_position;
-in vec4[3] te_shadowCoords;
+in vec4 te_shadowCoords;
 in vec3 te_normal;
 in float te_noise;
 in LightVectors te_lightVectors;
@@ -66,7 +66,7 @@ vec3 finalTexture(int index, vec3 normal, LightVectors lv, float shadowFactor) {
 
 void main() {
     float dist = length(uCameraPosition - te_position.xyz);
-    float shadowFactor = getShadowFactor(te_shadowCoords, dist, 0.5);
+    float shadowFactor = getShadowFactor(te_shadowCoords, 0.5);
 
     vec3 color = vec3(0);
     for (int i = 0; i < uSplatCount; i++) {

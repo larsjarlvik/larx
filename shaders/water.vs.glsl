@@ -10,7 +10,7 @@ uniform mat4 uViewMatrix;
 out vec4 vert_position;
 out vec2 vert_texCoord;
 out LightVectors vert_lightVectors;
-out vec4[3] vert_shadowCoords;
+out vec4 vert_shadowCoords;
 
 void main() {
     vec4 worldPosition = uViewMatrix * vec4(vPosition, 1.0);

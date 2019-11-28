@@ -12,7 +12,7 @@ uniform sampler2D uRoughnessTexture;
 in vec2 vs_texCoord;
 in vec3 vs_normal;
 in LightVectors vs_lightVectors;
-in vec4[3] vs_shadowCoords;
+in vec4 vs_shadowCoords;
 in vec3 vs_position;
 
 out vec4 outputColor;
@@ -32,7 +32,7 @@ void main() {
         roughness = texture(uRoughnessTexture, vs_texCoord).r;
     }
 
-
-    outputColor = tex * vec4(calculateLight(vs_lightVectors, n, roughness, 1.0) * getShadowFactor(vs_shadowCoords, dist, 0.5), tex.a);
+    float shadowFactor = getShadowFactor(vs_shadowCoords, 0.5);
+    outputColor = tex * vec4(calculateLight(vs_lightVectors, n, roughness, 1.0, shadowFactor), tex.a);
     outputColor = vec4(fog(outputColor.rgb, dist), tex.a * 2.0);
 }

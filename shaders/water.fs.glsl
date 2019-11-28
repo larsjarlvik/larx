@@ -11,7 +11,7 @@ const float reflectivity = 1.0;
 in vec4 vert_position;
 in vec2 vert_texCoord;
 in LightVectors vert_lightVectors;
-in vec4[3] vert_shadowCoords;
+in vec4 vert_shadowCoords;
 
 uniform sampler2D uRefractionColorTexture;
 uniform sampler2D uRefractionDepthTexture;
@@ -44,7 +44,9 @@ vec2 getDistortion(float waterDepth) {
 
 void main() {
     vec2 ndc = (vert_position.xy / vert_position.w) / 2.0 + 0.5;
+    float dist = length(uCameraPosition - vert_position.xyz);
     float waterDepth = calculateDepth(ndc);
+    float shadowFactor = getShadowFactor(vert_shadowCoords, 0.2);
 
     vec2 totalDistortion = getDistortion(waterDepth);
     vec3 refractionTexture = texture(uRefractionColorTexture, clamp(ndc + totalDistortion, 0.001, 0.999)).rgb;
@@ -52,10 +54,9 @@ void main() {
     vec3 nm1 = texture(uNormalMap, vec2(vert_texCoord.x + uTimeOffset, vert_texCoord.y) / waveScale).rgb;
     vec3 nm2 = texture(uNormalMap, vec2(-vert_texCoord.x + uTimeOffset, vert_texCoord.y + uTimeOffset) / waveScale).rgb;
     vec3 n = normalize(nm1 + nm2 - 1.0);
-    vec3 light = calculateLight(vert_lightVectors, n, uShininess, 0.0) * clamp(waterDepth / 5.0, 0, 1);
+    vec3 light = calculateLight(vert_lightVectors, n, uShininess, 0.0, shadowFactor) * clamp(waterDepth / 5.0, 0, 1);
 
-    float dist = length(uCameraPosition - vert_position.xyz);
-    vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb * getShadowFactor(vert_shadowCoords, dist, 0.2);
+    vec3 reflectionTexture = texture(uReflectionColorTexture, clamp(vec2(1.0 - ndc.x, ndc.y) + totalDistortion, 0.001, 0.999)).rgb ;
     vec3 waterColor = mix(refractionTexture, reflectionTexture, clamp(waterDepth / 35.0 + 0.3, 0.0, 1.0)) + light;
 
     outputColor = vec4(waterColor, clamp(waterDepth, 0.0, 1.0));

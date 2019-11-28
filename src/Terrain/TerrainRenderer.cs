@@ -166,34 +166,34 @@ namespace Larx.Terrain
             GL.BindVertexArray(0);
         }
 
-        // internal void RenderShadowMap(Camera camera, ShadowBox shadows, ClipPlane clipPlane = ClipPlane.None)
-        // {
-        //     GL.UseProgram(shadowShader.Program);
+        internal void RenderShadowMap(Camera camera, ShadowBox shadows, ClipPlane clipPlane = ClipPlane.None)
+        {
+            GL.UseProgram(shadowShader.Program);
 
-        //     GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
-        //     GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
-        //     GL.UniformMatrix4(shadowShader.WorldMatrix, false, ref worldTransform);
+            GL.UniformMatrix4(shadowShader.ViewMatrix, false, ref shadows.ViewMatrix);
+            GL.UniformMatrix4(shadowShader.ProjectionMatrix, false, ref shadows.ProjectionMatrix);
+            GL.UniformMatrix4(shadowShader.WorldMatrix, false, ref worldTransform);
 
-        //     GL.Uniform3(shadowShader.CameraPosition, camera.Position);
-        //     GL.Uniform1(shadowShader.TessFactor, TerrainConfig.TessFactor);
-        //     GL.Uniform1(shadowShader.TessSlope, TerrainConfig.TessSlope);
-        //     GL.Uniform1(shadowShader.TessShift, TerrainConfig.TessShift);
+            GL.Uniform3(shadowShader.CameraPosition, camera.Position);
+            GL.Uniform1(shadowShader.TessFactor, TerrainConfig.TessFactor);
+            GL.Uniform1(shadowShader.TessSlope, TerrainConfig.TessSlope);
+            GL.Uniform1(shadowShader.TessShift, TerrainConfig.TessShift);
 
-        //     GL.ActiveTexture(TextureUnit.Texture0);
-        //     GL.BindTexture(TextureTarget.Texture2D, HeightMap.Texture);
-        //     GL.Uniform1(shadowShader.HeightMap, 0);
-        //     GL.Uniform1(shadowShader.HeightMapScale, TerrainConfig.HeightMapScale);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, HeightMap.Texture);
+            GL.Uniform1(shadowShader.HeightMap, 0);
+            GL.Uniform1(shadowShader.HeightMapScale, TerrainConfig.HeightMapScale);
 
-        //     GL.Uniform1(shadowShader.ClipPlane, (int)clipPlane);
-        //     for (int i = 0; i < 8; i++){
-        //         GL.Uniform1(shadowShader.LodMorphAreas[i], TerrainConfig.LodMorphAreas[i]);
-        //     }
+            GL.Uniform1(shadowShader.ClipPlane, (int)clipPlane);
+            for (int i = 0; i < 8; i++){
+                GL.Uniform1(shadowShader.LodMorphAreas[i], TerrainConfig.LodMorphAreas[i]);
+            }
 
-        //     GL.BindVertexArray(vaoId);
-        //     GL.EnableVertexAttribArray(0);
-        //     quadTree.Render(shadows.ShadowFrustumPlanes, shadowShader);
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
+            quadTree.Render(shadows.ShadowFrustumPlanes, shadowShader);
 
-        //     GL.BindVertexArray(0);
-        // }
+            GL.BindVertexArray(0);
+        }
     }
 }
