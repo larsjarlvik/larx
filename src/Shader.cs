@@ -88,9 +88,9 @@ namespace Larx
 
         protected void SetShadowUniformLocations()
         {
-            enableShadows = GL.GetUniformLocation(Program, "uEnableShadows");
             shadowMatrix = GL.GetUniformLocation(Program, $"uShadowMatrix");
             shadowMap = GL.GetUniformLocation(Program, $"uShadowMap");
+            enableShadows = GL.GetUniformLocation(Program, "uEnableShadows");
         }
 
         private void checkCompileStatus(string shaderName, int shader)

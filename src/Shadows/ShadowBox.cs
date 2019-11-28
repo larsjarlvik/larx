@@ -34,12 +34,9 @@ namespace Larx.Shadows
 
         public void Update(Camera camera, Light light)
         {
-            var near = State.Near;
-            var shadowFarPlane = 600.0f;
-
             ViewMatrix = getLightViewMatrix(camera, light);
 
-            var projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, near, shadowFarPlane);
+            var projectionMatrix = Matrix4.CreatePerspectiveFieldOfView(MathF.PI / 4f, State.Window.Aspect, State.Near, 600.0f);
             var frustumCorners = Frustum.GetFrustumCorners(Frustum.ExtractFrustum(ViewMatrix, projectionMatrix));
 
             var min = Vector3.Zero;

@@ -44,7 +44,6 @@ vec2 getDistortion(float waterDepth) {
 
 void main() {
     vec2 ndc = (vert_position.xy / vert_position.w) / 2.0 + 0.5;
-    float dist = length(uCameraPosition - vert_position.xyz);
     float waterDepth = calculateDepth(ndc);
     float shadowFactor = getShadowFactor(vert_shadowCoords, 0.2);
 
