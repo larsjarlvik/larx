@@ -60,13 +60,9 @@ namespace Larx
             var normals = new Matrix3(f1.Xyz, f2.Xyz, f3.Xyz);
             var det = normals.Determinant;
 
-            var v1 = Vector3.Cross(f2.Xyz, f3.Xyz);
-            var v2 = Vector3.Cross(f3.Xyz, f1.Xyz);
-            var v3 = Vector3.Cross(f1.Xyz, f2.Xyz);
-
-            v1.X *= -f1.W; v1.Y *= -f1.W; v1.Z *= -f1.W;
-            v2.X *= -f2.W; v2.Y *= -f2.W; v2.Z *= -f2.W;
-            v3.X *= -f3.W; v3.Y *= -f3.W; v3.Z *= -f3.W;
+            var v1 = Vector3.Cross(f2.Xyz, f3.Xyz) * -f1.W;
+            var v2 = Vector3.Cross(f3.Xyz, f1.Xyz) * -f2.W;
+            var v3 = Vector3.Cross(f1.Xyz, f2.Xyz) * -f3.W;
 
             return (v1 + v2 + v3) / det;
         }

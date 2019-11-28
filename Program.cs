@@ -224,7 +224,7 @@ namespace Larx
 
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
             ui.Render();
-            shadows.ShadowBuffer.DrawDepthBuffer();
+            // shadows.ShadowBuffer.DrawDepthBuffer();
 
             SwapBuffers();
             State.Time.CountFPS();
