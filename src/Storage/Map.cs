@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Apex.Serialization;
-using Larx.MapAssets;
+using Larx.Assets;
 using Larx.Terrain;
 using OpenTK;
 
@@ -12,12 +12,14 @@ namespace Larx.Storage
     [Serializable]
     public class PlacedAsset
     {
+        public string Model { get; set; }
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
         public float Scale { get; set; }
 
-        public PlacedAsset(Vector2 position, float rotation, float scale)
+        public PlacedAsset(string model, Vector2 position, float rotation, float scale)
         {
+            Model = model;
             Position = position;
             Rotation = rotation;
             Scale = scale;
@@ -56,7 +58,7 @@ namespace Larx.Storage
                 MapData.SplatMap[i] = new float[size, size];
         }
 
-        public static void Save(TerrainRenderer terrain, Assets assets)
+        public static void Save(TerrainRenderer terrain)
         {
             MapData.TerrainElevations = terrain.HeightMap.Heights;
 
@@ -67,7 +69,7 @@ namespace Larx.Storage
                 }
         }
 
-        public static void Load(TerrainRenderer terrain, Assets assets)
+        public static void Load(TerrainRenderer terrain, AssetRenderer assets)
         {
             using (var stream = File.Open(MapFileName, FileMode.Open))
                 using (var decompressedStream = new GZipStream(stream, CompressionMode.Decompress)) {

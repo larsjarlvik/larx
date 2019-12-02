@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Larx.MapAssets;
+using Larx.Assets;
 using Larx.Terrain;
 using Larx.UserInterface.Button;
 using Larx.UserInterface.Text;
@@ -53,7 +53,7 @@ namespace Larx.UserInterface
             State.ChildMenus[UiKeys.TopMenu.TerrainPaint].Add(UiKeys.SplatMap.AutoPaint, new UiElement("ui/auto.png", true));
             State.ChildMenus[UiKeys.TopMenu.TerrainPaint].Add(UiKeys.SplatMap.AutoPaintGlobal, new UiElement("ui/auto-global.png"));
 
-            State.ChildMenus.Add(UiKeys.TopMenu.Assets, Assets.AssetKeys
+            State.ChildMenus.Add(UiKeys.TopMenu.Assets, AssetRenderer.AssetKeys
                 .Select(a => new KeyValuePair<string, UiElement>(a , new UiElement(Path.Combine($"ui/assets/{a}.png"), true, true)))
                 .ToDictionary(x => x.Key, x => x.Value)
             );

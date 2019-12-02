@@ -1,6 +1,6 @@
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.MapAssets
+namespace Larx.Assets
 {
     public class AssetShader : Shader
     {

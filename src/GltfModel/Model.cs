@@ -14,10 +14,10 @@ namespace Larx.GltfModel
             Meshes = meshes;
         }
 
-        public static Model Load(string name)
+        public static Model Load(string path, string name)
         {
             var meshes = new List<Mesh>();
-            var rootPath = Path.Combine("resources", "models", name);
+            var rootPath = Path.Combine("resources", path, name);
 
             using(var fs = new FileStream(Path.Combine(rootPath, $"{name}.gltf"), FileMode.Open))
             {

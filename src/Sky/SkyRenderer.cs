@@ -13,7 +13,7 @@ namespace Larx.Sky
         public SkyRenderer()
         {
             shader = new SkyShader();
-            model = Model.Load("skydome");
+            model = Model.Load("models", "skydome");
         }
 
         public void Render(Camera camera, Light light)

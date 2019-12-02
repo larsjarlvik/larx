@@ -7,13 +7,13 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Input;
 using GL4 = OpenTK.Graphics.OpenGL4;
 using Larx.Water;
-using Larx.MapAssets;
 using Larx.Sky;
 using Larx.Storage;
 using Larx.Shadows;
 using Larx.Buffers;
 using Larx.Utils;
 using Larx.Terrain;
+using Larx.Assets;
 
 namespace Larx
 {
@@ -23,13 +23,12 @@ namespace Larx
         private Camera camera;
         private Light light;
         private ObjectRenderer debug;
-        // private TerrainRenderer terrain;
 
-        public TerrainRenderer terrain { get; private set; }
+        private TerrainRenderer terrain;
 
         private WaterRenderer water;
         private SkyRenderer sky;
-        private Assets assets;
+        private AssetRenderer assets;
         private ShadowBox shadows;
         private Ui ui;
 
@@ -58,13 +57,13 @@ namespace Larx
             GL.MinSampleShading(1.0f);
 
             Map.New(2048);
-            ui = new Ui();
             debug = new ObjectRenderer();
             camera = new Camera();
             terrain = new TerrainRenderer(camera);
             water = new WaterRenderer();
             light = new Light();
-            assets = new Assets();
+            assets = new AssetRenderer();
+            ui = new Ui();
             sky = new SkyRenderer();
             shadows = new ShadowBox();
         }
@@ -196,6 +195,7 @@ namespace Larx
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             terrain.Render(camera, light, null, ClipPlane.ClipBottom);
+            assets.Render(camera, light, null, terrain, ClipPlane.ClipBottom);
             sky.Render(camera, light);
             GL.Disable(EnableCap.ClipDistance0);
             camera.Reset();
@@ -270,7 +270,7 @@ namespace Larx
                         State.ShowGridLines = !State.ShowGridLines;
 
                     if (e.Keyboard[Key.S])
-                        Map.Save(terrain, assets);
+                        Map.Save(terrain);
 
                     if (e.Keyboard[Key.O])
                         Map.Load(terrain, assets);
