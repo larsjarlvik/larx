@@ -280,8 +280,16 @@ namespace Larx
                 }
             }
 
+            if (e.Key == Key.BackSpace)
+                ui.KeyPress((char)27);
+
             if (!e.Control)
                 State.Keyboard.Set(e.Keyboard);
+        }
+
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            ui.KeyPress(e.KeyChar);
         }
 
         protected override void OnKeyUp(KeyboardKeyEventArgs e)

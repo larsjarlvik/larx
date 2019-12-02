@@ -1,27 +1,26 @@
-using System.IO;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.UserInterface.Button
+namespace Larx.UserInterface.Panel
 {
-    public enum ButtonState
+    public enum PanelState
     {
         Default = 0,
         Hover = 1,
-        Pressed = 2,
+        Active = 2,
     }
 
-    public class ButtonRenderer
+    public class PanelRenderer
     {
-        public ButtonShader Shader { get; }
+        public PanelShader Shader { get; }
 
         private int vertexBuffer;
         private int textureBuffer;
         private int vaoId;
 
-        public ButtonRenderer()
+        public PanelRenderer()
         {
-            Shader = new ButtonShader();
+            Shader = new PanelShader();
             build();
         }
 
@@ -62,27 +61,26 @@ namespace Larx.UserInterface.Button
             GL.BindVertexArray(0);
         }
 
-        public void Render(Matrix4 pMatrix, Vector2 position, Vector2 size, int textureId, ButtonState state, bool active)
+        public void RenderImagePanel(Matrix4 pMatrix, Vector2 position, Vector2 size, int textureId, PanelState state, bool active, float borderWidth = 2.0f)
         {
             GL.UseProgram(Shader.Program);
 
-            GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
-
+            GL.Uniform1(Shader.PanelType, 0);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, textureId);
             GL.Uniform1(Shader.Texture, 0);
-            GL.Uniform2(Shader.Position, position);
-            GL.Uniform2(Shader.Size, size);
-            GL.Uniform1(Shader.State, (int)state);
-            GL.Uniform1(Shader.Active, active ? 1 : 0);
 
-            GL.BindVertexArray(vaoId);
-            GL.EnableVertexAttribArray(0);
-            GL.EnableVertexAttribArray(1);
+            render(pMatrix, position, size, state, active, borderWidth);
+        }
 
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+        public void RenderSolidPanel(Matrix4 pMatrix, Vector2 position, Vector2 size, Vector3 backgroundColor, PanelState state, bool active, float borderWidth = 2.0f)
+        {
+            GL.UseProgram(Shader.Program);
 
-            GL.BindVertexArray(0);
+            GL.Uniform1(Shader.PanelType, 1);
+            GL.Uniform3(Shader.BackgroundColor, backgroundColor);
+
+            render(pMatrix, position, size, state, active, borderWidth);
         }
 
         public bool Intersect(Vector2 mouse, Vector2 position, Vector2 size)
@@ -93,6 +91,25 @@ namespace Larx.UserInterface.Button
             }
 
             return false;
+        }
+
+        private void render(Matrix4 pMatrix, Vector2 position, Vector2 size, PanelState state, bool active, float borderWidth)
+        {
+            GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
+
+            GL.Uniform2(Shader.Position, position);
+            GL.Uniform2(Shader.Size, size);
+            GL.Uniform1(Shader.State, (int)state);
+            GL.Uniform1(Shader.Active, active ? 1 : 0);
+            GL.Uniform1(Shader.BorderWidth, borderWidth);
+
+            GL.BindVertexArray(vaoId);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+
+            GL.DrawArrays(PrimitiveType.Triangles, 0, 6);
+
+            GL.BindVertexArray(0);
         }
     }
 }

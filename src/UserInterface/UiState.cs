@@ -14,6 +14,7 @@ namespace Larx.UserInterface
 
         public string HoverKey { get; set; }
         public string PressedKey { get; set; }
+        public string ActiveKey { get; set; }
         public string ActiveTopMenuKey { get; set; }
         public string ActiveChildMenuKey { get; set; }
         public bool MousePressed { get; set; }

@@ -9,14 +9,17 @@ namespace Larx.UserInterface.Text
 {
     public struct DisplayText
     {
-        public int VaoId { get; set; }
+        public int VaoId { get; }
 
-        public int NumItems { get; set; }
+        public int NumItems { get; }
 
-        public DisplayText(int vaoId, int numItems)
+        public float Width { get; }
+
+        public DisplayText(int vaoId, int numItems, float width)
         {
             VaoId = vaoId;
             NumItems = numItems;
+            Width = width;
         }
     }
 
@@ -24,7 +27,6 @@ namespace Larx.UserInterface.Text
     {
         private Texture texture;
         private FontData fontData;
-
         public TextShader Shader { get; }
 
         public TextRenderer()
@@ -41,7 +43,7 @@ namespace Larx.UserInterface.Text
             GL.UseProgram(Shader.Program);
 
             GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
-            GL.Uniform2(Shader.Position, position);
+            GL.Uniform2(Shader.Position, new Vector2(position.X, position.Y));
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, texture.TextureId);
@@ -134,7 +136,7 @@ namespace Larx.UserInterface.Text
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
             GL.BindVertexArray(0);
 
-            return new DisplayText(vaoId, numItems);
+            return new DisplayText(vaoId, numItems, pen.X);
         }
     }
 }

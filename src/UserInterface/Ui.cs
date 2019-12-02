@@ -4,9 +4,10 @@ using System.IO;
 using System.Linq;
 using Larx.Assets;
 using Larx.Terrain;
-using Larx.UserInterface.Button;
+using Larx.UserInterface.Panel;
 using Larx.UserInterface.Text;
 using OpenTK;
+using OpenTK.Input;
 
 namespace Larx.UserInterface
 {
@@ -14,8 +15,9 @@ namespace Larx.UserInterface
     {
         private Matrix4 pMatrix;
         public readonly UiState State;
-        private readonly ButtonRenderer buttonRenderer;
+        private readonly PanelRenderer panelRenderer;
         private readonly TextRenderer textRenderer;
+        private readonly TextBox textBox;
         private Vector2 bottomLeftOrigin;
         private Vector2 bottomRightOrigin;
         private const float buttonSize = 45.0f;
@@ -27,8 +29,9 @@ namespace Larx.UserInterface
         {
             pMatrix = Matrix4.CreateOrthographicOffCenter(0, Larx.State.Window.Size.Width, Larx.State.Window.Size.Height, 0f, 0f, -1f);
             State = new UiState();
-            buttonRenderer = new ButtonRenderer();
+            panelRenderer = new PanelRenderer();
             textRenderer = new TextRenderer();
+            textBox = new TextBox(panelRenderer, textRenderer);
 
             State.ChildMenus = new Dictionary<string, Dictionary<string, UiElement>>();
             State.TopMenu = new Dictionary<string, UiElement>() {
@@ -115,6 +118,9 @@ namespace Larx.UserInterface
                 position.X -= buttonSize + buttonSpacing;
             }
 
+            if (State.MousePressed)
+                State.ActiveKey = State.HoverKey;
+
             return State.HoverKey != null;
         }
 
@@ -158,16 +164,23 @@ namespace Larx.UserInterface
             position.X = bottomRightOrigin.X;
             foreach(var uiElement in State.RightMenu)
                 renderButton(uiElement, ref position, size, -(buttonSize + buttonSpacing), State.ActiveChildMenuKey);
+
+            textBox.Render(pMatrix, new Vector2(200.0f, 200.0f), new Vector2(200, 30), true);
         }
 
         private void renderButton(KeyValuePair<string, UiElement> uiElement, ref Vector2 position, Vector2 size, float advance, string compareKey)
         {
             var buttonState = uiElement.Key == State.PressedKey
-                ? ButtonState.Pressed
-                : uiElement.Key == State.HoverKey ? ButtonState.Hover : ButtonState.Default;
+                ? PanelState.Active
+                : uiElement.Key == State.HoverKey ? PanelState.Hover : PanelState.Default;
 
-            buttonRenderer.Render(pMatrix, position, size, uiElement.Value.Texture, buttonState, uiElement.Key == compareKey);
+            panelRenderer.RenderImagePanel(pMatrix, position, size, uiElement.Value.Texture, buttonState, uiElement.Key == compareKey);
             position.X += advance;
+        }
+
+        public void KeyPress(Char key)
+        {
+            textBox.KeyPress(key, 200.0f);
         }
     }
 }
