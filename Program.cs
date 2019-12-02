@@ -174,6 +174,7 @@ namespace Larx
         {
             GL.Enable(EnableCap.ClipDistance0);
             GL.Enable(EnableCap.DepthTest);
+            GL.Disable(EnableCap.Blend);
 
             // Shadow rendering
             shadows.ShadowBuffer.Bind();
@@ -209,7 +210,6 @@ namespace Larx
             water.Render(camera, light, shadows);
 
             GL.Enable(EnableCap.SampleShading);
-            GL.Enable(EnableCap.Blend);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
 
             GL.Disable(EnableCap.SampleShading);
@@ -217,6 +217,7 @@ namespace Larx
             // Draw to screen
             multisampling.Draw();
 
+            GL.Enable(EnableCap.Blend);
             // UI and debug
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.Disable(EnableCap.DepthTest);
