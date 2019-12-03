@@ -39,11 +39,13 @@ namespace Larx.UserInterface
         {
             public const string AutoPaint = "splatmap-auto";
             public const string AutoPaintGlobal = "splatmap-auto-global";
+            public const string Paint = "splatmap-paint";
         }
 
         public static class Assets
         {
             public const string Erase = "asset-erase";
+            public const string Asset = "asset-asset";
         }
     }
 }

@@ -21,6 +21,8 @@ namespace Larx
         public const float Far = 2000.0f;
         public static readonly Color ClearColor = Color.FromArgb(255, 207, 210, 230);
         public const int ShadowMapResolution = 4096;
+        public static string SelectedTool;
+        public static string SelectedToolData;
 
         public static class Window
         {
