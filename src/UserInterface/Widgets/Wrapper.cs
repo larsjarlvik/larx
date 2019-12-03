@@ -19,7 +19,7 @@ namespace Larx.UserInterface.Widgets
             return Child.GetSize();
         }
 
-        public string Intersect(Vector2 mouse, Vector2 position)
+        public IWidget Intersect(Vector2 mouse, Vector2 position)
         {
             return Child.Intersect(mouse, position);
         }

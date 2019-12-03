@@ -48,7 +48,7 @@ namespace Larx.UserInterface.Widgets
             }
         }
 
-        public string Intersect(Vector2 mouse, Vector2 position)
+        public IWidget Intersect(Vector2 mouse, Vector2 position)
         {
             foreach(var child in Children) {
                 var pos = position + getPosition(child);

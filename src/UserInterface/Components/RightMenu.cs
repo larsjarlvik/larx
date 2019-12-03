@@ -27,11 +27,8 @@ namespace Larx.UserInterface.Components
 
         public void Update()
         {
-            if (Component.Children.Any(x => x.Key == Ui.State.HoverKey)) {
-                setControls(Ui.State.HoverKey);
-                // UpdateText(UiKeys.Texts.Radius, $"Radius: {Larx.State.ToolRadius}");
-                // UpdateText(UiKeys.Texts.Hardness, $"Hardness: {Larx.State.ToolHardness}");
-            }
+            if (Component.Children.Any(x => x.Key == Ui.State.Hover.Key))
+                setControls(Ui.State.Hover.Key);
         }
 
         private void setControls(string key)

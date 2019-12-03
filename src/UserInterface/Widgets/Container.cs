@@ -36,18 +36,17 @@ namespace Larx.UserInterface.Widgets
             return pos + new Vector2(Padding * 2.0f);
         }
 
-        public string Intersect(Vector2 mouse, Vector2 position)
+        public IWidget Intersect(Vector2 mouse, Vector2 position)
         {
             var pos = getInitialPosition(position);
-            string key = null;
 
             foreach(var child in Children) {
                 var intersect = child.Intersect(mouse, pos);
-                if (intersect != null) key = intersect;
+                if (intersect != null) return intersect;
                 pos = advance(child, pos);
             }
 
-            return key;
+            return null;
         }
 
         public void Render(Matrix4 matrix, Vector2 position)

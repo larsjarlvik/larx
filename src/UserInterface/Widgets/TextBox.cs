@@ -25,7 +25,7 @@ namespace Larx.UserInterface.Widgets
             size = new Vector2(width, 30);
         }
 
-        public void KeyPress(Char key, float maxWidth)
+        public void KeyPress(Char key)
         {
             if (key == 27) {
                 if (text.Length > 0) text = text.Substring(0, text.Length - 1);
@@ -34,8 +34,8 @@ namespace Larx.UserInterface.Widgets
             }
 
             displayText = Ui.State.TextRenderer.CreateText(text, textSize);
-            if (displayText.Width > maxWidth - padding * 2)
-                KeyPress((char)27, maxWidth);
+            if (displayText.Width > size.X - padding * 2)
+                KeyPress((char)27);
         }
 
         public Vector2 GetSize()
@@ -46,17 +46,17 @@ namespace Larx.UserInterface.Widgets
         public void Render(Matrix4 matrix, Vector2 position)
         {
             var pos = position + new Vector2(margin);
-            Ui.State.PanelRenderer.RenderSolidPanel(matrix, pos, size, new Vector3(0.2f, 0.2f, 0.2f), PanelState.Default, false, 1.0f);
+            Ui.State.PanelRenderer.RenderSolidPanel(matrix, pos, size, new Vector3(0.2f, 0.2f, 0.2f), PanelState.Default, Ui.State.Active?.Key == Key, 1.0f);
             Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(pos.X + padding, pos.Y + textSize * 1.25f), 1.0f, 1.6f);
         }
 
-        public string Intersect(Vector2 mouse, Vector2 position)
+        public IWidget Intersect(Vector2 mouse, Vector2 position)
         {
             var pos = position + new Vector2(margin);
             return (
                 mouse.X >= pos.X && mouse.Y >= pos.Y &&
                 mouse.X <= pos.X + size.X && mouse.Y <= pos.Y + size.Y
-            ) ? Key : null;
+            ) ? this : null;
         }
     }
 }

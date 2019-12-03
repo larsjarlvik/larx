@@ -42,11 +42,12 @@ namespace Larx.UserInterface
 
             State.MouseRepeat = State.MousePressed;
             State.MousePressed = Larx.State.Mouse.LeftButton;
-            State.HoverKey = page.Intersect(Larx.State.Mouse.Position, new Vector2(0.0f, 0.0f));
+            State.Hover = page.Intersect(Larx.State.Mouse.Position, new Vector2(0.0f, 0.0f));
+            if (State.MousePressed) State.Active = State.Hover != null ? State.Hover : null;
 
             applicationInfo.Update();
 
-            if (State.HoverKey == null) return false;
+            if (State.Hover == null) return false;
             if (!State.MousePressed || State.MouseRepeat) return true;
 
             mainMenu.Update();
@@ -62,7 +63,8 @@ namespace Larx.UserInterface
 
         public void KeyPress(Char key)
         {
-            // textBox.KeyPress(key, 200.0f);
+            var active = State.Active as TextBox;
+            if (active != null) active.KeyPress(key);
         }
     }
 }

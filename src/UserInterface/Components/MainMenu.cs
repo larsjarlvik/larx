@@ -17,7 +17,6 @@ namespace Larx.UserInterface.Components
 
         public MainMenu()
         {
-            children = new List<Container>();
             root = new Container("TopMenu", Direction.Horizonal,
                 new List<IWidget>() {
                     new IconButton(UiKeys.TopMenu.ElevationTools, "ui/terrain.png", true),
@@ -26,6 +25,7 @@ namespace Larx.UserInterface.Components
                 }
             );
 
+            children = new List<Container>();
             children.Add(new Container(UiKeys.TopMenu.ElevationTools, Direction.Horizonal,
                 new List<IWidget> {
                     new IconButton(UiKeys.Terrain.ElevationTool, "ui/raise-lower.png", true),
@@ -40,7 +40,6 @@ namespace Larx.UserInterface.Components
             var textures = TerrainConfig.Textures
                 .Select(t => new IconButton(Array.IndexOf(TerrainConfig.Textures, t).ToString(), Path.Combine($"textures/{t}-albedo.png"), true, true))
                 .ToList<IWidget>();
-
             textures.Add(new IconButton(UiKeys.SplatMap.AutoPaint, "ui/auto.png", true));
             textures.Add(new IconButton(UiKeys.SplatMap.AutoPaintGlobal, "ui/auto-global.png"));
             children.Add(new Container(UiKeys.TopMenu.TerrainPaint, Direction.Horizonal, textures));
@@ -48,36 +47,28 @@ namespace Larx.UserInterface.Components
             var assets = AssetRenderer.AssetKeys
                 .Select(a => new IconButton(a, Path.Combine($"ui/assets/{a}.png"), true, true))
                 .ToList<IWidget>();
-
             assets.Add(new IconButton(UiKeys.Assets.Erase, "ui/erase.png", true));
             children.Add(new Container(UiKeys.TopMenu.Assets, Direction.Horizonal, assets));
 
-            SetActiveTopMenuKey(UiKeys.TopMenu.ElevationTools);
             Component = new Container("Left", Direction.Horizonal, new List<IWidget>() { root, children.First() }, 0.0f);
-
-            State.SelectedTool = UiKeys.Terrain.ElevationTool;
+            setActiveTopMenuKey(UiKeys.TopMenu.ElevationTools);
+            setActiveButtonStates();
         }
 
         public void Update()
         {
-            if (children.Any(x => x.Key == Ui.State.HoverKey)) {
-                Component.Children[1] = children.First(x => x.Key == Ui.State.HoverKey);
-                SetActiveTopMenuKey(Ui.State.HoverKey);
-            }
+            if (children.Any(x => x.Key == Ui.State.Hover.Key))
+                setActiveTopMenuKey(Ui.State.Hover.Key);
 
-            var child = children.First(x => x.Key == activeTopMenuKey).Children.FirstOrDefault(x => x.Key == Ui.State.HoverKey);
-            if (child != null) setState(child as IconButton);
-
-            foreach(var button in root.Children)
-                ((IconButton)button).Active = activeTopMenuKey == button.Key;
-
-            foreach(var button in children.SelectMany(x => x.Children))
-                ((IconButton)button).Active = (State.SelectedTool == button.Key || State.SelectedToolData == button.Key);
+            var child = children.First(x => x.Key == activeTopMenuKey).Children.Any(x => x.Key == Ui.State.Hover.Key);
+            if (child) setState(Ui.State.Hover as IconButton);
+            setActiveButtonStates();
         }
 
-        private void SetActiveTopMenuKey(string key)
+        private void setActiveTopMenuKey(string key)
         {
             activeTopMenuKey = key;
+            Component.Children[1] = children.First(x => x.Key == key);
             setState(children.First(x => x.Key == key).Children.First() as IconButton);
 
             switch(key) {
@@ -108,6 +99,15 @@ namespace Larx.UserInterface.Components
                     State.SelectedToolData = child.Key;
                     break;
             }
+        }
+
+        private void setActiveButtonStates()
+        {
+            foreach(var button in root.Children)
+                ((IconButton)button).Active = activeTopMenuKey == button.Key;
+
+            foreach(var button in children.SelectMany(x => x.Children))
+                ((IconButton)button).Active = (State.SelectedTool == button.Key || State.SelectedToolData == button.Key);
         }
     }
 }

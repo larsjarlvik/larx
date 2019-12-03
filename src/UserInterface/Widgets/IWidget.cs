@@ -8,7 +8,7 @@ namespace Larx.UserInterface.Widgets
 
         void Render(Matrix4 matrix, Vector2 position);
 
-        string Intersect(Vector2 mouse, Vector2 position);
+        IWidget Intersect(Vector2 mouse, Vector2 position);
 
         Vector2 GetSize();
     }

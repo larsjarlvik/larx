@@ -136,7 +136,7 @@ namespace Larx
                         break;
                 }
             } else if (Ui.State.MousePressed) {
-                switch (Ui.State.HoverKey)
+                switch (Ui.State.Hover.Key)
                 {
                     case UiKeys.Terrain.LevelRaise:
                         terrain.HeightMap.ChangeSettings(0.1f, 1.0f);

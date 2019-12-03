@@ -27,7 +27,7 @@ namespace Larx.UserInterface.Widgets
             return new Vector2(displayText.Width, TextSize * 1.25f);
         }
 
-        public string Intersect(Vector2 mouse, Vector2 position)
+        public IWidget Intersect(Vector2 mouse, Vector2 position)
         {
             return null;
         }

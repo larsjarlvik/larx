@@ -37,21 +37,19 @@ namespace Larx.UserInterface.Widgets
 
         public void Render(Matrix4 matrix, Vector2 position)
         {
-            var panelState = Key == Ui.State.HoverKey
+            var panelState = Key == Ui.State.Hover?.Key
                 ? Ui.State.MousePressed ? PanelState.Active : PanelState.Hover
                 : PanelState.Default;
 
             Ui.State.PanelRenderer.RenderImagePanel(matrix, position + new Vector2(margin), size, Texture, panelState, IsToggle && Active);
         }
 
-        public string Intersect(Vector2 mouse, Vector2 position)
+        public IWidget Intersect(Vector2 mouse, Vector2 position)
         {
-            var intersect = (
+            return (
                 mouse.X >= position.X && mouse.Y >= position.Y &&
                 mouse.X <= position.X + size.X && mouse.Y <= position.Y + size.Y
-            ) ? Key : null;
-
-            return intersect;
+            ) ? this : null;
         }
     }
 }
