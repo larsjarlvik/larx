@@ -13,6 +13,7 @@ namespace Larx.UserInterface.Widgets
         private Vector2 size;
         public int Texture { get; set; }
         public bool IsToggle { get; set; }
+        public bool Active { get; set; }
 
         public IconButton(string key, string texturePath, bool isToggle = false, bool mipMap = false)
         {
@@ -40,7 +41,7 @@ namespace Larx.UserInterface.Widgets
                 ? Ui.State.MousePressed ? PanelState.Active : PanelState.Hover
                 : PanelState.Default;
 
-            Ui.State.PanelRenderer.RenderImagePanel(matrix, position + new Vector2(margin), size, Texture, panelState, false);
+            Ui.State.PanelRenderer.RenderImagePanel(matrix, position + new Vector2(margin), size, Texture, panelState, IsToggle && Active);
         }
 
         public string Intersect(Vector2 mouse, Vector2 position)

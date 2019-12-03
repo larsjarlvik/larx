@@ -23,6 +23,7 @@ namespace Larx
         public const int ShadowMapResolution = 4096;
         public static string SelectedTool;
         public static string SelectedToolData;
+        public static Vector3 TerrainMousePosition;
 
         public static class Window
         {

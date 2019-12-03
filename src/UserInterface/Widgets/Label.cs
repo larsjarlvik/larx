@@ -1,3 +1,4 @@
+using System;
 using Larx.UserInterface.Text;
 using OpenTK;
 
@@ -6,6 +7,9 @@ namespace Larx.UserInterface.Widgets
     public class Label : IWidget
     {
         public string Key { get; }
+
+        private string currentText;
+
         public float TextSize { get; }
         private DisplayText displayText;
 
@@ -13,6 +17,8 @@ namespace Larx.UserInterface.Widgets
         {
             TextSize = textSize;
             Key = key;
+
+            currentText = text;
             displayText = Ui.State.TextRenderer.CreateText(text, textSize);
         }
 
@@ -28,6 +34,8 @@ namespace Larx.UserInterface.Widgets
 
         public void UpdateText(string text)
         {
+            if (currentText == text) return;
+            currentText = text;
             displayText = Ui.State.TextRenderer.CreateText(text, TextSize);
         }
 

@@ -11,10 +11,10 @@ namespace Larx.UserInterface
     {
         private Matrix4 pMatrix;
         public static readonly UiState State;
-        private readonly Container Texts;
         private readonly Dock page;
         private readonly MainMenu mainMenu;
         private readonly RightMenu rightMenu;
+        private readonly ApplicationInfo applicationInfo;
 
         static Ui()
         {
@@ -25,20 +25,14 @@ namespace Larx.UserInterface
         {
             pMatrix = Matrix4.CreateOrthographicOffCenter(0, Larx.State.Window.Size.Width, Larx.State.Window.Size.Height, 0f, 0f, -1f);
 
-            Texts = new Container("Texts", Direction.Vertical, new List<IWidget>() {
-                new Label(UiKeys.Texts.Title, "Larx Terrain Editor v0.1"),
-                new Label(UiKeys.Texts.Radius, $"Radius: {Larx.State.ToolRadius}"),
-                new Label(UiKeys.Texts.Hardness, $"Hardness: {Larx.State.ToolHardness}"),
-                new Label(UiKeys.Texts.Position, "Position: 0 0")
-            });
-
             mainMenu = new MainMenu();
             rightMenu = new RightMenu();
+            applicationInfo = new ApplicationInfo();
 
             page = new Dock("page", new Vector2(1280, 720), new List<Child>() {
                 new Child(DockPosition.BottomLeft, mainMenu.Component),
                 new Child(DockPosition.BottomRight, rightMenu.Component),
-                new Child(DockPosition.TopLeft, Texts),
+                new Child(DockPosition.TopLeft, applicationInfo.Component),
             });
         }
 
@@ -50,6 +44,8 @@ namespace Larx.UserInterface
             State.MousePressed = Larx.State.Mouse.LeftButton;
             State.HoverKey = page.Intersect(Larx.State.Mouse.Position, new Vector2(0.0f, 0.0f));
 
+            applicationInfo.Update();
+
             if (State.HoverKey == null) return false;
             if (!State.MousePressed || State.MouseRepeat) return true;
 
@@ -57,11 +53,6 @@ namespace Larx.UserInterface
             rightMenu.Update();
 
             return true;
-        }
-
-        public void UpdateText(string key, string value)
-        {
-            ((Label)Texts.Children.First(x => x.Key == key)).UpdateText(value);
         }
 
         public void Render()

@@ -12,9 +12,8 @@ namespace Larx.UserInterface.Components
     {
         private readonly Container root;
         private readonly List<Container> children;
+        private string activeTopMenuKey;
         public Container Component { get; }
-        public string ActiveTopMenuKey;
-
 
         public MainMenu()
         {
@@ -64,17 +63,22 @@ namespace Larx.UserInterface.Components
             if (children.Any(x => x.Key == Ui.State.HoverKey)) {
                 Component.Children[1] = children.First(x => x.Key == Ui.State.HoverKey);
                 SetActiveTopMenuKey(Ui.State.HoverKey);
-                return;
             }
 
-            var child = children.First(x => x.Key == ActiveTopMenuKey).Children.FirstOrDefault(x => x.Key == Ui.State.HoverKey);
-            if (child != null) setState(child);
+            var child = children.First(x => x.Key == activeTopMenuKey).Children.FirstOrDefault(x => x.Key == Ui.State.HoverKey);
+            if (child != null) setState(child as IconButton);
+
+            foreach(var button in root.Children)
+                ((IconButton)button).Active = activeTopMenuKey == button.Key;
+
+            foreach(var button in children.SelectMany(x => x.Children))
+                ((IconButton)button).Active = (State.SelectedTool == button.Key || State.SelectedToolData == button.Key);
         }
 
         private void SetActiveTopMenuKey(string key)
         {
-            ActiveTopMenuKey = key;
-            setState(children.First(x => x.Key == key).Children.First());
+            activeTopMenuKey = key;
+            setState(children.First(x => x.Key == key).Children.First() as IconButton);
 
             switch(key) {
                 case UiKeys.TopMenu.ElevationTools:
@@ -89,9 +93,9 @@ namespace Larx.UserInterface.Components
             }
         }
 
-        private void setState(IWidget child)
+        private void setState(IconButton child)
         {
-            switch(ActiveTopMenuKey) {
+            switch(activeTopMenuKey) {
                 case UiKeys.TopMenu.ElevationTools:
                     State.SelectedTool = child.Key;
                     break;

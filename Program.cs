@@ -104,34 +104,34 @@ namespace Larx
                 {
                     case UiKeys.Terrain.ElevationTool:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            terrain.HeightMap.Sculpt(terrain.MousePosition, 0.1f);
+                            terrain.HeightMap.Sculpt(State.TerrainMousePosition, 0.1f);
                             assets.Refresh(terrain);
                         } else if (mouse.RightButton == ButtonState.Pressed) {
-                            terrain.HeightMap.Sculpt(terrain.MousePosition, -0.1f);
+                            terrain.HeightMap.Sculpt(State.TerrainMousePosition, -0.1f);
                             assets.Refresh(terrain);
                         }
                         break;
                     case UiKeys.Terrain.SmudgeTool:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            terrain.HeightMap.Smudge(terrain.MousePosition);
+                            terrain.HeightMap.Smudge(State.TerrainMousePosition);
                             assets.Refresh(terrain);
                         }
                         break;
                     case UiKeys.SplatMap.AutoPaint:
                         if (mouse.LeftButton == ButtonState.Pressed)
-                            terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap, terrain.MousePosition);
+                            terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap, State.TerrainMousePosition);
                         break;
                     case UiKeys.SplatMap.Paint:
                         if (mouse.LeftButton == ButtonState.Pressed)
-                            terrain.SplatMap.Paint(terrain.MousePosition, byte.Parse(State.SelectedToolData));
+                            terrain.SplatMap.Paint(State.TerrainMousePosition, byte.Parse(State.SelectedToolData));
                         break;
                     case UiKeys.Assets.Asset:
                         if (mouse.LeftButton == ButtonState.Pressed && !Ui.State.MouseRepeat)
-                            assets.Add(terrain.MousePosition.Xz, terrain, State.SelectedToolData);
+                            assets.Add(State.TerrainMousePosition.Xz, terrain, State.SelectedToolData);
                         break;
                     case UiKeys.Assets.Erase:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            assets.Remove(terrain.MousePosition.Xz, terrain);
+                            assets.Remove(State.TerrainMousePosition.Xz, terrain);
                         }
                         break;
                 }
