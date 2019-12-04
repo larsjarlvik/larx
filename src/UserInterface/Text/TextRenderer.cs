@@ -37,7 +37,13 @@ namespace Larx.UserInterface.Text
             fontData = JsonConvert.DeserializeObject<FontData>(File.ReadAllText(Path.Combine("resources", "OpenSans-Regular.json")));
         }
 
+
         public void Render(DisplayText text, Matrix4 pMatrix, Vector2 position, float buffer, float gamma)
+        {
+            Render(text, pMatrix, position,buffer, gamma, new Color4(1f, 1f, 1f, 1f));
+        }
+
+        public void Render(DisplayText text, Matrix4 pMatrix, Vector2 position, float buffer, float gamma, Color4 color)
         {
             GL.DepthMask(false);
             GL.UseProgram(Shader.Program);
@@ -50,7 +56,7 @@ namespace Larx.UserInterface.Text
             GL.Uniform1(Shader.Texture, 0);
             GL.Uniform2(Shader.TextSize, new Vector2(texture.Size.X, texture.Size.Y));
 
-            GL.Uniform4(Shader.Color, new Color4(0.2f, 0.2f, 0.2f, 1f));
+            GL.Uniform4(Shader.Color, color);
             GL.Uniform1(Shader.Buffer, buffer);
 
             GL.BindVertexArray(text.VaoId);
@@ -58,7 +64,6 @@ namespace Larx.UserInterface.Text
             GL.EnableVertexAttribArray(1);
             GL.DrawArrays(PrimitiveType.Triangles, 0, text.NumItems);
 
-            GL.Uniform4(Shader.Color, new Color4(1f, 1f, 1f, 1f));
             GL.Uniform1(Shader.Buffer, 192f / 256f);
             GL.Uniform1(Shader.Gamma, gamma * 1.4142f / 14.0f);
 

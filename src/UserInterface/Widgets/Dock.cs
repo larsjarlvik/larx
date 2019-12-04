@@ -28,7 +28,7 @@ namespace Larx.UserInterface.Widgets
     {
         public string Key { get; }
 
-        public Vector2 Size { get; }
+        public Vector2 Size { get; set; }
         public float Padding { get; }
         public List<Child> Children { get; }
 

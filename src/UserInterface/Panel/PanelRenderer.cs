@@ -69,16 +69,18 @@ namespace Larx.UserInterface.Panel
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, textureId);
             GL.Uniform1(Shader.Texture, 0);
+            GL.Uniform1(Shader.Flat, 0);
 
             render(pMatrix, position, size, state, active, borderWidth);
         }
 
-        public void RenderSolidPanel(Matrix4 pMatrix, Vector2 position, Vector2 size, Vector3 backgroundColor, PanelState state, bool active, float borderWidth = 2.0f)
+        public void RenderSolidPanel(Matrix4 pMatrix, Vector2 position, Vector2 size, Vector3 backgroundColor, PanelState state, bool active, float borderWidth = 2.0f, bool flat = false)
         {
             GL.UseProgram(Shader.Program);
 
             GL.Uniform1(Shader.PanelType, 1);
             GL.Uniform3(Shader.BackgroundColor, backgroundColor);
+            GL.Uniform1(Shader.Flat, flat ? 1 : 0);
 
             render(pMatrix, position, size, state, active, borderWidth);
         }

@@ -15,6 +15,7 @@ namespace Larx.UserInterface.Panel
         public int BackgroundColor { get; private set; }
         public int PanelType { get; private set; }
         public int BorderWidth { get; private set; }
+        public int Flat { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -27,6 +28,7 @@ namespace Larx.UserInterface.Panel
             BackgroundColor = GL.GetUniformLocation(Program, "uBackgroundColor");
             PanelType = GL.GetUniformLocation(Program, "uPanelType");
             BorderWidth = GL.GetUniformLocation(Program, "uBorderWidth");
+            Flat = GL.GetUniformLocation(Program, "uFlat");
         }
     }
 }

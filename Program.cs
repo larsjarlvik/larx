@@ -77,7 +77,7 @@ namespace Larx
 
             var uiIntersect = ui.Update();
 
-            if (Focused)
+            if (Focused && Ui.State.Focused == null)
             {
                 if (State.Mouse.ScrollDelta > 0) camera.Zoom(-0.2f);
                 if (State.Mouse.ScrollDelta < 0) camera.Zoom( 0.2f);
@@ -136,7 +136,7 @@ namespace Larx
                         break;
                 }
             } else if (Ui.State.MousePressed) {
-                switch (Ui.State.Hover.Key)
+                switch (Ui.State.Hover?.Key)
                 {
                     case UiKeys.Terrain.LevelRaise:
                         terrain.HeightMap.ChangeSettings(0.1f, 1.0f);
@@ -205,14 +205,10 @@ namespace Larx
 
             GL.Enable(EnableCap.SampleShading);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
-
             GL.Disable(EnableCap.SampleShading);
 
-            // Draw to screen
-            multisampling.Draw();
-
-            GL.Enable(EnableCap.Blend);
             // UI and debug
+            GL.Enable(EnableCap.Blend);
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.Disable(EnableCap.DepthTest);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
@@ -220,6 +216,9 @@ namespace Larx
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
             ui.Render();
             // shadows.ShadowBuffer.DrawDepthBuffer();
+
+            // Draw to screen
+            multisampling.Draw();
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -238,6 +237,7 @@ namespace Larx
             water.ReflectionBuffer.RefreshBuffers();
 
             shadows.ShadowBuffer.RefreshBuffers();
+            ui.Resize();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -248,6 +248,12 @@ namespace Larx
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
+            if (Ui.State.Focused != null) {
+                if (e.Key == Key.BackSpace)
+                    ui.KeyPress((char)27);
+                return;
+            }
+
             if (!e.IsRepeat)
             {
                 if (e.Keyboard[Key.Escape])
@@ -264,7 +270,10 @@ namespace Larx
                         State.ShowGridLines = !State.ShowGridLines;
 
                     if (e.Keyboard[Key.S])
-                        Map.Save(terrain);
+                        ui.ShowModal("Save Map", "Save", (message) => {
+                            Console.WriteLine(message);
+                            ui.CloseModals();
+                        });
 
                     if (e.Keyboard[Key.O])
                         Map.Load(terrain, assets);
@@ -274,8 +283,6 @@ namespace Larx
                 }
             }
 
-            if (e.Key == Key.BackSpace)
-                ui.KeyPress((char)27);
 
             if (!e.Control)
                 State.Keyboard.Set(e.Keyboard);

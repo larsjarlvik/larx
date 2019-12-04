@@ -10,49 +10,47 @@ namespace Larx.UserInterface.Widgets
     {
         public string Key { get; }
         private const float padding = 10.0f;
-        private const float margin = 5.0f;
         private const float textSize = 14.0f;
 
         private DisplayText displayText;
         private readonly Vector2 size;
-        private string text;
+        public string Text { get; private set; }
 
         public TextBox(string key, float width)
         {
             Key = key;
-            text = "";
-            displayText = Ui.State.TextRenderer.CreateText(text, textSize);
+            Text = "";
+            displayText = Ui.State.TextRenderer.CreateText(Text, textSize);
             size = new Vector2(width, 30);
         }
 
         public void KeyPress(Char key)
         {
             if (key == 27) {
-                if (text.Length > 0) text = text.Substring(0, text.Length - 1);
+                if (Text.Length > 0) Text = Text.Substring(0, Text.Length - 1);
             } else {
-                text += key;
+                Text += key;
             }
 
-            displayText = Ui.State.TextRenderer.CreateText(text, textSize);
+            displayText = Ui.State.TextRenderer.CreateText(Text, textSize);
             if (displayText.Width > size.X - padding * 2)
                 KeyPress((char)27);
         }
 
         public Vector2 GetSize()
         {
-            return size + new Vector2(margin * 2.0f);
+            return size;
         }
 
         public void Render(Matrix4 matrix, Vector2 position)
         {
-            var pos = position + new Vector2(margin);
-            Ui.State.PanelRenderer.RenderSolidPanel(matrix, pos, size, new Vector3(0.2f, 0.2f, 0.2f), PanelState.Default, Ui.State.Active?.Key == Key, 1.0f);
-            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(pos.X + padding, pos.Y + textSize * 1.25f), 1.0f, 1.6f);
+            Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, new Vector3(0.2f, 0.2f, 0.2f), PanelState.Default, Ui.State.Focused?.Key == Key, 1.0f);
+            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(position.X + padding, position.Y + textSize * 1.25f), 1.0f, 1.6f);
         }
 
         public IWidget Intersect(Vector2 mouse, Vector2 position)
         {
-            var pos = position + new Vector2(margin);
+            var pos = position;
             return (
                 mouse.X >= pos.X && mouse.Y >= pos.Y &&
                 mouse.X <= pos.X + size.X && mouse.Y <= pos.Y + size.Y

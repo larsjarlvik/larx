@@ -17,21 +17,26 @@ namespace Larx.UserInterface.Widgets
         public List<IWidget> Children { get; }
         public Direction Direction { get; }
         public float Padding { get; }
+        public float ChildPadding;
 
-
-        public Container(string key, Direction direction, List<IWidget> children, float padding = 10.0f)
+        public Container(string key, Direction direction, List<IWidget> children, float padding = 10.0f, float childPadding = 0.0f)
         {
             Key = key;
             Children = children;
             Direction = direction;
             Padding = padding;
+            ChildPadding = childPadding;
         }
 
         public Vector2 GetSize()
         {
-            var pos = Children.FirstOrDefault()?.GetSize() ?? Vector2.Zero;
+            var pos = Vector2.Zero;
+
+            pos.X = Direction == Direction.Horizonal ? Children.First().GetSize().X : Children.Max(x => x.GetSize().X);
+            pos.Y = Direction == Direction.Horizonal ? Children.Max(x => x.GetSize().Y) : Children.First().GetSize().Y;
+
             for(var i = 1; i < Children.Count; i ++)
-                pos += Direction == Direction.Horizonal ? new Vector2(Children[i].GetSize().X, 0.0f) : new Vector2(0.0f, Children[i].GetSize().Y);
+                pos = advance(Children[i], pos);
 
             return pos + new Vector2(Padding * 2.0f);
         }
@@ -61,9 +66,9 @@ namespace Larx.UserInterface.Widgets
         private Vector2 advance(IWidget child, Vector2 pos)
         {
             if (Direction == Direction.Horizonal)
-                return new Vector2(pos.X + child.GetSize().X, pos.Y);
+                return new Vector2(pos.X + child.GetSize().X + ChildPadding, pos.Y);
 
-            return new Vector2(pos.X, pos.Y + child.GetSize().Y);
+            return new Vector2(pos.X, pos.Y + child.GetSize().Y + ChildPadding);
         }
 
         private Vector2 getInitialPosition(Vector2 position)

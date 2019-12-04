@@ -9,8 +9,9 @@ namespace Larx.UserInterface.Widgets
         public string Key { get; }
         public IWidget Child { get; }
 
-        public Wrapper(IWidget child)
+        public Wrapper(string key, IWidget child)
         {
+            Key = key;
             Child = child;
         }
 
