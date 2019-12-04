@@ -27,8 +27,10 @@ namespace Larx.UserInterface.Components
 
         public void Update()
         {
-            if (Component.Children.Any(x => x.Key == Ui.State.Hover.Key))
-                setControls(Ui.State.Hover.Key);
+            if (Ui.State.Click == null) return;
+
+            if (Component.Children.Any(x => x.Key == Ui.State.Click.Key))
+                setControls(Ui.State.Click.Key);
         }
 
         private void setControls(string key)

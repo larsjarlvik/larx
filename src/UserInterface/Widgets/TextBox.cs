@@ -3,6 +3,7 @@ using Larx.UserInterface.Panel;
 using OpenTK;
 using OpenTK.Input;
 using System;
+using OpenTK.Graphics;
 
 namespace Larx.UserInterface.Widgets
 {
@@ -44,7 +45,7 @@ namespace Larx.UserInterface.Widgets
 
         public void Render(Matrix4 matrix, Vector2 position)
         {
-            Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, new Vector3(0.2f, 0.2f, 0.2f), PanelState.Default, Ui.State.Focused?.Key == Key, 1.0f);
+            Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, new Color4(0.2f, 0.2f, 0.2f, 1.0f), PanelState.Default, Ui.State.Focused?.Key == Key, 1.0f);
             Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(position.X + padding, position.Y + textSize * 1.25f), 1.0f, 1.6f);
         }
 

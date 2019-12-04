@@ -1,4 +1,5 @@
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 
 namespace Larx.UserInterface.Panel
@@ -74,12 +75,12 @@ namespace Larx.UserInterface.Panel
             render(pMatrix, position, size, state, active, borderWidth);
         }
 
-        public void RenderSolidPanel(Matrix4 pMatrix, Vector2 position, Vector2 size, Vector3 backgroundColor, PanelState state, bool active, float borderWidth = 2.0f, bool flat = false)
+        public void RenderSolidPanel(Matrix4 pMatrix, Vector2 position, Vector2 size, Color4 backgroundColor, PanelState state, bool active, float borderWidth = 2.0f, bool flat = false)
         {
             GL.UseProgram(Shader.Program);
 
             GL.Uniform1(Shader.PanelType, 1);
-            GL.Uniform3(Shader.BackgroundColor, backgroundColor);
+            GL.Uniform4(Shader.BackgroundColor, backgroundColor);
             GL.Uniform1(Shader.Flat, flat ? 1 : 0);
 
             render(pMatrix, position, size, state, active, borderWidth);

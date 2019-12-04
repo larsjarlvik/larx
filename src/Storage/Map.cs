@@ -58,20 +58,24 @@ namespace Larx.Storage
                 MapData.SplatMap[i] = new float[size, size];
         }
 
-        public static void Save(TerrainRenderer terrain)
+        public static void Save(string name, TerrainRenderer terrain)
         {
-            MapData.TerrainElevations = terrain.HeightMap.Heights;
+            var path = getMapPath(name);
 
-            using (var stream = File.Open(MapFileName, FileMode.Create))
+            MapData.TerrainElevations = terrain.HeightMap.Heights;
+            using (var stream = File.Open(path, FileMode.Create))
                 using (var compressedStream = new GZipStream(stream, CompressionMode.Compress)) {
                     var binarySerializer = Binary.Create();
                     binarySerializer.Write(MapData, compressedStream);
                 }
         }
 
-        public static void Load(TerrainRenderer terrain, AssetRenderer assets)
+        public static bool Load(string name, TerrainRenderer terrain, AssetRenderer assets)
         {
-            using (var stream = File.Open(MapFileName, FileMode.Open))
+            var path = getMapPath(name);
+            if (!File.Exists(path)) return false;
+
+            using (var stream = File.Open(path, FileMode.Open))
                 using (var decompressedStream = new GZipStream(stream, CompressionMode.Decompress)) {
                     var binarySerializer = Binary.Create();
                     MapData = binarySerializer.Read<MapDataContainer>(decompressedStream);
@@ -82,6 +86,12 @@ namespace Larx.Storage
             terrain.HeightMap.Update();
             terrain.SplatMap.Refresh();
             assets.Refresh(terrain);
+            return true;
+        }
+
+        private static string getMapPath(string name)
+        {
+            return $"data/maps/{name}.lrx";
         }
     }
 }

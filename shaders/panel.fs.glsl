@@ -9,7 +9,7 @@ uniform int uState;
 uniform int uActive;
 uniform int uPanelType;
 uniform int uFlat;
-uniform vec3 uBackgroundColor;
+uniform vec4 uBackgroundColor;
 uniform vec2 uSize;
 uniform float uBorderWidth;
 
@@ -18,9 +18,9 @@ in vec2 vs_texCoord;
 out vec4 outputColor;
 
 void main() {
-    vec3 background = uBackgroundColor;
+    vec4 background = uBackgroundColor;
     if (uPanelType == 0) {
-        background = texture(uTexture, vs_texCoord).rgb;
+        background = texture(uTexture, vs_texCoord);
     }
 
     vec3 gradient = vec3(0.0);
@@ -30,6 +30,7 @@ void main() {
     float minX = border.x;
     float maxY = 1.0 - border.y;
     float minY = border.y;
+    float alpha = uState == 0 ? background.a * 0.85 : background.a;
 
     if (vs_texCoord.x < maxX && vs_texCoord.x > minX &&
         vs_texCoord.y < maxY && vs_texCoord.y > minY) {
@@ -41,9 +42,9 @@ void main() {
                 0.0, 1.0
             ) * 0.6;
 
-            outputColor = vec4(mix(background, gradient, intensity), uState == 0 ? 0.85 : 1.0);
+            outputColor = vec4(mix(background.rgb, gradient, intensity), alpha);
         } else {
-            outputColor = vec4(background, uState == 0 ? 0.85 : 1.0);
+            outputColor = vec4(background.rgb, alpha);
         }
     } else {
         if (uActive == 1) {

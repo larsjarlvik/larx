@@ -57,11 +57,13 @@ namespace Larx.UserInterface.Components
 
         public void Update()
         {
-            if (children.Any(x => x.Key == Ui.State.Hover.Key))
-                setActiveTopMenuKey(Ui.State.Hover.Key);
+            if (Ui.State.Click == null) return;
 
-            var child = children.First(x => x.Key == activeTopMenuKey).Children.Any(x => x.Key == Ui.State.Hover.Key);
-            if (child) setState(Ui.State.Hover as IconButton);
+            if (children.Any(x => x.Key == Ui.State.Click.Key))
+                setActiveTopMenuKey(Ui.State.Click.Key);
+
+            var child = children.First(x => x.Key == activeTopMenuKey).Children.Any(x => x.Key == Ui.State.Click.Key);
+            if (child) setState(Ui.State.Click as IconButton);
             setActiveButtonStates();
         }
 

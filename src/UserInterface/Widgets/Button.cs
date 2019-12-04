@@ -6,6 +6,12 @@ using OpenTK.Graphics;
 
 namespace Larx.UserInterface.Widgets
 {
+    public enum ButtonStyle
+    {
+        Action,
+        Dismiss,
+    }
+
     public class Button : IWidget
     {
         private const float padding = 10.0f;
@@ -14,13 +20,16 @@ namespace Larx.UserInterface.Widgets
         public string Key { get; }
         private Vector2 size;
         private readonly DisplayText displayText;
+        private readonly ButtonStyle buttonStyle;
+
         public bool Active { get; set; }
 
-        public Button(string key, string text, float width)
+        public Button(string key, string text, float width, ButtonStyle style = ButtonStyle.Action)
         {
             Key = key;
             size = new Vector2(width, 30);
             displayText = Ui.State.TextRenderer.CreateText(text, textSize);
+            buttonStyle = style;
         }
 
         private int addTexture(string path, bool mipMap = false)
@@ -41,8 +50,8 @@ namespace Larx.UserInterface.Widgets
                 ? Ui.State.MousePressed ? PanelState.Active : PanelState.Hover
                 : PanelState.Default;
 
-            Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, new Vector3(0.6f, 0.82f, 0.0f), panelState, Active, 2.0f, true);
-            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(position.X + size.X / 2.0f - displayText.Width / 2.0f, position.Y + textSize * 1.25f), 1.0f, 1.6f, new Color4(0f, 0f, 0f, 1f));
+            Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, getBackgroundColor(), panelState, Active, 2.0f, true);
+            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(position.X + size.X / 2.0f - displayText.Width / 2.0f, position.Y + textSize * 1.25f), 1.0f, 1.6f, getForegroungColor());
         }
 
         public IWidget Intersect(Vector2 mouse, Vector2 position)
@@ -51,6 +60,30 @@ namespace Larx.UserInterface.Widgets
                 mouse.X >= position.X && mouse.Y >= position.Y &&
                 mouse.X <= position.X + size.X && mouse.Y <= position.Y + size.Y
             ) ? this : null;
+        }
+
+        private Color4 getForegroungColor()
+        {
+            switch(buttonStyle) {
+                case ButtonStyle.Action:
+                    return new Color4(0f, 0f, 0f, 1f);
+                case ButtonStyle.Dismiss:
+                    return new Color4(1f, 1f, 1f, 1f);
+            }
+
+            return new Color4(0f, 0f, 0f, 1f);
+        }
+
+        private Color4 getBackgroundColor()
+        {
+            switch(buttonStyle) {
+                case ButtonStyle.Action:
+                    return new Color4(0.6f, 0.82f, 0.0f, 1.0f);
+                case ButtonStyle.Dismiss:
+                    return new Color4(0.0f, 0.0f, 0.0f, 0.0f);
+            }
+
+            return new Color4(0.0f, 0.0f, 0.0f, 0.0f);
         }
     }
 }

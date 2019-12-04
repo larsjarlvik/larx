@@ -270,13 +270,15 @@ namespace Larx
                         State.ShowGridLines = !State.ShowGridLines;
 
                     if (e.Keyboard[Key.S])
-                        ui.ShowModal("Save Map", "Save", (message) => {
-                            Console.WriteLine(message);
+                        ui.ShowModal("Save Map", "Save", (name) => {
+                            Map.Save(name, terrain);
                             ui.CloseModals();
                         });
 
                     if (e.Keyboard[Key.O])
-                        Map.Load(terrain, assets);
+                        ui.ShowModal("Open Map", "Open", (name) => {
+                            if (Map.Load(name, terrain, assets)) ui.CloseModals();
+                        });
 
                     if (e.Keyboard[Key.H])
                         terrain.HeightMap.LoadFromImage();
@@ -296,6 +298,8 @@ namespace Larx
         protected override void OnKeyUp(KeyboardKeyEventArgs e)
         {
             State.Keyboard.Set(e.Keyboard);
+            if (e.Key == Key.Enter)
+                ui.KeyPress((char)49);
         }
 
         public static void Main(string[] args)

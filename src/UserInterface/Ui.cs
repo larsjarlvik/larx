@@ -39,8 +39,10 @@ namespace Larx.UserInterface
         public bool Update()
         {
             State.MouseRepeat = State.MousePressed;
-            State.MousePressed = Larx.State.Mouse.LeftButton;
             State.Hover = page.Intersect(Larx.State.Mouse.Position * uiScale, new Vector2(0.0f, 0.0f));
+            State.Click = State.MousePressed && !Larx.State.Mouse.LeftButton ? State.Hover : null;
+            State.MousePressed = Larx.State.Mouse.LeftButton;
+
             if (State.MousePressed) State.Focused = State.Hover != null ? State.Hover : null;
 
             applicationInfo.Update();
@@ -50,12 +52,10 @@ namespace Larx.UserInterface
                 return true;
             }
 
-            if (State.Hover == null) return false;
-            if (!State.MousePressed || State.MouseRepeat) return true;
-
             mainMenu.Update();
             rightMenu.Update();
 
+            State.Click = null;
             return true;
         }
 
@@ -66,6 +66,10 @@ namespace Larx.UserInterface
 
         public void KeyPress(Char key)
         {
+            if (key == 49 && modal != null) {
+                modal.Submit();
+            }
+
             var active = State.Focused as TextBox;
             if (active != null) active.KeyPress(key);
         }
@@ -78,7 +82,7 @@ namespace Larx.UserInterface
 
         public void ShowModal(string title, string actionText, Submit submitCallback)
         {
-            modal = new InputModal(title, actionText, submitCallback);
+            modal = new InputModal(title, actionText, submitCallback, () => CloseModals());
             page.Children.Add(new Child(DockPosition.Center, modal.Component));
         }
 
