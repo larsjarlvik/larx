@@ -69,10 +69,13 @@ void main() {
     float shadowFactor = getShadowFactor(te_shadowCoords, 0.5);
 
     vec3 color = vec3(0);
+    float sum = 0;
     for (int i = 0; i < uSplatCount; i++) {
         float intesity = texture(uSplatMap, vec3(te_texCoord.x, te_texCoord.y, i)).r;
         if (intesity > 0.02) {
             color += finalTexture(i, te_normal, te_lightVectors, shadowFactor) * intesity;
+            sum += intesity;
+            if (sum > 0.98) break;
         }
     }
 
