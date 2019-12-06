@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Larx.UserInterface.Components;
+using Larx.UserInterface.Components.Modals;
 using Larx.UserInterface.Widgets;
 using OpenTK;
+using OpenTK.Input;
 
 namespace Larx.UserInterface
 {
@@ -16,7 +18,7 @@ namespace Larx.UserInterface
         private readonly RightMenu rightMenu;
         private readonly ApplicationInfo applicationInfo;
         private const float uiScale = 1.0f;
-        private InputModal modal;
+        private IModal modal;
 
         static Ui()
         {
@@ -56,7 +58,7 @@ namespace Larx.UserInterface
             rightMenu.Update();
 
             State.Click = null;
-            return true;
+            return State.Hover != null;
         }
 
         public void Render()
@@ -66,7 +68,7 @@ namespace Larx.UserInterface
 
         public void KeyPress(Char key)
         {
-            if (key == 49 && modal != null) {
+            if (key == 13 && modal != null) {
                 modal.Submit();
             }
 
@@ -80,15 +82,22 @@ namespace Larx.UserInterface
             page.Size = new Vector2(Larx.State.Window.Size.Width * uiScale, Larx.State.Window.Size.Height * uiScale);
         }
 
-        public void ShowModal(string title, string actionText, Submit submitCallback)
+        public void ShowInputModal(string title, string actionText, Submit submitCallback)
         {
             modal = new InputModal(title, actionText, submitCallback, () => CloseModals());
+            page.Children.Add(new Child(DockPosition.Center, modal.Component));
+        }
+
+        public void ShowListModal(string title, string actionText, string[] options, Submit submitCallback)
+        {
+            modal = new ListModal(title, actionText, options, submitCallback, () => CloseModals());
             page.Children.Add(new Child(DockPosition.Center, modal.Component));
         }
 
         public void CloseModals()
         {
             modal = null;
+            State.Focused = null;
             page.Children.RemoveAll(x => x.Component.Key == UiKeys.Modal.Key);
         }
     }

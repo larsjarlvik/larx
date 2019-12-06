@@ -11,5 +11,5 @@ out vec2 vs_texCoord;
 
 void main() {
     vs_texCoord = vTexCoord;
-    gl_Position = uMatrix * vec4(uPosition + (vPosition * uSize), 0.0, 1.0);
+    gl_Position = uMatrix * vec4(round(uPosition + round(vPosition) * uSize), 0.0, 1.0);
 }

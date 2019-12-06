@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Apex.Serialization;
 using Larx.Assets;
 using Larx.Terrain;
@@ -87,6 +88,11 @@ namespace Larx.Storage
             terrain.SplatMap.Refresh();
             assets.Refresh(terrain);
             return true;
+        }
+
+        public static string[] ListMaps()
+        {
+            return Directory.GetFiles("data/maps").Select(x => new FileInfo(x).Name.Replace(".lrx", "")).ToArray();
         }
 
         private static string getMapPath(string name)

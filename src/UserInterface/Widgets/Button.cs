@@ -8,8 +8,15 @@ namespace Larx.UserInterface.Widgets
 {
     public enum ButtonStyle
     {
+        Default,
         Action,
         Dismiss,
+    }
+
+    public enum Align
+    {
+        Left,
+        Center,
     }
 
     public class Button : IWidget
@@ -21,15 +28,19 @@ namespace Larx.UserInterface.Widgets
         private Vector2 size;
         private readonly DisplayText displayText;
         private readonly ButtonStyle buttonStyle;
+        private readonly float borderWidth;
+        private readonly Align textAlign;
 
         public bool Active { get; set; }
 
-        public Button(string key, string text, float width, ButtonStyle style = ButtonStyle.Action)
+        public Button(string key, string text, float width, ButtonStyle style = ButtonStyle.Default, float border = 2.0f, Align align = Align.Center)
         {
             Key = key;
             size = new Vector2(width, 30);
             displayText = Ui.State.TextRenderer.CreateText(text, textSize);
             buttonStyle = style;
+            borderWidth = border;
+            textAlign = align;
         }
 
         private int addTexture(string path, bool mipMap = false)
@@ -50,8 +61,12 @@ namespace Larx.UserInterface.Widgets
                 ? Ui.State.MousePressed ? PanelState.Active : PanelState.Hover
                 : PanelState.Default;
 
-            Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, getBackgroundColor(), panelState, Active, 2.0f, true);
-            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(position.X + size.X / 2.0f - displayText.Width / 2.0f, position.Y + textSize * 1.25f), 1.0f, 1.6f, getForegroungColor());
+            var textPosition = textAlign == Align.Center
+                ? position.X + size.X / 2.0f - displayText.Width / 2.0f
+                : position.X + 10.0f;
+
+            Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, getBackgroundColor(), panelState, Active, borderWidth, true);
+            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(textPosition, position.Y + textSize * 1.3f), 1.0f, 1.6f, getForegroungColor());
         }
 
         public IWidget Intersect(Vector2 mouse, Vector2 position)
@@ -66,12 +81,11 @@ namespace Larx.UserInterface.Widgets
         {
             switch(buttonStyle) {
                 case ButtonStyle.Action:
-                    return new Color4(0f, 0f, 0f, 1f);
                 case ButtonStyle.Dismiss:
+                    return new Color4(0f, 0f, 0f, 1f);
+                default:
                     return new Color4(1f, 1f, 1f, 1f);
             }
-
-            return new Color4(0f, 0f, 0f, 1f);
         }
 
         private Color4 getBackgroundColor()
@@ -80,10 +94,10 @@ namespace Larx.UserInterface.Widgets
                 case ButtonStyle.Action:
                     return new Color4(0.6f, 0.82f, 0.0f, 1.0f);
                 case ButtonStyle.Dismiss:
-                    return new Color4(0.0f, 0.0f, 0.0f, 0.0f);
+                    return new Color4(1.0f, 0.29f, 0.33f, 1.0f);
+                default:
+                    return new Color4(1.0f, 1.0f, 1.0f, 0.1f);
             }
-
-            return new Color4(0.0f, 0.0f, 0.0f, 0.0f);
         }
     }
 }

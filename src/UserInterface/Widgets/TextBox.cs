@@ -14,6 +14,7 @@ namespace Larx.UserInterface.Widgets
         private const float textSize = 14.0f;
 
         private DisplayText displayText;
+        private readonly DisplayText cursor;
         private readonly Vector2 size;
         public string Text { get; private set; }
 
@@ -22,6 +23,7 @@ namespace Larx.UserInterface.Widgets
             Key = key;
             Text = "";
             displayText = Ui.State.TextRenderer.CreateText(Text, textSize);
+            cursor = Ui.State.TextRenderer.CreateText("|", 16.0f);
             size = new Vector2(width, 30);
         }
 
@@ -46,7 +48,10 @@ namespace Larx.UserInterface.Widgets
         public void Render(Matrix4 matrix, Vector2 position)
         {
             Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, new Color4(0.2f, 0.2f, 0.2f, 1.0f), PanelState.Default, Ui.State.Focused?.Key == Key, 1.0f);
-            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(position.X + padding, position.Y + textSize * 1.25f), 1.0f, 1.6f);
+            Ui.State.TextRenderer.Render(displayText, matrix, new Vector2(position.X + padding - 5.0f, position.Y + textSize * 1.3f), 1.0f, 1.6f);
+
+            if (Larx.State.Time.Total % 1 > 0.5 && Ui.State.Focused?.Key == Key)
+                Ui.State.TextRenderer.Render(cursor, matrix, new Vector2(position.X + displayText.Width + 2.0f, position.Y + textSize * 1.3f), 1.0f, 1.6f);
         }
 
         public IWidget Intersect(Vector2 mouse, Vector2 position)

@@ -270,13 +270,15 @@ namespace Larx
                         State.ShowGridLines = !State.ShowGridLines;
 
                     if (e.Keyboard[Key.S])
-                        ui.ShowModal("Save Map", "Save", (name) => {
-                            Map.Save(name, terrain);
-                            ui.CloseModals();
+                        ui.ShowInputModal("Save Map", "Save", (name) => {
+                            if (name.Trim().Length > 2) {
+                                Map.Save(name.Trim(), terrain);
+                                ui.CloseModals();
+                            }
                         });
 
                     if (e.Keyboard[Key.O])
-                        ui.ShowModal("Open Map", "Open", (name) => {
+                        ui.ShowListModal("Open Map", "Open", Map.ListMaps(), (name) => {
                             if (Map.Load(name, terrain, assets)) ui.CloseModals();
                         });
 
@@ -299,7 +301,7 @@ namespace Larx
         {
             State.Keyboard.Set(e.Keyboard);
             if (e.Key == Key.Enter)
-                ui.KeyPress((char)49);
+                ui.KeyPress((char)13);
         }
 
         public static void Main(string[] args)

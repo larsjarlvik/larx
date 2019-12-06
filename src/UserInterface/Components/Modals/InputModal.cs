@@ -2,20 +2,19 @@ using System;
 using System.Collections.Generic;
 using Larx.UserInterface.Widgets;
 
-namespace Larx.UserInterface.Components
+namespace Larx.UserInterface.Components.Modals
 {
     public delegate void Submit(string message);
     public delegate void Cancel();
 
-    public class InputModal
+    public class InputModal : IModal
     {
         private const string submitKey = "SubmitButton";
         private const string cancelKey = "CancelButton";
         private readonly Submit submit;
         private readonly Cancel cancel;
         private readonly TextBox input;
-
-        public Wrapper Component { get; }
+        public IWidget Component { get; }
 
         public InputModal(string title, string actionText, Submit submitCallback, Cancel cancelCallback)
         {
@@ -29,7 +28,7 @@ namespace Larx.UserInterface.Components
                     input,
                     new Container("actions", Direction.Horizonal, new List<IWidget> {
                         new Button(cancelKey, "Cancel", 95.0f, ButtonStyle.Dismiss),
-                        new Button(submitKey, actionText, 95.0f),
+                        new Button(submitKey, actionText, 95.0f, ButtonStyle.Action),
                     }, 0.0f, 10.0f)
                 }, 20.0f, 10.0f
             ));
