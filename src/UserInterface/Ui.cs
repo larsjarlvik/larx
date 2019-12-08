@@ -82,9 +82,9 @@ namespace Larx.UserInterface
             page.Size = new Vector2(Larx.State.Window.Size.Width * uiScale, Larx.State.Window.Size.Height * uiScale);
         }
 
-        public void ShowInputModal(string title, string actionText, Submit submitCallback)
+        public void ShowInputModal(string title, string actionText, string defaultValue, Submit submitCallback)
         {
-            modal = new InputModal(title, actionText, submitCallback, () => CloseModals());
+            modal = new InputModal(title, actionText, defaultValue, submitCallback, () => CloseModals());
             page.Children.Add(new Child(DockPosition.Center, modal.Component));
         }
 

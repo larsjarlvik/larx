@@ -18,10 +18,10 @@ namespace Larx.UserInterface.Widgets
         private readonly Vector2 size;
         public string Text { get; private set; }
 
-        public TextBox(string key, float width)
+        public TextBox(string key, float width, string text = "")
         {
             Key = key;
-            Text = "";
+            Text = text;
             displayText = Ui.State.TextRenderer.CreateText(Text, textSize);
             cursor = Ui.State.TextRenderer.CreateText("|", 16.0f);
             size = new Vector2(width, 30);

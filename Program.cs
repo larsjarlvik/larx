@@ -270,7 +270,7 @@ namespace Larx
                         State.ShowGridLines = !State.ShowGridLines;
 
                     if (e.Keyboard[Key.S])
-                        ui.ShowInputModal("Save Map", "Save", (name) => {
+                        ui.ShowInputModal("Save Map", "Save", Map.MapData.Name, (name) => {
                             if (name.Trim().Length > 2) {
                                 Map.Save(name.Trim(), terrain);
                                 ui.CloseModals();

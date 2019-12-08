@@ -30,6 +30,7 @@ namespace Larx.Storage
     [Serializable]
     public class MapDataContainer
     {
+        public string Name { get; set; }
         public int MapSize { get; set; }
         public float[,] TerrainElevations { get; set; }
         public float[][,] SplatMap { get; set; }
@@ -38,15 +39,13 @@ namespace Larx.Storage
 
     public static class Map
     {
-        private const string MapFileName = "default.lrx";
         public static MapDataContainer MapData = new MapDataContainer();
 
         public static void New(int mapSize)
         {
+            MapData.Name = "New Map";
             MapData.MapSize = mapSize;
             MapData.Assets = new Dictionary<string, List<PlacedAsset>>();
-
-            var paddedMapSize = MapData.MapSize + 1;
             MapData.TerrainElevations = new float[MapData.MapSize + 1, MapData.MapSize + 1];
             for (var z = 0; z <= Map.MapData.MapSize; z++)
                 for (var x = 0; x <= Map.MapData.MapSize; x++)
@@ -63,6 +62,7 @@ namespace Larx.Storage
         {
             var path = getMapPath(name);
 
+            MapData.Name = name;
             MapData.TerrainElevations = terrain.HeightMap.Heights;
             using (var stream = File.Open(path, FileMode.Create))
                 using (var compressedStream = new GZipStream(stream, CompressionMode.Compress)) {
@@ -92,7 +92,11 @@ namespace Larx.Storage
 
         public static string[] ListMaps()
         {
-            return Directory.GetFiles("data/maps").Select(x => new FileInfo(x).Name.Replace(".lrx", "")).ToArray();
+            return Directory.GetFiles("data/maps")
+                .Select(x => new FileInfo(x).Name)
+                .Where(x => x.EndsWith(".lrx"))
+                .Select(x => x.Replace(".lrx", ""))
+                .ToArray();
         }
 
         private static string getMapPath(string name)

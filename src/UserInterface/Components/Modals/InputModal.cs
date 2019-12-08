@@ -16,11 +16,11 @@ namespace Larx.UserInterface.Components.Modals
         private readonly TextBox input;
         public IWidget Component { get; }
 
-        public InputModal(string title, string actionText, Submit submitCallback, Cancel cancelCallback)
+        public InputModal(string title, string actionText, string defaultValue, Submit submitCallback, Cancel cancelCallback)
         {
             submit = submitCallback;
             cancel = cancelCallback;
-            input = new TextBox("input", 200.0f);
+            input = new TextBox("input", 200.0f, defaultValue);
 
             Component = new Wrapper(UiKeys.Modal.Key, new Container("container", Direction.Vertical,
                 new List<IWidget> {
