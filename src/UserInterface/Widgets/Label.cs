@@ -7,24 +7,25 @@ namespace Larx.UserInterface.Widgets
     public class Label : IWidget
     {
         public string Key { get; }
+        public float MaxWidth { get; }
+        public float TextSize { get; }
 
         private string currentText;
-
-        public float TextSize { get; }
         private DisplayText displayText;
 
-        public Label(string key, string text, float textSize = 13.0f)
+        public Label(string key, string text, float textSize = 13.0f, float maxWidth = float.MaxValue)
         {
             TextSize = textSize;
             Key = key;
+            MaxWidth = maxWidth;
 
             currentText = text;
-            displayText = Ui.State.TextRenderer.CreateText(text, textSize);
+            displayText = Ui.State.TextRenderer.CreateText(text, textSize, MaxWidth);
         }
 
         public Vector2 GetSize()
         {
-            return new Vector2(displayText.Width, TextSize * 1.25f);
+            return displayText.Size;
         }
 
         public IWidget Intersect(Vector2 mouse, Vector2 position)
@@ -36,7 +37,7 @@ namespace Larx.UserInterface.Widgets
         {
             if (currentText == text) return;
             currentText = text;
-            displayText = Ui.State.TextRenderer.CreateText(text, TextSize);
+            displayText = Ui.State.TextRenderer.CreateText(text, TextSize, MaxWidth);
         }
 
         public void Render(Matrix4 matrix, Vector2 position)

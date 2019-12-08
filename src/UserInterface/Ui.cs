@@ -19,6 +19,7 @@ namespace Larx.UserInterface
         private readonly ApplicationInfo applicationInfo;
         private const float uiScale = 1.0f;
         private IModal modal;
+        public bool IsAnyModalOpen => modal != null;
 
         static Ui()
         {
@@ -50,7 +51,10 @@ namespace Larx.UserInterface
             applicationInfo.Update();
 
             if (modal != null) {
-                modal.Update();
+                if (Ui.State.Click != null) {
+                    if (Ui.State.Click.Key.StartsWith(UiKeys.Modal.Submit)) modal.Submit();
+                    if (Ui.State.Click.Key == UiKeys.Modal.Cancel) CloseModals();
+                }
                 return true;
             }
 
@@ -82,15 +86,9 @@ namespace Larx.UserInterface
             page.Size = new Vector2(Larx.State.Window.Size.Width * uiScale, Larx.State.Window.Size.Height * uiScale);
         }
 
-        public void ShowInputModal(string title, string actionText, string defaultValue, Submit submitCallback)
+        public void ShowModal(IModal modal)
         {
-            modal = new InputModal(title, actionText, defaultValue, submitCallback, () => CloseModals());
-            page.Children.Add(new Child(DockPosition.Center, modal.Component));
-        }
-
-        public void ShowListModal(string title, string actionText, string[] options, Submit submitCallback)
-        {
-            modal = new ListModal(title, actionText, options, submitCallback, () => CloseModals());
+            this.modal = modal;
             page.Children.Add(new Child(DockPosition.Center, modal.Component));
         }
 

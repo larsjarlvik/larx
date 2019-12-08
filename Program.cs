@@ -14,6 +14,7 @@ using Larx.Buffers;
 using Larx.Utils;
 using Larx.Terrain;
 using Larx.Assets;
+using Larx.UserInterface.Components.Modals;
 
 namespace Larx
 {
@@ -248,48 +249,51 @@ namespace Larx
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
-            if (Ui.State.Focused != null) {
-                if (e.Key == Key.BackSpace)
-                    ui.KeyPress((char)27);
-                return;
-            }
+            if (e.Key == Key.BackSpace) ui.KeyPress((char)27);
+            if (!e.Control) State.Keyboard.Set(e.Keyboard);
+            if (e.IsRepeat) return;
 
-            if (!e.IsRepeat)
-            {
-                if (e.Keyboard[Key.Escape])
+            if (e.Keyboard[Key.Escape])
+                if (Ui.State.Focused != null) {
+                    Ui.State.Focused = null;
+                } else if (ui.IsAnyModalOpen) {
+                    ui.CloseModals();
+                } else {
                     Exit();
+                }
 
-                if (e.Control) {
-                    if (e.Keyboard[Key.F])
+            if (e.Control) {
+                switch (e.Key) {
+                    case Key.F:
                         WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
-
-                    if (e.Keyboard[Key.W])
+                        break;
+                    case Key.W:
                         State.PolygonMode = State.PolygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
-
-                    if (e.Keyboard[Key.G])
+                        break;
+                    case Key.G:
                         State.ShowGridLines = !State.ShowGridLines;
-
-                    if (e.Keyboard[Key.S])
-                        ui.ShowInputModal("Save Map", "Save", Map.MapData.Name, (name) => {
+                        break;
+                    case Key.S:
+                        ui.ShowModal(new InputModal("Save Map", "Save", Map.MapData.Name, (name) => {
                             if (name.Trim().Length > 2) {
                                 Map.Save(name.Trim(), terrain);
                                 ui.CloseModals();
                             }
-                        });
-
-                    if (e.Keyboard[Key.O])
-                        ui.ShowListModal("Open Map", "Open", Map.ListMaps(), (name) => {
+                        }));
+                        break;
+                    case Key.O:
+                        ui.ShowModal(new ListModal("Open Map", "Open", Map.ListMaps(), (name) => {
                             if (Map.Load(name, terrain, assets)) ui.CloseModals();
-                        });
-
-                    if (e.Keyboard[Key.H])
-                        terrain.HeightMap.LoadFromImage();
+                        }));
+                        break;
+                    case Key.H:
+                        ui.ShowModal(new ConfirmModal("Load Heightmap", "This will overwrite all current height data!", () => {
+                            terrain.HeightMap.LoadFromImage();
+                            ui.CloseModals();
+                        }));
+                        break;
                 }
             }
-
-
-            if (!e.Control)
-                State.Keyboard.Set(e.Keyboard);
         }
 
         protected override void OnKeyPress(KeyPressEventArgs e)

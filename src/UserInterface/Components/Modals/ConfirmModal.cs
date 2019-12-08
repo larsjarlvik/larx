@@ -1,45 +1,43 @@
 using System;
 using System.Collections.Generic;
 using Larx.UserInterface.Widgets;
+using OpenTK;
 
 namespace Larx.UserInterface.Components.Modals
 {
-    public class InputModal : IModal
+    public class ConfirmModal : IModal
     {
-        private readonly Submit submit;
-        private readonly TextBox input;
+        private readonly Confirm confirm;
+        private readonly Cancel cancel;
         public IWidget Component { get; }
 
-        public InputModal(string title, string actionText, string defaultValue, Submit submitCallback)
+        public ConfirmModal(string title, string confirmText, Confirm confirmCallback, Cancel cancelCallback = null)
         {
-            submit = submitCallback;
-            input = new TextBox("input", 200.0f, defaultValue);
+            confirm = confirmCallback;
+            cancel = cancelCallback;
 
             Component = new Wrapper(UiKeys.Modal.Key, new Container("container", Direction.Vertical,
                 new List<IWidget> {
                     new Label("title", title, 16.0f),
-                    input,
+                    new Label("confirm", confirmText, 14.0f, 200.0f),
                     new Container("actions", Direction.Horizonal, new List<IWidget> {
-                        new Button(UiKeys.Modal.Cancel, "Cancel", 95.0f, ButtonStyle.Dismiss),
-                        new Button(UiKeys.Modal.Submit, actionText, 95.0f, ButtonStyle.Action),
+                        new Button(UiKeys.Modal.Cancel, "No", 95.0f, ButtonStyle.Dismiss),
+                        new Button(UiKeys.Modal.Submit, "Yes", 95.0f, ButtonStyle.Action),
                     }, 0.0f, 10.0f)
                 }, 20.0f, 10.0f
             ));
-
-            Ui.State.Focused = input;
         }
 
         public void Submit()
         {
-            if (string.IsNullOrWhiteSpace(input.Text)) return;
-
             Ui.State.Focused = null;
-            submit(input.Text);
+            confirm();
         }
 
         public void Close()
         {
             Ui.State.Focused = null;
+            if (cancel != null) cancel();
         }
     }
 }

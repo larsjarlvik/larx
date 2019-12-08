@@ -7,44 +7,35 @@ namespace Larx.UserInterface.Components.Modals
     public class ListModal : IModal
     {
         private const float width = 250.0f;
-        private const string prefix = "list-";
-        private const string cancelKey = "CancelButton";
         private readonly Submit submit;
-        private readonly Cancel cancel;
 
         public IWidget Component { get; }
 
-        public ListModal(string title, string actionText, string[] options, Submit submitCallback, Cancel cancelCallback)
+        public ListModal(string title, string actionText, string[] options, Submit submitCallback)
         {
             submit = submitCallback;
-            cancel = cancelCallback;
 
             Component = new Wrapper(UiKeys.Modal.Key, new Container("container", Direction.Vertical,
                 new List<IWidget> {
                     new Label("title", title, 16.0f),
                     new Container("list-items", Direction.Vertical,
-                        options.Select(o => new Button(prefix + o, o, width, ButtonStyle.Default, 1.0f, Align.Left) as IWidget).ToList(),
+                        options.Select(o => new Button($"{UiKeys.Modal.Submit}-{o}", o, width, ButtonStyle.Default, 1.0f, Align.Left) as IWidget).ToList(),
                         0.0f, -1.0f
                     ),
-                    new Button(cancelKey, "Cancel", width, ButtonStyle.Dismiss),
+                    new Button(UiKeys.Modal.Cancel, "Cancel", width, ButtonStyle.Dismiss),
                 }, 20.0f, 10.0f
             ));
         }
 
-        public void Update()
+        public void Submit()
         {
-            if (Ui.State.Click == null) return;
-
-            if (Ui.State.Click.Key.StartsWith(prefix)) {
-                submit(Ui.State.Click.Key.Substring(prefix.Length));
-            }
-
-            if (Ui.State.Click.Key == cancelKey) {
-                Ui.State.Focused = null;
-                cancel();
-            }
+            submit(Ui.State.Click.Key.Substring(UiKeys.Modal.Submit.Length + 1));
+            Ui.State.Focused = null;
         }
 
-        public void Submit() { }
+        public void Close()
+        {
+            Ui.State.Focused = null;
+        }
     }
 }

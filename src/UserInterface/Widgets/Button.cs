@@ -62,7 +62,7 @@ namespace Larx.UserInterface.Widgets
                 : PanelState.Default;
 
             var textPosition = textAlign == Align.Center
-                ? position.X + size.X / 2.0f - displayText.Width / 2.0f
+                ? position.X + size.X / 2.0f - displayText.Size.X / 2.0f
                 : position.X + 10.0f;
 
             Ui.State.PanelRenderer.RenderSolidPanel(matrix, position, size, getBackgroundColor(), panelState, Active, borderWidth, true);

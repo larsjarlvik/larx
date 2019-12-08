@@ -51,7 +51,8 @@ namespace Larx.UserInterface
         public static class Modal
         {
             public const string Key = "modal";
-            public const string Overlay = "overlay";
+            public const string Submit = "modal-submit";
+            public const string Cancel = "modal-cancel";
         }
     }
 }
