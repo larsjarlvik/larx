@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Apex.Serialization;
 using Larx.Assets;
 using Larx.Terrain;
@@ -29,6 +30,7 @@ namespace Larx.Storage
     [Serializable]
     public class MapDataContainer
     {
+        public string Name { get; set; }
         public int MapSize { get; set; }
         public float[,] TerrainElevations { get; set; }
         public float[][,] SplatMap { get; set; }
@@ -37,15 +39,13 @@ namespace Larx.Storage
 
     public static class Map
     {
-        private const string MapFileName = "default.lrx";
         public static MapDataContainer MapData = new MapDataContainer();
 
         public static void New(int mapSize)
         {
+            MapData.Name = "New Map";
             MapData.MapSize = mapSize;
             MapData.Assets = new Dictionary<string, List<PlacedAsset>>();
-
-            var paddedMapSize = MapData.MapSize + 1;
             MapData.TerrainElevations = new float[MapData.MapSize + 1, MapData.MapSize + 1];
             for (var z = 0; z <= Map.MapData.MapSize; z++)
                 for (var x = 0; x <= Map.MapData.MapSize; x++)
@@ -58,20 +58,25 @@ namespace Larx.Storage
                 MapData.SplatMap[i] = new float[size, size];
         }
 
-        public static void Save(TerrainRenderer terrain)
+        public static void Save(string name, TerrainRenderer terrain)
         {
-            MapData.TerrainElevations = terrain.HeightMap.Heights;
+            var path = getMapPath(name);
 
-            using (var stream = File.Open(MapFileName, FileMode.Create))
+            MapData.Name = name;
+            MapData.TerrainElevations = terrain.HeightMap.Heights;
+            using (var stream = File.Open(path, FileMode.Create))
                 using (var compressedStream = new GZipStream(stream, CompressionMode.Compress)) {
                     var binarySerializer = Binary.Create();
                     binarySerializer.Write(MapData, compressedStream);
                 }
         }
 
-        public static void Load(TerrainRenderer terrain, AssetRenderer assets)
+        public static bool Load(string name, TerrainRenderer terrain, AssetRenderer assets)
         {
-            using (var stream = File.Open(MapFileName, FileMode.Open))
+            var path = getMapPath(name);
+            if (!File.Exists(path)) return false;
+
+            using (var stream = File.Open(path, FileMode.Open))
                 using (var decompressedStream = new GZipStream(stream, CompressionMode.Decompress)) {
                     var binarySerializer = Binary.Create();
                     MapData = binarySerializer.Read<MapDataContainer>(decompressedStream);
@@ -82,6 +87,21 @@ namespace Larx.Storage
             terrain.HeightMap.Update();
             terrain.SplatMap.Refresh();
             assets.Refresh(terrain);
+            return true;
+        }
+
+        public static string[] ListMaps()
+        {
+            return Directory.GetFiles("data/maps")
+                .Select(x => new FileInfo(x).Name)
+                .Where(x => x.EndsWith(".lrx"))
+                .Select(x => x.Replace(".lrx", ""))
+                .ToArray();
+        }
+
+        private static string getMapPath(string name)
+        {
+            return $"data/maps/{name}.lrx";
         }
     }
 }

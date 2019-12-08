@@ -1,10 +1,10 @@
 using OpenTK.Graphics.OpenGL;
 
-namespace Larx.UserInterface.Button
+namespace Larx.UserInterface.Panel
 {
-    public class ButtonShader : Shader
+    public class PanelShader : Shader
     {
-        public ButtonShader() : base("button") { }
+        public PanelShader() : base("panel") { }
 
         public int Matrix { get; private set; }
         public int Texture { get; private set; }
@@ -12,6 +12,10 @@ namespace Larx.UserInterface.Button
         public int Size { get; private set; }
         public int State { get; private set; }
         public int Active { get; private set; }
+        public int BackgroundColor { get; private set; }
+        public int PanelType { get; private set; }
+        public int BorderWidth { get; private set; }
+        public int Flat { get; private set; }
 
         protected override void SetUniformsLocations()
         {
@@ -21,6 +25,10 @@ namespace Larx.UserInterface.Button
             Size = GL.GetUniformLocation(Program, "uSize");
             State = GL.GetUniformLocation(Program, "uState");
             Active = GL.GetUniformLocation(Program, "uActive");
+            BackgroundColor = GL.GetUniformLocation(Program, "uBackgroundColor");
+            PanelType = GL.GetUniformLocation(Program, "uPanelType");
+            BorderWidth = GL.GetUniformLocation(Program, "uBorderWidth");
+            Flat = GL.GetUniformLocation(Program, "uFlat");
         }
     }
 }

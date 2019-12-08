@@ -9,14 +9,15 @@ namespace Larx.UserInterface.Text
 {
     public struct DisplayText
     {
-        public int VaoId { get; set; }
+        public int VaoId { get; }
+        public int NumItems { get; }
+        public Vector2 Size { get; }
 
-        public int NumItems { get; set; }
-
-        public DisplayText(int vaoId, int numItems)
+        public DisplayText(int vaoId, int numItems, Vector2 size)
         {
             VaoId = vaoId;
             NumItems = numItems;
+            Size = size;
         }
     }
 
@@ -24,7 +25,6 @@ namespace Larx.UserInterface.Text
     {
         private Texture texture;
         private FontData fontData;
-
         public TextShader Shader { get; }
 
         public TextRenderer()
@@ -37,18 +37,23 @@ namespace Larx.UserInterface.Text
 
         public void Render(DisplayText text, Matrix4 pMatrix, Vector2 position, float buffer, float gamma)
         {
+            Render(text, pMatrix, position,buffer, gamma, new Color4(1f, 1f, 1f, 1f));
+        }
+
+        public void Render(DisplayText text, Matrix4 pMatrix, Vector2 position, float buffer, float gamma, Color4 color)
+        {
             GL.DepthMask(false);
             GL.UseProgram(Shader.Program);
 
             GL.UniformMatrix4(Shader.Matrix, false, ref pMatrix);
-            GL.Uniform2(Shader.Position, position);
+            GL.Uniform2(Shader.Position, new Vector2(position.X, position.Y));
 
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, texture.TextureId);
             GL.Uniform1(Shader.Texture, 0);
             GL.Uniform2(Shader.TextSize, new Vector2(texture.Size.X, texture.Size.Y));
 
-            GL.Uniform4(Shader.Color, new Color4(0.2f, 0.2f, 0.2f, 1f));
+            GL.Uniform4(Shader.Color, color);
             GL.Uniform1(Shader.Buffer, buffer);
 
             GL.BindVertexArray(text.VaoId);
@@ -56,7 +61,6 @@ namespace Larx.UserInterface.Text
             GL.EnableVertexAttribArray(1);
             GL.DrawArrays(PrimitiveType.Triangles, 0, text.NumItems);
 
-            GL.Uniform4(Shader.Color, new Color4(1f, 1f, 1f, 1f));
             GL.Uniform1(Shader.Buffer, 192f / 256f);
             GL.Uniform1(Shader.Gamma, gamma * 1.4142f / 14.0f);
 
@@ -65,7 +69,8 @@ namespace Larx.UserInterface.Text
             GL.BindVertexArray(0);
         }
 
-        private Vector2 drawGlyph(char chr, Vector2 pen, float size, List<Vector2> vertexElements, List<Vector2> textureElements) {
+        private Vector2 drawGlyph(char chr, Vector2 pen, float size, List<Vector2> vertexElements, List<Vector2> textureElements)
+        {
             var metric = fontData.Chars[chr];
             var scale = size / fontData.Size;
 
@@ -108,13 +113,43 @@ namespace Larx.UserInterface.Text
             return pen;
         }
 
-        public DisplayText CreateText(string text, float size) {
+        private float getWordLength(string word, float size)
+        {
+            var totalAdvance = 0.0f;
+            var scale = size / fontData.Size;
+
+            foreach(var chr in word) {
+                var metric = fontData.Chars[chr];
+                totalAdvance += metric[4] * scale;
+            }
+
+            return totalAdvance;
+        }
+
+        private string getRemainingLettersInWord(int index, string text)
+        {
+            if (text[index] == ' ') return "";
+            var remaining = text.Substring(index);
+            var nextSpace = remaining.IndexOf(' ');
+
+            if (nextSpace == -1) return remaining;
+
+            return remaining.Substring(0, nextSpace);
+        }
+
+        public DisplayText CreateText(string text, float size, float maxWidth = float.MaxValue)
+        {
             var vertexElements = new List<Vector2>();
             var textureElements = new List<Vector2>();
 
             var pen = new Vector2(0, 0);
 
             for (var i = 0; i < text.Length; i++) {
+                if (pen.X + getWordLength(getRemainingLettersInWord(i, text), size) > maxWidth) {
+                    pen.X = 0.0f;
+                    pen.Y += size * 1.3f;
+                }
+
                 var chr = text[i];
                 pen = drawGlyph(chr, pen, size, vertexElements, textureElements);
             }
@@ -134,7 +169,8 @@ namespace Larx.UserInterface.Text
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, Vector2.SizeInBytes, 0);
             GL.BindVertexArray(0);
 
-            return new DisplayText(vaoId, numItems);
+            pen.Y += size * 1.3f;
+            return new DisplayText(vaoId, numItems, pen);
         }
     }
 }

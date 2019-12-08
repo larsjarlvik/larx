@@ -31,7 +31,6 @@ namespace Larx.Terrain
         public readonly NormalMap NormalMap;
         public readonly SplatMap SplatMap;
         public readonly HeightMap HeightMap;
-        public Vector3 MousePosition { get; private set; }
 
         public TerrainRenderer(Camera camera)
         {
@@ -40,7 +39,6 @@ namespace Larx.Terrain
             shadowShader = new ShadowShader();
             quadTree = new TerrainQuadTree();
             worldTransform = Matrix4.CreateScale(Map.MapData.MapSize) * Matrix4.CreateTranslation(-Map.MapData.MapSize / 2.0f, 0.0f, -Map.MapData.MapSize / 2.0f);
-            MousePosition = new Vector3();
 
             texture = new Texture();
             textureNoise = new TextureNoise(12312234);
@@ -67,7 +65,7 @@ namespace Larx.Terrain
 
         public void Update()
         {
-            MousePosition = picker.GetPosition();
+            State.TerrainMousePosition = picker.GetPosition();
 
             if (camera.Position == lastCameraPosition)
                 return;
@@ -149,7 +147,7 @@ namespace Larx.Terrain
 
             GL.Uniform1(shader.ClipPlane, (int)clipPlane);
             GL.Uniform1(shader.GridLines, State.ShowGridLines ? 1 : 0);
-            GL.Uniform3(shader.MousePosition, MousePosition);
+            GL.Uniform3(shader.MousePosition, State.TerrainMousePosition);
             GL.Uniform1(shader.SelectionSize, State.ToolRadius);
 
             GL.Uniform4(shader.FogColor, Color.FromArgb(255, 124, 151, 185));

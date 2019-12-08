@@ -14,6 +14,7 @@ using Larx.Buffers;
 using Larx.Utils;
 using Larx.Terrain;
 using Larx.Assets;
+using Larx.UserInterface.Components.Modals;
 
 namespace Larx
 {
@@ -77,7 +78,7 @@ namespace Larx
 
             var uiIntersect = ui.Update();
 
-            if (Focused)
+            if (Focused && Ui.State.Focused == null)
             {
                 if (State.Mouse.ScrollDelta > 0) camera.Zoom(-0.2f);
                 if (State.Mouse.ScrollDelta < 0) camera.Zoom( 0.2f);
@@ -100,48 +101,43 @@ namespace Larx
             terrain.Update();
 
             if (!uiIntersect) {
-                switch (ui.State.ActiveTopMenuKey)
+                switch (State.SelectedTool)
                 {
-                    case UiKeys.TopMenu.ElevationTools:
-                        switch(ui.State.ActiveChildMenuKey)
-                        {
-                            case UiKeys.Terrain.ElevationTool:
-                                if (mouse.LeftButton == ButtonState.Pressed) {
-                                    terrain.HeightMap.Sculpt(terrain.MousePosition, 0.1f);
-                                    assets.Refresh(terrain);
-                                } else if (mouse.RightButton == ButtonState.Pressed) {
-                                    terrain.HeightMap.Sculpt(terrain.MousePosition, -0.1f);
-                                    assets.Refresh(terrain);
-                                }
-                                break;
-                            case UiKeys.Terrain.SmudgeTool:
-                                if (mouse.LeftButton == ButtonState.Pressed) {
-                                    terrain.HeightMap.Smudge(terrain.MousePosition);
-                                    assets.Refresh(terrain);
-                                }
-                                break;
+                    case UiKeys.Terrain.ElevationTool:
+                        if (mouse.LeftButton == ButtonState.Pressed) {
+                            terrain.HeightMap.Sculpt(State.TerrainMousePosition, 0.1f);
+                            assets.Refresh(terrain);
+                        } else if (mouse.RightButton == ButtonState.Pressed) {
+                            terrain.HeightMap.Sculpt(State.TerrainMousePosition, -0.1f);
+                            assets.Refresh(terrain);
                         }
                         break;
-                    case UiKeys.TopMenu.TerrainPaint:
+                    case UiKeys.Terrain.SmudgeTool:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            if (ui.State.ActiveChildMenuKey == UiKeys.SplatMap.AutoPaint)
-                                terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap, terrain.MousePosition);
-                            else
-                                terrain.SplatMap.Paint(terrain.MousePosition, byte.Parse(ui.State.ActiveChildMenuKey));
+                            terrain.HeightMap.Smudge(State.TerrainMousePosition);
+                            assets.Refresh(terrain);
                         }
                         break;
-                    case UiKeys.TopMenu.Assets:
+                    case UiKeys.SplatMap.AutoPaint:
+                        if (mouse.LeftButton == ButtonState.Pressed)
+                            terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap, State.TerrainMousePosition);
+                        break;
+                    case UiKeys.SplatMap.Paint:
+                        if (mouse.LeftButton == ButtonState.Pressed)
+                            terrain.SplatMap.Paint(State.TerrainMousePosition, byte.Parse(State.SelectedToolData));
+                        break;
+                    case UiKeys.Assets.Asset:
+                        if (mouse.LeftButton == ButtonState.Pressed && !Ui.State.MouseRepeat)
+                            assets.Add(State.TerrainMousePosition.Xz, terrain, State.SelectedToolData);
+                        break;
+                    case UiKeys.Assets.Erase:
                         if (mouse.LeftButton == ButtonState.Pressed) {
-                            if (ui.State.ActiveChildMenuKey == UiKeys.Assets.Erase) {
-                                assets.Remove(terrain.MousePosition.Xz, terrain);
-                            } else if (!ui.State.MouseRepeat) {
-                                assets.Add(terrain.MousePosition.Xz, terrain, ui.State.ActiveChildMenuKey);
-                            }
+                            assets.Remove(State.TerrainMousePosition.Xz, terrain);
                         }
                         break;
                 }
-            } else {
-                switch (ui.State.PressedKey)
+            } else if (Ui.State.MousePressed) {
+                switch (Ui.State.Hover?.Key)
                 {
                     case UiKeys.Terrain.LevelRaise:
                         terrain.HeightMap.ChangeSettings(0.1f, 1.0f);
@@ -165,7 +161,6 @@ namespace Larx
                 }
             }
 
-            ui.UpdateText(UiKeys.Texts.Position, $"Position: {terrain.MousePosition.X:0.##} {terrain.MousePosition.Z:0.##}");
             Title = $"Larx (Vsync: {VSync}) - FPS: {State.Time.FPS}";
         }
 
@@ -211,14 +206,10 @@ namespace Larx
 
             GL.Enable(EnableCap.SampleShading);
             assets.Render(camera, light, shadows, terrain, ClipPlane.ClipBottom);
-
             GL.Disable(EnableCap.SampleShading);
 
-            // Draw to screen
-            multisampling.Draw();
-
-            GL.Enable(EnableCap.Blend);
             // UI and debug
+            GL.Enable(EnableCap.Blend);
             GL.PolygonMode(MaterialFace.Front, PolygonMode.Fill);
             GL.Disable(EnableCap.DepthTest);
             GL4.GL.BlendFuncSeparate(GL4.BlendingFactorSrc.SrcAlpha, GL4.BlendingFactorDest.OneMinusSrcAlpha, GL4.BlendingFactorSrc.One, GL4.BlendingFactorDest.One);
@@ -226,6 +217,9 @@ namespace Larx
             GL.ClipControl(ClipOrigin.LowerLeft, ClipDepthMode.NegativeOneToOne);
             ui.Render();
             // shadows.ShadowBuffer.DrawDepthBuffer();
+
+            // Draw to screen
+            multisampling.Draw();
 
             SwapBuffers();
             State.Time.CountFPS();
@@ -244,6 +238,7 @@ namespace Larx
             water.ReflectionBuffer.RefreshBuffers();
 
             shadows.ShadowBuffer.RefreshBuffers();
+            ui.Resize();
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -254,39 +249,63 @@ namespace Larx
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
         {
-            if (!e.IsRepeat)
-            {
-                if (e.Keyboard[Key.Escape])
+            if (e.Key == Key.BackSpace) ui.KeyPress((char)27);
+            if (!e.Control) State.Keyboard.Set(e.Keyboard);
+            if (e.IsRepeat) return;
+
+            if (e.Keyboard[Key.Escape])
+                if (Ui.State.Focused != null) {
+                    Ui.State.Focused = null;
+                } else if (ui.IsAnyModalOpen) {
+                    ui.CloseModals();
+                } else {
                     Exit();
+                }
 
-                if (e.Control) {
-                    if (e.Keyboard[Key.F])
+            if (e.Control) {
+                switch (e.Key) {
+                    case Key.F:
                         WindowState = WindowState == WindowState.Fullscreen ? WindowState.Normal : WindowState.Fullscreen;
-
-                    if (e.Keyboard[Key.W])
+                        break;
+                    case Key.W:
                         State.PolygonMode = State.PolygonMode == PolygonMode.Fill ? PolygonMode.Line : PolygonMode.Fill;
-
-                    if (e.Keyboard[Key.G])
+                        break;
+                    case Key.G:
                         State.ShowGridLines = !State.ShowGridLines;
-
-                    if (e.Keyboard[Key.S])
-                        Map.Save(terrain);
-
-                    if (e.Keyboard[Key.O])
-                        Map.Load(terrain, assets);
-
-                    if (e.Keyboard[Key.H])
-                        terrain.HeightMap.LoadFromImage();
+                        break;
+                    case Key.S:
+                        ui.ShowModal(new InputModal("Save Map", "Save", Map.MapData.Name, (name) => {
+                            if (name.Trim().Length > 2) {
+                                Map.Save(name.Trim(), terrain);
+                                ui.CloseModals();
+                            }
+                        }));
+                        break;
+                    case Key.O:
+                        ui.ShowModal(new ListModal("Open Map", "Open", Map.ListMaps(), (name) => {
+                            if (Map.Load(name, terrain, assets)) ui.CloseModals();
+                        }));
+                        break;
+                    case Key.H:
+                        ui.ShowModal(new ConfirmModal("Load Heightmap", "This will overwrite all current height data!", () => {
+                            terrain.HeightMap.LoadFromImage();
+                            ui.CloseModals();
+                        }));
+                        break;
                 }
             }
+        }
 
-            if (!e.Control)
-                State.Keyboard.Set(e.Keyboard);
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            ui.KeyPress(e.KeyChar);
         }
 
         protected override void OnKeyUp(KeyboardKeyEventArgs e)
         {
             State.Keyboard.Set(e.Keyboard);
+            if (e.Key == Key.Enter)
+                ui.KeyPress((char)13);
         }
 
         public static void Main(string[] args)
