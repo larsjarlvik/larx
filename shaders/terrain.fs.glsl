@@ -23,9 +23,9 @@ in LightVectors te_lightVectors;
 
 out vec4 outputColor;
 
-float circle() {
+float circle(float cameraDistance) {
     float radius = uSelectionSize;
-    float border = 0.08;
+    float border = max(0.002 * cameraDistance, 0.08);
     float dist = distance(uMousePosition.xz, te_position.xz);
 
     return 1.0 + smoothstep(radius, radius + border, dist)
@@ -79,5 +79,5 @@ void main() {
     color = fog(color, dist);
 
     vec3 terrainGridLines = mix(color, vec3(0.3, 0.3, 0.3), gridLine());
-    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle()), 1.0);
+    outputColor = vec4(mix(vec3(1.0, 1.0, 1.0), terrainGridLines, circle(dist)), 1.0);
 }
