@@ -156,7 +156,10 @@ namespace Larx
                         assets.Refresh(terrain);
                         break;
                     case UiKeys.SplatMap.AutoPaintGlobal:
-                        terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap);
+                        ui.ShowModal(new ConfirmModal("Auto Paint?", "This action will overwrite all current textures!", () => {
+                            terrain.SplatMap.AutoPaint(terrain.HeightMap, terrain.NormalMap);
+                            ui.CloseModals();
+                        }));
                         break;
                 }
             }
@@ -287,8 +290,9 @@ namespace Larx
                         }));
                         break;
                     case Key.H:
-                        ui.ShowModal(new ConfirmModal("Load Heightmap", "This will overwrite all current height data!", () => {
+                        ui.ShowModal(new ConfirmModal("Load Heightmap?", "This will overwrite all current height data!", () => {
                             terrain.HeightMap.LoadFromImage();
+                            assets.Refresh(terrain);
                             ui.CloseModals();
                         }));
                         break;
